@@ -51,6 +51,10 @@ permission_query_conditions = {
 	"Team Project Update": "team_update_tool.team_update_tool.doctype.team_project_update.team_project_update.get_permission_query_conditions",
 }
 
+# Console Commands (for demo data seeding on the site)
+# -------------------------------------------------------
+# Run: bench --site yoursitename execute team_update_tool.demo.seed_demo_data
+
 # Website route rules
 # --------------------
 website_route_rules = []
