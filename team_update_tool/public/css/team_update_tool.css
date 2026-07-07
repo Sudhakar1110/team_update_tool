@@ -1,153 +1,315 @@
 /* ==============================================================
-   Team Update Tool - Professional ERPNext v15 Style Components
+   Team Update Tool - Professional ERPNext v15 Dashboard Styles
    ============================================================== */
 
-/* ─── Role Banners (Desk Forms) ─── */
+/* ─── CSS Variables Overrides ─── */
+:root {
+  --tut-sidebar-width: 200px;
+  --tut-card-radius: 10px;
+  --tut-card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --tut-card-shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+  --tut-transition: all 0.2s ease;
+}
+
+/* ─── Role Banners ─── */
 .tut-readonly-banner { background: var(--yellow-100); color: var(--yellow-700); padding: 6px 12px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; display: inline-block; }
 .tut-member-banner { background: var(--blue-100); color: var(--blue-700); padding: 6px 12px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; display: inline-block; }
 .tut-leader-banner { background: var(--purple-100); color: var(--purple-700); padding: 6px 12px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; display: inline-block; }
 .tut-admin-banner { background: var(--green-100); color: var(--green-700); padding: 6px 12px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; display: inline-block; }
 
-/* ─── Dashboard Sidebar ─── */
-.tut-sidebar-menu {
-    width: 220px;
-    min-width: 220px;
-    background: var(--bg-color);
-    border-right: 1px solid var(--border-color);
-    padding: 12px 0;
-    overflow-y: auto;
-    height: 100%;
+/* ─── Dashboard Layout ─── */
+.tut-desk-dashboard {
+  display: flex;
+  min-height: calc(100vh - 110px);
+  background: var(--bg-color);
 }
-.tut-sidebar-section { margin-bottom: 8px; }
+
+/* ─── Sidebar ─── */
+.tut-sidebar-menu {
+  width: var(--tut-sidebar-width);
+  min-width: var(--tut-sidebar-width);
+  background: var(--bg-color);
+  border-right: 1px solid var(--border-color);
+  padding: 8px 0;
+  overflow-y: auto;
+  height: 100%;
+}
+.tut-sidebar-section { margin-bottom: 4px; }
 .tut-sidebar-title {
-    padding: 6px 16px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-muted);
+  padding: 6px 12px 4px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
 }
 .tut-sidebar-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    font-size: 13px;
-    color: var(--text-color);
-    text-decoration: none;
-    cursor: pointer;
-    border-left: 3px solid transparent;
-    transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  color: var(--text-color);
+  text-decoration: none !important;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: var(--tut-transition);
+  margin: 1px 6px;
+  border-radius: 6px;
 }
-.tut-sidebar-item:hover { background: var(--bg-light-gray); color: var(--text-color); text-decoration: none; }
-.tut-sidebar-item.active { background: var(--blue-50); color: var(--blue-600); border-left-color: var(--blue-500); font-weight: 500; }
+.tut-sidebar-item:hover {
+  background: var(--bg-light-gray);
+  color: var(--text-color);
+  text-decoration: none;
+}
+.tut-sidebar-item.active {
+  background: var(--blue-50);
+  color: var(--blue-600);
+  border-left-color: var(--blue-500);
+  font-weight: 500;
+}
+.tut-sidebar-item .icon { width: 14px; height: 14px; flex-shrink: 0; }
 
-/* ─── Dashboard Container ─── */
+/* ─── Dashboard Main Container ─── */
+.tut-dashboard-main {
+  flex: 1;
+  overflow-x: auto;
+  padding: 0;
+  background: var(--bg-color);
+}
 .tut-dashboard-container {
-    padding: 20px;
-    max-width: 1400px;
+  padding: 16px 20px 24px;
+  max-width: 1400px;
 }
-.tut-desk-dashboard { display: flex; height: calc(100vh - 60px); }
-.tut-dashboard-loading { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.tut-dashboard-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-/* ─── Stats Grid (Modern Cards) ─── */
+/* ─── Welcome Banner ─── */
+.tut-welcome-banner {
+  background: linear-gradient(135deg, var(--blue-50) 0%, var(--blue-100) 100%);
+  border: 1px solid var(--blue-200);
+  border-radius: var(--tut-card-radius);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.tut-welcome-text h3 { margin: 0 0 4px; font-size: 18px; font-weight: 700; color: var(--blue-800); }
+.tut-welcome-text p { margin: 0; font-size: 13px; color: var(--blue-600); }
+.tut-welcome-actions { display: flex; gap: 8px; }
+
+/* ─── Section Headers ─── */
+.tut-section-header-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+.tut-section-header-compact h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+.tut-section-header-compact a {
+  font-size: 12px;
+  color: var(--blue-600);
+  text-decoration: none;
+}
+.tut-section-header-compact a:hover { text-decoration: underline; }
+
+/* ─── Stats Grid (12-column responsive) ─── */
 .tut-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 14px;
-    margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
 }
-.tut-stat-card-modern {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 18px;
-    border-radius: 10px;
-    background: var(--bg-color);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    transition: all 0.2s;
+.tut-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--tut-card-radius);
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--tut-card-shadow);
+  transition: var(--tut-transition);
+  min-height: 80px;
 }
-.tut-stat-card-modern:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+.tut-stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--tut-card-shadow-hover);
 }
-.tut-stat-icon-modern { font-size: 30px; line-height: 1; }
-.tut-stat-body { display: flex; flex-direction: column; }
-.tut-stat-number { font-size: 26px; font-weight: 700; line-height: 1.2; }
-.tut-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.tut-stat-icon {
+  font-size: 28px;
+  line-height: 1;
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.tut-stat-body { display: flex; flex-direction: column; min-width: 0; }
+.tut-stat-number {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-color);
+}
+.tut-stat-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Stat color accents */
 .tut-stat-blue .tut-stat-number { color: var(--blue-600); }
 .tut-stat-green .tut-stat-number { color: var(--green-600); }
 .tut-stat-orange .tut-stat-number { color: var(--orange-600); }
 .tut-stat-red .tut-stat-number { color: var(--red-600); }
 .tut-stat-purple .tut-stat-number { color: var(--purple-600); }
 
+.tut-stat-blue .tut-stat-icon { color: var(--blue-400); }
+.tut-stat-green .tut-stat-icon { color: var(--green-400); }
+.tut-stat-orange .tut-stat-icon { color: var(--orange-400); }
+.tut-stat-red .tut-stat-icon { color: var(--red-400); }
+.tut-stat-purple .tut-stat-icon { color: var(--purple-400); }
+
+/* ─── Quick Action Buttons ─── */
+.tut-quick-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.tut-quick-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: var(--tut-transition);
+  white-space: nowrap;
+}
+.tut-quick-btn:hover {
+  background: var(--bg-light-gray);
+  border-color: var(--gray-400);
+  transform: translateY(-1px);
+}
+.tut-quick-btn .icon { width: 14px; height: 14px; }
+
 /* ─── Charts Row ─── */
 .tut-charts-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 .tut-chart-card {
-    background: var(--bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    overflow: hidden;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--tut-card-radius);
+  box-shadow: var(--tut-card-shadow);
+  overflow: hidden;
 }
 .tut-chart-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border-color);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
 }
-.tut-chart-header h4 { margin: 0; font-size: 14px; font-weight: 600; }
-.tut-chart-body { padding: 12px; }
+.tut-chart-header h4 { margin: 0; font-size: 13px; font-weight: 600; }
+.tut-chart-body { padding: 10px; }
 
-/* ─── Bottom Row (Activities + Teams) ─── */
-.tut-bottom-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 20px;
+/* ─── Content Grid: Two-Column Layout ─── */
+.tut-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
 }
-.tut-bottom-card {
-    background: var(--bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    overflow: hidden;
+
+/* ─── Section Card ─── */
+.tut-section-card {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--tut-card-radius);
+  box-shadow: var(--tut-card-shadow);
+  overflow: hidden;
+  margin-bottom: 20px;
 }
-.tut-bottom-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border-color);
+.tut-section-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.tut-bottom-header h4 { margin: 0; font-size: 14px; font-weight: 600; }
-.tut-bottom-body { padding: 0; overflow-x: auto; }
+.tut-section-header h4 { margin: 0; font-size: 13px; font-weight: 600; }
+.tut-section-header a { font-size: 11px; color: var(--blue-600); text-decoration: none; }
+.tut-section-header a:hover { text-decoration: underline; }
+.tut-section-body { padding: 10px 14px; }
 
 /* ─── Data Tables ─── */
-.tut-data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.tut-data-table th {
-    padding: 8px 12px;
-    text-align: left;
-    font-weight: 600;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-muted);
-    background: var(--bg-light-gray);
-    border-bottom: 1px solid var(--border-color);
+.tut-data-table-wrap {
+  overflow-x: auto;
 }
-.tut-data-table td { padding: 8px 12px; border-bottom: 1px solid var(--border-color); }
+.tut-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.tut-data-table th {
+  padding: 7px 10px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  background: var(--bg-light-gray);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+.tut-data-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
 .tut-data-table tr:last-child td { border-bottom: none; }
 .tut-data-table tr:hover td { background: var(--bg-light-gray); }
+.tut-data-table a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+.tut-data-table a:hover { color: var(--blue-600); text-decoration: underline; }
 
 /* ─── Status Pills ─── */
 .tut-status-pill {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 .tut-status-draft { background: var(--gray-100); color: var(--gray-700); }
 .tut-status-assigned { background: var(--purple-100); color: var(--purple-700); }
@@ -157,100 +319,173 @@
 .tut-status-approved { background: var(--green-100); color: var(--green-700); }
 .tut-status-rejected { background: var(--red-100); color: var(--red-700); }
 
-/* ─── Progress Mini ─── */
-.tut-progress-mini { display: flex; align-items: center; gap: 6px; }
-.tut-progress-track { flex: 1; height: 4px; background: var(--gray-200); border-radius: 2px; overflow: hidden; min-width: 60px; }
-.tut-progress-fill-mini { height: 100%; background: var(--green-500); border-radius: 2px; transition: width 0.3s; }
+/* ─── Priority Pills ─── */
+.tut-priority-low { background: var(--green-100); color: var(--green-700); }
+.tut-priority-medium { background: var(--orange-100); color: var(--orange-700); }
+.tut-priority-high { background: var(--red-100); color: var(--red-700); }
+.tut-priority-urgent { background: var(--pink-100); color: var(--pink-700); }
 
-/* ─── Rate Pills ─── */
-.tut-rate-pill { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
-.tut-rate-green { background: var(--green-100); color: var(--green-700); }
-.tut-rate-orange { background: var(--orange-100); color: var(--orange-700); }
-.tut-rate-red { background: var(--red-100); color: var(--red-700); }
-
-/* ─── Section Card ─── */
-.tut-section-card {
-    background: var(--bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    overflow: hidden;
-    margin-bottom: 20px;
+/* ─── Progress Bar ─── */
+.tut-progress-mini {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
 }
-.tut-section-header { padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
-.tut-section-header h4 { margin: 0; font-size: 14px; font-weight: 600; }
-.tut-section-body { padding: 12px 16px; }
-
-/* ─── Notifications ─── */
-.tut-notif-list { display: flex; flex-direction: column; gap: 6px; }
-.tut-notif-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    background: var(--bg-light-gray);
-    font-size: 13px;
+.tut-progress-track {
+  flex: 1;
+  height: 4px;
+  background: var(--gray-200);
+  border-radius: 2px;
+  overflow: hidden;
+  min-width: 50px;
 }
-.tut-notif-icon { font-size: 16px; }
-.tut-notif-text { flex: 1; }
-.tut-notif-time { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.tut-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+.tut-progress-fill-green { background: var(--green-500); }
+.tut-progress-fill-blue { background: var(--blue-500); }
+.tut-progress-fill-orange { background: var(--orange-500); }
+.tut-progress-fill-red { background: var(--red-500); }
 
-/* ─── Dialog Form Styles ─── */
-.tut-dialog-form .form-group { margin-bottom: 12px; }
-.tut-dialog-form label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-.tut-dialog-form .form-control { font-size: 13px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); width: 100%; }
-.tut-dialog-form select.form-control { height: 34px; }
+/* ─── Activity / Notification Items ─── */
+.tut-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tut-activity-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  transition: var(--tut-transition);
+}
+.tut-activity-row:hover { background: var(--bg-light-gray); }
+.tut-activity-icon { font-size: 14px; width: 20px; text-align: center; flex-shrink: 0; }
+.tut-activity-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tut-activity-meta { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
 
-/* ─── Web Frontend Pages ─── */
-.tut-dashboard, .tut-page { max-width: 1200px; margin: 0 auto; padding: 20px; }
-.tut-header { margin-bottom: 30px; }
-.tut-title { margin: 0; font-size: 28px; font-weight: 700; color: var(--text-color); }
-.tut-subtitle { margin: 5px 0 0; color: var(--text-muted); font-size: 14px; }
-.tut-page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-.tut-page-header h2 { margin: 0; font-size: 24px; font-weight: 700; }
-.tut-header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.tut-section { margin-bottom: 30px; }
-.tut-section-title { font-size: 18px; font-weight: 600; margin: 0 0 16px; color: var(--text-color); }
+/* ─── GitHub / External Link Items ─── */
+.tut-link-list { display: flex; flex-direction: column; gap: 4px; }
+.tut-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  transition: var(--tut-transition);
+}
+.tut-link-row:hover { background: var(--bg-light-gray); }
+.tut-link-row a {
+  color: var(--blue-600);
+  text-decoration: none;
+  font-weight: 500;
+}
+.tut-link-row a:hover { text-decoration: underline; }
 
-/* ─── Card Grid ─── */
-.tut-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
-.tut-card { display: block; padding: 16px; border-radius: 10px; background: var(--bg-color); border: 1px solid var(--border-color); text-decoration: none; color: var(--text-color); transition: all 0.2s; }
-.tut-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: var(--blue-300); }
-.tut-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
-.tut-card-title { font-weight: 600; font-size: 15px; line-height: 1.3; flex: 1; }
-.tut-card-body { margin-bottom: 10px; }
-.tut-card-meta { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
-.tut-card-footer { display: flex; align-items: center; gap: 10px; }
+/* ─── Screenshot Grid ─── */
+.tut-screenshot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+.tut-screenshot-item {
+  text-align: center;
+}
+.tut-thumbnail {
+  width: 100%;
+  max-height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: var(--tut-transition);
+}
+.tut-thumbnail:hover { transform: scale(1.05); box-shadow: var(--tut-card-shadow-hover); }
+.tut-screenshot-caption {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Empty / Welcome State ─── */
+.tut-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  background: var(--bg-color);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--tut-card-radius);
+  margin-bottom: 20px;
+}
+.tut-empty-state h4 { color: var(--text-muted); margin: 0 0 8px; font-size: 16px; }
+.tut-empty-state p { color: var(--text-muted); font-size: 13px; margin: 0 0 16px; }
 
 /* ─── Buttons ─── */
-.tut-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); transition: all 0.2s; }
-.tut-btn:hover { background: var(--bg-light-gray); }
-.tut-btn-primary { background: var(--blue-600); color: #fff; border-color: var(--blue-600); }
-.tut-btn-primary:hover { background: var(--blue-700); }
-
-/* ─── Detail View ─── */
-.tut-detail-card { padding: 24px; border-radius: 12px; background: var(--bg-color); border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.tut-detail-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-.tut-detail-header h3 { margin: 0; font-size: 22px; }
-.tut-detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
-.tut-detail-section { margin-bottom: 20px; }
-.tut-detail-section h4 { font-size: 15px; font-weight: 600; margin: 0 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color); }
-.tut-info-table { width: 100%; border-collapse: collapse; }
-.tut-info-table td { padding: 6px 10px; font-size: 13px; border-bottom: 1px solid var(--border-color); }
-.tut-info-table td:first-child { font-weight: 500; color: var(--text-muted); width: 140px; }
-.tut-screenshot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-.tut-thumbnail { width: 100%; max-height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; transition: transform 0.2s; }
-.tut-thumbnail:hover { transform: scale(1.05); }
-
-/* ─── Responsive ─── */
-@media (max-width: 992px) {
-    .tut-charts-row { grid-template-columns: 1fr; }
-    .tut-bottom-row { grid-template-columns: 1fr; }
-    .tut-sidebar-menu { width: 180px; min-width: 180px; }
+.tut-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: var(--tut-transition);
+  text-decoration: none;
 }
+.tut-btn:hover { background: var(--bg-light-gray); border-color: var(--gray-400); }
+.tut-btn-primary {
+  background: var(--blue-600);
+  color: #fff !important;
+  border-color: var(--blue-600);
+}
+.tut-btn-primary:hover { background: var(--blue-700); border-color: var(--blue-700); color: #fff !important; }
+.tut-btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+
+/* ─── Responsive Breakpoints ─── */
+
+/* Tablet landscape (992px) */
+@media (max-width: 992px) {
+  .tut-stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .tut-charts-row { grid-template-columns: 1fr; }
+  .tut-content-grid { grid-template-columns: 1fr; }
+  .tut-sidebar-menu { width: 180px; min-width: 180px; }
+}
+
+/* Tablet portrait (768px) */
 @media (max-width: 768px) {
-    .tut-sidebar-menu { display: none; }
-    .tut-stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .tut-card-grid { grid-template-columns: 1fr; }
+  .tut-sidebar-menu {
+    display: none;
+  }
+  .tut-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .tut-dashboard-container { padding: 12px 14px; }
+  .tut-stat-card { padding: 12px; min-height: 70px; }
+  .tut-stat-number { font-size: 18px; }
+  .tut-stat-icon { font-size: 22px; width: 30px; }
+  .tut-welcome-banner { flex-direction: column; align-items: flex-start; }
+}
+
+/* Mobile (576px) */
+@media (max-width: 576px) {
+  .tut-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .tut-dashboard-container { padding: 10px; }
+  .tut-stat-card { padding: 10px; gap: 8px; min-height: 60px; }
+  .tut-stat-number { font-size: 16px; }
+  .tut-stat-icon { font-size: 18px; width: 26px; }
+  .tut-screenshot-grid { grid-template-columns: repeat(2, 1fr); }
+  .tut-quick-actions { flex-direction: column; }
+  .tut-quick-btn { width: 100%; justify-content: center; }
 }
