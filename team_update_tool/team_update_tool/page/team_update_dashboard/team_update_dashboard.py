@@ -186,11 +186,11 @@ def _get_chart_data():
 				WHEN progress_percent <= 75 THEN '51-75%'
 				WHEN progress_percent < 100 THEN '76-99%'
 				WHEN progress_percent = 100 THEN '100%'
-			END as range,
+			END as `range`,
 			COUNT(*) as count
 		FROM `tabTeam Project Update`
-		GROUP BY range
-		ORDER BY FIELD(range, 'Not Started', '0-25%', '26-50%', '51-75%', '76-99%', '100%')""",
+		GROUP BY `range`
+		ORDER BY FIELD(`range`, 'Not Started', '0-25%', '26-50%', '51-75%', '76-99%', '100%')""",
 		as_dict=1,
 	)
 
