@@ -20,3 +20,41 @@ team_update_tool.show_viewer_banner = function (frm) {
 		frm.disable_form();
 	}
 };
+
+/**
+ * Adds a "View on GitHub" button to project forms that have a repo URL.
+ */
+team_update_tool.add_github_button = function (frm) {
+	if (frm.doc.github_repo_url && !frm.is_new()) {
+		frm.add_custom_button(__("Open GitHub Repo"), function () {
+			window.open(frm.doc.github_repo_url, "_blank");
+		}, __("View"));
+	}
+};
+
+/**
+ * Adds a "View Live Demo" button to project forms that have a demo URL.
+ */
+team_update_tool.add_demo_button = function (frm) {
+	if (frm.doc.live_demo_url && !frm.is_new()) {
+		frm.add_custom_button(__("Open Live Demo"), function () {
+			window.open(frm.doc.live_demo_url, "_blank");
+		}, __("View"));
+	}
+};
+
+/**
+ * Sets the status indicator color on the form.
+ */
+team_update_tool.set_status_indicator = function (frm) {
+	const colors = {
+		Draft: "grey",
+		"In Progress": "orange",
+		Completed: "green",
+		"On Hold": "red",
+		Approved: "blue",
+	};
+	if (frm.doc.status) {
+		frm.page.set_indicator(frm.doc.status, colors[frm.doc.status] || "grey");
+	}
+};

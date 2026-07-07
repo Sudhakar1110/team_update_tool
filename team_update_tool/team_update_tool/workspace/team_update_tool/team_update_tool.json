@@ -10,7 +10,36 @@
  "idx": 0,
  "is_hidden": 0,
  "label": "Team Update Tool",
- "links": [],
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "All Project Updates",
+   "link_to": "Team Project Update",
+   "type": "DocType"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Teams",
+   "link_to": "Team",
+   "type": "DocType"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Project Status Summary",
+   "link_to": "Project Status Summary",
+   "type": "Report"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Team Update Settings",
+   "link_to": "Team Update Settings",
+   "type": "DocType"
+  }
+ ],
  "modified": "2026-01-01 10:00:00",
  "modified_by": "Administrator",
  "module": "Team Update Tool",
