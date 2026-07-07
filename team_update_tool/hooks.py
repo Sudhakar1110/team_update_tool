@@ -14,9 +14,9 @@ app_include_js = "/assets/team_update_tool/js/team_update_tool.js"
 
 # Home Pages
 # ----------
-# Opens the default Desk page. Access the Team Update Tool workspace
-# from the Workspace dropdown in the top navbar.
-# home_page = "workspace"
+# Opens the custom Team Update Dashboard as the default landing page after login.
+# Users land on /app/team-update-dashboard when they log in or visit /app directly.
+home_page = "team-update-dashboard"
 
 # Website route rules
 # --------------------
