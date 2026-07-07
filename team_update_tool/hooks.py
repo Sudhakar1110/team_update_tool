@@ -14,8 +14,8 @@ app_include_js = "/assets/team_update_tool/js/team_update_tool.js"
 
 # Home Pages
 # ----------
-# application home page (will override Website Settings)
-# home_page = "login"
+# Opens the Team Update Tool workspace when users access the Desk
+home_page = "workspace/team-update-tool"
 
 # Installation
 # ------------
@@ -32,7 +32,11 @@ fixtures = [
 			"Team Update Team Member",
 			"Team Update Viewer"
 		]]],
-	}
+	},
+	{
+		"dt": "Workspace",
+		"filters": [["name", "=", "Team Update Tool"]],
+	},
 ]
 
 # Document Events
@@ -53,37 +57,3 @@ permission_query_conditions = {
 # Console Commands
 # -------------------------------------------------------
 # Run: bench --site yoursitename execute team_update_tool.demo.seed_demo_data
-
-# Website route rules
-# --------------------
-website_route_rules = [
-	# Dashboard landing
-	{"from_route": "/dashboard", "to_route": "dashboard"},
-	{"from_route": "/team-update", "to_route": "dashboard"},
-
-	# Projects list and detail
-	{"from_route": "/projects", "to_route": "projects/index"},
-	{"from_route": "/projects/<name>", "to_route": "projects/index"},
-
-	# Tasks list and detail
-	{"from_route": "/tasks", "to_route": "tasks/index"},
-	{"from_route": "/tasks/<name>", "to_route": "tasks/index"},
-
-	# Teams list and detail
-	{"from_route": "/teams", "to_route": "teams/index"},
-	{"from_route": "/teams/<name>", "to_route": "teams/index"},
-
-	# Notifications, profile, reports
-	{"from_route": "/notifications", "to_route": "notifications"},
-	{"from_route": "/profile", "to_route": "profile"},
-	{"from_route": "/reports", "to_route": "reports"},
-
-	# Aliases under /team-update/
-	{"from_route": "/team-update/dashboard", "to_route": "dashboard"},
-	{"from_route": "/team-update/projects", "to_route": "projects/index"},
-	{"from_route": "/team-update/tasks", "to_route": "tasks/index"},
-	{"from_route": "/team-update/teams", "to_route": "teams/index"},
-	{"from_route": "/team-update/notifications", "to_route": "notifications"},
-	{"from_route": "/team-update/profile", "to_route": "profile"},
-	{"from_route": "/team-update/reports", "to_route": "reports"},
-]
