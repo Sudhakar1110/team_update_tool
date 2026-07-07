@@ -56,7 +56,7 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Dashboard",
-   "link_to": "/app/team-update-dashboard",
+   "link_to": "/app/team_update_dashboard",
    "type": "URL"
   },
   {
@@ -241,7 +241,7 @@
    "color": "Green",
    "doc_view": "New",
    "label": "Dashboard",
-   "link_to": "/app/team-update-dashboard",
+   "link_to": "/app/team_update_dashboard",
    "type": "URL"
   },
   {

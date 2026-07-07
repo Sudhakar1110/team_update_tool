@@ -15,13 +15,13 @@ app_include_js = "/assets/team_update_tool/js/team_update_tool.js"
 # Home Pages
 # ----------
 # Opens the custom Team Update Dashboard as the default landing page after login.
-# Users land on /app/team-update-dashboard when they log in or visit /app directly.
-home_page = "team-update-dashboard"
+# Users land on /app/team_update_dashboard when they log in or visit /app directly.
+home_page = "team_update_dashboard"
 
 # Website route rules
 # --------------------
 website_route_rules = [
-	{"from_route": "/dashboard", "to_route": "/app/team-update-dashboard"},
+	{"from_route": "/dashboard", "to_route": "/app/team_update_dashboard"},
 ]
 
 # Installation
