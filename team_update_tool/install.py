@@ -5,33 +5,24 @@ import frappe
 
 
 def after_install():
-	"""Runs once when the app is installed on a site.
-	Creates three roles: Project Admin, Project Contributor, Project Viewer.
-	"""
+	"""Creates roles on app install."""
 	create_roles()
-	create_default_settings()
 	frappe.db.commit()
 
 
 def create_roles():
 	roles = [
 		{
-			"role_name": "Project Admin",
+			"role_name": "Admin",
 			"desk_access": 1,
-			"description": "Full CRUD access on all Team Update Tool DocTypes. Can approve/reject submissions and manage teams.",
+			"description": "Full CRUD access. Can create, read, update, delete, approve, reject projects, manage teams, configure settings.",
 		},
 		{
-			"role_name": "Project Contributor",
+			"role_name": "View-Only User",
 			"desk_access": 1,
-			"description": "Can create submissions, upload files, edit own records. Read-only on Teams.",
-		},
-		{
-			"role_name": "Project Viewer",
-			"desk_access": 1,
-			"description": "Strict read-only access. Can only see Approved submissions. Enforced server-side.",
+			"description": "Read-only access. Can view approved projects, GitHub links, screenshots, documents, and reports. Cannot create, edit, delete, or upload.",
 		},
 	]
-
 	for role in roles:
 		if not frappe.db.exists("Role", role["role_name"]):
 			doc = frappe.get_doc({
@@ -41,14 +32,3 @@ def create_roles():
 				"description": role["description"],
 			})
 			doc.insert(ignore_permissions=True)
-
-
-def create_default_settings():
-	if not frappe.db.exists("DocType", "Team Update Settings"):
-		return
-	if not frappe.db.exists("Team Update Settings", "Team Update Settings"):
-		return
-	settings = frappe.get_single("Team Update Settings")
-	if not settings.enable_email_notification:
-		settings.enable_email_notification = 1
-		settings.save(ignore_permissions=True)

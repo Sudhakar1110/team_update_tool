@@ -10,6 +10,6 @@ def get_data():
 			"color": "#2E8B57",
 			"icon": "octicon octicon-repo",
 			"type": "module",
-			"description": "Track completed team projects, GitHub links and workflow screenshots.",
+			"description": "Track completed team projects, GitHub links, screenshots, and documentation.",
 		}
 	]

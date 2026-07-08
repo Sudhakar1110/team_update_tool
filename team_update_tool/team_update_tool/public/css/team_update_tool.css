@@ -1,12 +1,4 @@
 /* Team Update Tool - custom styling */
-
-.tut-screenshot-preview img {
-	max-width: 100%;
-	border-radius: 6px;
-	border: 1px solid var(--border-color);
-	margin-bottom: 8px;
-}
-
 .tut-readonly-banner {
 	background-color: var(--yellow-100);
 	color: var(--yellow-700);

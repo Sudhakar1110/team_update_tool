@@ -1,133 +1,63 @@
 # Team Update Tool
 
-A custom **Frappe Framework** app (fully compatible with **ERPNext v15+**) that lets
-teams (e.g. Developers) upload completed projects — GitHub repo links, source
-files, and workflow/UI screenshots — so other teams (e.g. Marketing) can browse
-what has shipped, with strict **Admin vs View-Only** access control.
+A custom **Frappe Framework v15** application for tracking completed team projects with GitHub integration, screenshot uploads, and role-based access control.
 
 ## Features
 
-- **Team Project Update** doctype: project title, team, GitHub repo URL, live
-  demo URL, uploaded source files, workflow/UI screenshots, status, priority,
-  dates, description, tags, review remarks.
-- **Team** master doctype with a Team Members child table.
-- **Two access roles**:
-  - `Team Update Admin` — full Create / Read / Update / Delete / Export / Share.
-  - `Team Update Viewer` — Read + Export + Print only. Cannot create, edit or
-    delete anything (enforced both at the DocType permission level **and**
-    inside the server-side controller as a defense-in-depth check).
-- **Team Update Settings** (single doctype) to configure notification
-  recipients and toggle email alerts.
-- **Script Report** — *Project Status Summary* — counts of projects per team
-  by status (Draft / In Progress / Completed / On Hold / Approved), filterable
-  by team and completion date range.
-- **Workspace** — *Team Update Tool* — shortcuts to create a project, browse
-  all projects, manage teams, view the report and settings.
-- **Notifications** (Frappe `Notification` alerts):
-  - *New Project Uploaded* — fires when any new project update is created.
-  - *Project Completed* — fires when a project's status changes to `Completed`.
-  - Both also push an in-app Notification Log entry + optional email via the
-    doctype controller (`team_project_update.py`), driven by the recipients
-    configured in **Team Update Settings**.
+- **Role-Based Access**: `Admin` (full CRUD) and `View-Only User` (read-only, server-enforced)
+- **Master Data**: Project Categories, Teams, Technologies, Project Statuses
+- **Project Management**: Track projects with GitHub repos, files, screenshots, and updates
+- **GitHub Integration**: Auto-fetch repo metadata (commit SHA, languages, default branch)
+- **File Upload**: Support for PNG, JPG, JPEG, PDF, DOCX formats
+- **Notifications**: In-app alerts for new projects, approvals, and status changes
+- **Reports**: Project Summary, Team Activity, Completed Projects, GitHub Repository
 
-## Folder Structure
+## Modules
 
-```
-team_update_tool/
-├── setup.py
-├── requirements.txt
-├── MANIFEST.in
-├── license.txt
-├── team_update_tool/
-│   ├── hooks.py
-│   ├── install.py                 # creates the 2 roles on install
-│   ├── modules.txt
-│   ├── patches.txt
-│   ├── config/
-│   │   ├── desktop.py
-│   │   └── docs.py
-│   ├── public/
-│   │   ├── css/team_update_tool.css
-│   │   └── js/team_update_tool.js
-│   └── team_update_tool/          # module: "Team Update Tool"
-│       ├── doctype/
-│       │   ├── team/
-│       │   ├── team_member/               (child table)
-│       │   ├── team_project_update/       (core doctype)
-│       │   ├── project_screenshot/        (child table)
-│       │   ├── project_file/              (child table)
-│       │   ├── team_update_settings/      (single doctype)
-│       │   └── notification_recipient/    (child table)
-│       ├── report/
-│       │   └── project_status_summary/
-│       ├── workspace/
-│       │   └── team_update_tool/
-│       └── notification/
-│           ├── new_project_uploaded/
-│           └── project_completed/
-```
+| Module | Description |
+|--------|-------------|
+| **Masters** | Project Category, Team, Technology, Project Status |
+| **Transactions** | Project, Project Files, Project Screenshots, GitHub Repository, Project Update |
+| **Reports** | Project Summary, Team Activity, Completed Projects, GitHub Repository |
 
-## Installation (bench)
+## Installation
 
 ```bash
-# 1. Get the app onto your bench
 cd ~/frappe-bench
-bench get-app team_update_tool /path/to/team_update_tool   # or your git URL
-
-# 2. Install it on your site (ERPNext v15+ site)
+bench get-app https://github.com/Sudhakar1110/team_update_tool.git
 bench --site your-site.local install-app team_update_tool
-
-# 3. Migrate to sync doctypes / report / workspace / notifications
 bench --site your-site.local migrate
-
-# 4. Build assets
 bench build --app team_update_tool
-
-# 5. Restart
 bench restart
 ```
 
-`install.py:after_install` automatically creates the two roles
-(`Team Update Admin`, `Team Update Viewer`) the first time the app is
-installed, so you don't need to create them manually.
+## Roles
 
-## Post-install configuration
+| Role | Permissions |
+|------|-------------|
+| **Admin** | Full CRUD on all DocTypes. Can create, edit, delete, approve, reject |
+| **View-Only User** | Read-only. Can view approved projects, GitHub repos, screenshots. Server-enforced |
 
-1. Go to **Team Update Tool workspace → Teams** and create your teams
-   (e.g. "Development", "Marketing"), adding members under each team.
-2. Go to **User** for each team member and assign the correct role:
-   - Developers / project uploaders → `Team Update Admin`
-   - Marketing / stakeholders who only need to browse → `Team Update Viewer`
-   - (You can also keep `System Manager` for IT admins — it already has full
-     rights on every doctype in this app.)
-3. Go to **Team Update Settings** and add the users who should be notified
-   whenever a new project is uploaded or marked Completed, and toggle
-   **Enable Email Notification** if you also want emails sent.
-4. Go to **Team Project Update → New** to let the Development team start
-   logging finished projects: paste the GitHub repo URL, attach the zipped
-   source (optional), and upload workflow/UI screenshots.
-5. Marketing (or any `Team Update Viewer`) opens the same list/workspace and
-   can view every project, screenshots and the GitHub link — but the form
-   is locked (no Save/Delete) and the workspace clearly shows a "View Only"
-   banner.
+## Naming Series
 
-## Notes on permissions
+| Doctype | Format |
+|---------|--------|
+| Project | PRJ-.YYYY.-.##### |
+| GitHub Repository | GR-.YYYY.-.##### |
+| Project Update | PU-.YYYY.-.##### |
 
-Permissions are enforced in three layers, so the Viewer role cannot bypass
-read-only access even via the API/mobile app:
+## Permissions
 
-1. **DocType permission table** (`team_project_update.json`) — Viewer role
-   has `read`, `report`, `print`, `email`, `export` only; no `write`/`create`/`delete`.
-2. **Server-side controller guard** (`validate()` / `on_trash()` in
-   `team_project_update.py`) — throws `frappe.PermissionError` if a
-   Viewer-only user somehow attempts to insert/save/delete.
-3. **Client-side UX** (`team_update_tool.js` / doctype `.js` files) — shows a
-   "View Only" banner and disables the form for a smoother user experience.
+Permissions are enforced in three layers:
 
-## Compatibility
+1. **DocType permission table** - Role-based CRUD in each JSON file
+2. **`get_permission_query_conditions()`** - View-Only Users only see Approved projects in list views
+3. **`has_permission()`** - Doc-level read check for View-Only Users
 
-Built against the **Frappe Framework v15** doctype schema (`naming_rule`,
-`field_order`, Workspace `content` builder JSON, `Notification` alert
-doctype, `Notification Log`) and is compatible with **ERPNext v15+** sites
-(the app itself does not depend on any ERPNext doctype, so it installs
-cleanly on a plain Frappe site or an ERPNext v15+ site).
+## Frappe v15 Compatible
+
+- All code lives inside `apps/team_update_tool` only
+- Uses Frappe ORM (`frappe.get_doc`, `frappe.get_all`, `frappe.db.count`)
+- No deprecated APIs
+- Upgrade-safe with version-controlled JSON files
+- Fixtures exportable via `bench export-fixtures`
