@@ -71,8 +71,6 @@
 
 /* --- Navbar --- */
 
-body { padding-top: 56px; }
-
 .tut-navbar {
 	background: #fff; border-bottom: 1px solid #e5e7eb;
 	position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
@@ -184,7 +182,8 @@ body { padding-top: 56px; }
 
 .tut-page-header {
 	background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-	padding: 2.5rem 0 2rem;
+	padding: calc(56px + 2.5rem) 0 2rem;
+	margin-top: -56px;
 	border-bottom: 1px solid #e5e7eb;
 }
 .tut-page-header .container {
@@ -487,7 +486,8 @@ body { padding-top: 56px; }
 /* --- Auth Pages (Signup) --- */
 
 .tut-auth-page {
-	min-height: 70vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+	min-height: 70vh; display: flex; align-items: center; justify-content: center;
+	padding: calc(56px + 2rem) 1rem 2rem;
 }
 .tut-auth-card {
 	width: 100%; max-width: 420px; background: #fff; border: 1px solid #e5e7eb;
