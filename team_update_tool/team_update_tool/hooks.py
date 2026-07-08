@@ -1,7 +1,7 @@
 app_name = "team_update_tool"
 app_title = "Team Update Tool"
 app_publisher = "Your Company"
-app_description = "Team Project Update Tool - Track completed projects, GitHub links and workflow screenshots with role based Admin / Viewer access. Built for Frappe Framework and ERPNext v15+."
+app_description = "Team Project Update Tool - Role-based task management with Admin, Team Leader, Team Member and Viewer access. Built for Frappe Framework and ERPNext v15+."
 app_email = "admin@example.com"
 app_license = "MIT"
 app_icon = "octicon octicon-repo"
@@ -14,8 +14,12 @@ app_include_js = "/assets/team_update_tool/js/team_update_tool.js"
 
 # Home Pages
 # ----------
-# application home page (will override Website Settings)
-# home_page = "login"
+# home_page is not set - users land on the default Frappe Desk.
+# The dashboard is served as a Frappe Page at /app/team-update-dashboard.
+
+# Website route rules
+# --------------------
+website_route_rules = []
 
 # Installation
 # ------------
@@ -23,36 +27,33 @@ after_install = "team_update_tool.install.after_install"
 
 # Fixtures
 # --------
-# Exported so that `bench --site [site] export-fixtures` / a fresh
-# `bench --site [site] migrate` keeps the two custom Roles available
-# even if the site is rebuilt from scratch.
 fixtures = [
 	{
 		"dt": "Role",
-		"filters": [["role_name", "in", ["Team Update Admin", "Team Update Viewer"]]],
-	}
+		"filters": [["role_name", "in", [
+			"Team Update Admin",
+			"Team Update Team Leader",
+			"Team Update Team Member",
+			"Team Update Viewer"
+		]]],
+	},
 ]
 
 # Document Events
 # ---------------
-# hook on document methods and events
 doc_events = {
 	"Team Project Update": {
-		"after_insert": "team_update_tool.team_update_tool.doctype.team_project_update.team_project_update.notify_new_project",
-		"on_update": "team_update_tool.team_update_tool.doctype.team_project_update.team_project_update.notify_status_change",
+		"after_insert": "team_update_tool.team_update_tool.doctype.team_project_update.team_project_update.after_insert_handler",
+		"on_update": "team_update_tool.team_update_tool.doctype.team_project_update.team_project_update.on_update_handler",
 	}
 }
 
 # Permission query conditions
 # ----------------------------
-# Optional - restrict list view to a user's own team while still allowing
-# full read for both Admin and Viewer roles at the DocType permission level.
-# Left disabled by default. Uncomment to enable "see only my team's projects"
-# style scoping for Viewer role.
-# permission_query_conditions = {
-# 	"Team Project Update": "team_update_tool.team_update_tool.doctype.team_project_update.team_project_update.get_permission_query_conditions",
-# }
+permission_query_conditions = {
+	"Team Project Update": "team_update_tool.team_update_tool.doctype.team_project_update.team_project_update.get_permission_query_conditions",
+}
 
-# Website route rules
-# --------------------
-website_route_rules = []
+# Console Commands
+# -------------------------------------------------------
+# Run: bench --site yoursitename execute team_update_tool.demo.seed_demo_data
