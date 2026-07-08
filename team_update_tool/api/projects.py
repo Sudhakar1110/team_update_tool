@@ -458,12 +458,12 @@ def create_project(project_title, team, status=None, project_category=None,
 			technologies = json.loads(technologies)
 		tech_list = technologies if isinstance(technologies, list) else []
 
-	if not tech_list:
-		frappe.throw(_("At least one technology must be selected."))
+		for tech in tech_list:
+			if not frappe.db.exists("Technology", tech):
+				frappe.throw(_(f"Technology '{tech}' does not exist."))
 
-	for tech in tech_list:
-		if not frappe.db.exists("Technology", tech):
-			frappe.throw(_(f"Technology '{tech}' does not exist."))
+	if not tech_list:
+		frappe.msgprint(_("No technologies selected. Technologies can be added later from the project detail page."), alert=True)
 
 	project = frappe.get_doc({
 		"doctype": "Project",
