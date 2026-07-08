@@ -1,0 +1,94 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Sign Up - Team Update Tool{% endblock %}
+
+{% block page_content %}
+<div class="tut-auth-page">
+	<div class="tut-auth-card">
+		<div class="tut-auth-header">
+			<h1 class="tut-auth-title">Create Account</h1>
+			<p class="tut-auth-desc">Join Team Update Tool as a team member</p>
+		</div>
+		<form id="signupForm" class="tut-auth-form">
+			<div class="tut-form-group">
+				<label class="tut-form-label" for="first_name">First Name *</label>
+				<input type="text" id="first_name" name="first_name" class="tut-form-input" required
+					placeholder="John">
+			</div>
+			<div class="tut-form-group">
+				<label class="tut-form-label" for="last_name">Last Name</label>
+				<input type="text" id="last_name" name="last_name" class="tut-form-input"
+					placeholder="Doe">
+			</div>
+			<div class="tut-form-group">
+				<label class="tut-form-label" for="email">Email *</label>
+				<input type="email" id="email" name="email" class="tut-form-input" required
+					placeholder="john@example.com">
+			</div>
+			<div class="tut-form-group">
+				<label class="tut-form-label" for="password">Password</label>
+				<input type="password" id="password" name="password" class="tut-form-input"
+					placeholder="Leave blank for auto-generated password">
+			</div>
+			<button type="submit" class="tut-btn tut-btn-primary tut-btn-full" id="signupBtn">
+				Create Account
+			</button>
+			<div id="signupMessage" class="tut-form-message" style="display:none;"></div>
+		</form>
+		<div class="tut-auth-footer">
+			<p>Already have an account? <a href="/login?redirect-to=/team_update_tool">Sign In</a></p>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+frappe.ready(function() {
+	document.getElementById('signupForm').addEventListener('submit', async function(e) {
+		e.preventDefault();
+		const btn = document.getElementById('signupBtn');
+		const msg = document.getElementById('signupMessage');
+		const form = new FormData(this);
+
+		btn.disabled = true;
+		btn.innerHTML = 'Creating account...';
+		msg.style.display = 'none';
+
+		try {
+			const resp = await fetch('/api/method/team_update_tool.api.auth.signup', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': frappe.csrf_token },
+				body: JSON.stringify({
+					first_name: form.get('first_name'),
+					last_name: form.get('last_name'),
+					email: form.get('email'),
+					password: form.get('password') || undefined,
+				})
+			});
+			const result = await resp.json();
+			if (result.message) {
+				msg.className = 'tut-form-message tut-form-success';
+				msg.innerHTML = '<p>' + result.message.message + '</p>';
+				msg.style.display = 'block';
+				btn.innerHTML = 'Redirecting...';
+				setTimeout(function() {
+					window.location.href = '/login?redirect-to=/team_update_tool';
+				}, 2000);
+			} else if (result.exc) {
+				const err = JSON.parse(result.exc);
+				msg.className = 'tut-form-message tut-form-error';
+				msg.innerHTML = '<p>' + (err[0] || 'An error occurred') + '</p>';
+				msg.style.display = 'block';
+			}
+		} catch (err) {
+			msg.className = 'tut-form-message tut-form-error';
+			msg.innerHTML = '<p>Network error. Please try again.</p>';
+			msg.style.display = 'block';
+		}
+		btn.disabled = false;
+		btn.innerHTML = 'Create Account';
+	});
+});
+</script>
+{% endblock %}

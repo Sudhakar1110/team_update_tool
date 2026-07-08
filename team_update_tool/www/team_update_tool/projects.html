@@ -1,0 +1,106 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Projects - Team Update Tool{% endblock %}
+
+{% block page_content %}
+<div class="tut-page-header">
+	<div class="container">
+		<div class="tut-page-header-content">
+			<h1 class="tut-page-title">Projects</h1>
+			<p class="tut-page-desc">Browse all team projects</p>
+		</div>
+		<div class="tut-page-header-actions">
+			{% if is_logged_in and not is_viewer %}
+			<a href="/team_update_tool/create_project" class="tut-btn tut-btn-primary tut-btn-sm">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+				</svg>
+				New Project
+			</a>
+			{% endif %}
+		</div>
+	</div>
+</div>
+
+<div class="container tut-page-body">
+	<!-- Filters -->
+	<div class="tut-filters">
+		<form class="tut-filter-form" method="GET">
+			<div class="tut-filter-group">
+				<label class="tut-filter-label">Status</label>
+				<select name="status" class="tut-filter-select" onchange="this.form.submit()">
+					<option value="">All Statuses</option>
+					{% for s in statuses %}
+					<option value="{{ s.name }}" {% if active_status == s.name %}selected{% endif %}>
+						{{ s.status_name }}
+					</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="tut-filter-group">
+				<label class="tut-filter-label">Category</label>
+				<select name="category" class="tut-filter-select" onchange="this.form.submit()">
+					<option value="">All Categories</option>
+					{% for c in categories %}
+					<option value="{{ c.name }}" {% if active_category == c.name %}selected{% endif %}>
+						{{ c.category_name }}
+					</option>
+					{% endfor %}
+				</select>
+			</div>
+			{% if active_status or active_category %}
+			<div class="tut-filter-group tut-filter-clear">
+				<a href="/team_update_tool/projects" class="tut-btn tut-btn-ghost tut-btn-sm">Clear Filters</a>
+			</div>
+			{% endif %}
+		</form>
+	</div>
+
+	<!-- Projects Grid -->
+	{% if projects %}
+	<div class="tut-grid-3">
+		{% for project in projects %}
+		<a href="/team_update_tool/project?name={{ project.name }}" class="tut-card tut-card-hover">
+			<div class="tut-card-body">
+				<div class="tut-card-header">
+					<span class="tut-status-badge" style="--badge-color: {{ project.status_color or '#6b7280' }}">
+						{{ project.status_name or project.status }}
+					</span>
+					{% if project.priority %}
+					<span class="tut-priority tut-priority-{{ project.priority|lower }}">{{ project.priority }}</span>
+					{% endif %}
+				</div>
+				<h3 class="tut-card-title">{{ project.project_title }}</h3>
+				<div class="tut-card-meta">
+					<span class="tut-card-team">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+							<circle cx="9" cy="7" r="4"/>
+						</svg>
+						{{ project.team }}
+					</span>
+					{% if project.project_category %}
+					<span class="tut-card-category">{{ project.project_category }}</span>
+					{% endif %}
+				</div>
+				{% if project.completion_date %}
+				<div class="tut-card-footer">
+					<span>Completed: {{ frappe.utils.format_date(project.completion_date) }}</span>
+				</div>
+				{% endif %}
+			</div>
+		</a>
+		{% endfor %}
+	</div>
+	{% else %}
+	<div class="tut-empty-state">
+		<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: #9ca3af;">
+			<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+			<rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+		</svg>
+		<h3>No Projects Found</h3>
+		<p>No projects match the current filters. Try adjusting your search criteria.</p>
+	</div>
+	{% endif %}
+</div>
+{% endblock %}

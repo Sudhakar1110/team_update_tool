@@ -1,0 +1,201 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ project.project_title }} - Team Update Tool{% endblock %}
+
+{% block page_content %}
+{% if page_error %}
+<div class="tut-error-page">
+	<div class="container text-center py-5">
+		<h2>{{ page_error }}</h2>
+		<a href="/team_update_tool/projects" class="tut-btn tut-btn-primary mt-3">Back to Projects</a>
+	</div>
+</div>
+{% else %}
+<div class="tut-page-header">
+	<div class="container">
+		<div class="tut-breadcrumbs">
+			<a href="/team_update_tool">Home</a>
+			<span class="separator">/</span>
+			<a href="/team_update_tool/projects">Projects</a>
+			<span class="separator">/</span>
+			<span>{{ project.project_title }}</span>
+		</div>
+		<div class="tut-page-header-content">
+			<div class="tut-page-header-top">
+				<h1 class="tut-page-title">{{ project.project_title }}</h1>
+				<span class="tut-status-badge tut-status-lg" style="--badge-color: {{ status_color or '#6b7280' }}">
+					{{ status_name or project.status }}
+				</span>
+			</div>
+			<div class="tut-page-meta">
+				<span><strong>Team:</strong> {{ project.team }}</span>
+				{% if project.priority %}
+				<span class="tut-priority tut-priority-{{ project.priority|lower }}">{{ project.priority }}</span>
+				{% endif %}
+				{% if project.project_category %}
+				<span><strong>Category:</strong> {{ project.project_category }}</span>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container tut-page-body">
+	<div class="tut-detail-grid">
+		<!-- Main Content -->
+		<div class="tut-detail-main">
+			{% if project.description %}
+			<section class="tut-detail-section">
+				<h2 class="tut-section-title-sm">Description</h2>
+				<div class="tut-desc-content">{{ project.description }}</div>
+			</section>
+			{% endif %}
+
+			{% if technologies %}
+			<section class="tut-detail-section">
+				<h2 class="tut-section-title-sm">Technologies</h2>
+				<div class="tut-tags">
+					{% for tech in technologies %}
+					<span class="tut-tag">{{ tech }}</span>
+					{% endfor %}
+				</div>
+			</section>
+			{% endif %}
+
+			{% if screenshots %}
+			<section class="tut-detail-section">
+				<h2 class="tut-section-title-sm">Screenshots ({{ screenshots|length }})</h2>
+				<div class="tut-gallery-grid">
+					{% for s in screenshots %}
+					<a href="{{ s.screenshot }}" target="_blank" class="tut-gallery-item">
+						<img src="{{ s.screenshot }}" alt="{{ s.caption or 'Screenshot' }}" loading="lazy">
+						{% if s.caption %}
+						<div class="tut-gallery-caption">{{ s.caption }}</div>
+						{% endif %}
+					</a>
+					{% endfor %}
+				</div>
+			</section>
+			{% endif %}
+
+			{% if files_list %}
+			<section class="tut-detail-section">
+				<h2 class="tut-section-title-sm">Files ({{ files_list|length }})</h2>
+				<div class="tut-files-list">
+					{% for f in files_list %}
+					<a href="{{ f.file }}" target="_blank" class="tut-file-item">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+							<polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>
+							<line x1="16" y1="17" x2="8" y2="17"/>
+						</svg>
+						<div>
+							<div class="tut-file-name">{{ f.file_name or f.file }}</div>
+							{% if f.description %}
+							<div class="tut-file-desc">{{ f.description }}</div>
+							{% endif %}
+						</div>
+					</a>
+					{% endfor %}
+				</div>
+			</section>
+			{% endif %}
+
+			{% if updates %}
+			<section class="tut-detail-section">
+				<h2 class="tut-section-title-sm">Updates ({{ updates|length }})</h2>
+				<div class="tut-updates-list">
+					{% for u in updates %}
+					<div class="tut-update-item">
+						<div class="tut-update-header">
+							<h4>{{ u.update_title }}</h4>
+							<span class="tut-update-date">{{ frappe.utils.format_date(u.update_date) }}</span>
+						</div>
+						{% if u.update_description %}
+						<div class="tut-update-desc">{{ u.update_description }}</div>
+						{% endif %}
+						{% if u.updated_by %}
+						<div class="tut-update-author">— {{ u.updated_by }}</div>
+						{% endif %}
+					</div>
+					{% endfor %}
+				</div>
+			</section>
+			{% endif %}
+		</div>
+
+		<!-- Sidebar -->
+		<div class="tut-detail-sidebar">
+			<div class="tut-sidebar-card">
+				<h3 class="tut-sidebar-title">Project Info</h3>
+				<div class="tut-info-list">
+					<div class="tut-info-item">
+						<span class="tut-info-label">Created</span>
+						<span class="tut-info-value">{{ frappe.utils.format_date(project.creation) }}</span>
+					</div>
+					{% if project.start_date %}
+					<div class="tut-info-item">
+						<span class="tut-info-label">Start Date</span>
+						<span class="tut-info-value">{{ frappe.utils.format_date(project.start_date) }}</span>
+					</div>
+					{% endif %}
+					{% if project.due_date %}
+					<div class="tut-info-item">
+						<span class="tut-info-label">Due Date</span>
+						<span class="tut-info-value">{{ frappe.utils.format_date(project.due_date) }}</span>
+					</div>
+					{% endif %}
+					{% if project.completion_date %}
+					<div class="tut-info-item">
+						<span class="tut-info-label">Completed</span>
+						<span class="tut-info-value">{{ frappe.utils.format_date(project.completion_date) }}</span>
+					</div>
+					{% endif %}
+					{% if project.approved_by %}
+					<div class="tut-info-item">
+						<span class="tut-info-label">Approved By</span>
+						<span class="tut-info-value">{{ project.approved_by }}</span>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+
+			{% if github_repo %}
+			<div class="tut-sidebar-card">
+				<h3 class="tut-sidebar-title">GitHub Repository</h3>
+				<div class="tut-github-info">
+					<a href="{{ github_repo.repository_url }}" target="_blank" class="tut-github-link">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+							<path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+						</svg>
+						<span>{{ github_repo.repository_name or github_repo.repository_url }}</span>
+					</a>
+					{% if github_repo.default_branch %}
+					<div class="tut-github-detail">
+						<span>Branch: {{ github_repo.default_branch }}</span>
+						{% if github_repo.commit_hash %}
+						<span title="{{ github_repo.commit_hash }}">Commit: {{ github_repo.commit_hash[:7] }}...</span>
+						{% endif %}
+					</div>
+					{% endif %}
+					{% if github_repo.languages %}
+					<div class="tut-github-langs">{{ github_repo.languages }}</div>
+					{% endif %}
+				</div>
+			</div>
+			{% endif %}
+
+			{% if is_logged_in and (is_owner or not is_viewer) %}
+			<div class="tut-sidebar-actions">
+				{% if not is_viewer %}
+				<a href="/team_update_tool/create_project?edit={{ project.name }}" class="tut-btn tut-btn-outline tut-btn-sm tut-btn-full">
+					Edit Project
+				</a>
+				{% endif %}
+			</div>
+			{% endif %}
+		</div>
+	</div>
+</div>
+{% endif %}
+{% endblock %}

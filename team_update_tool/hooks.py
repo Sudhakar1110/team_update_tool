@@ -12,7 +12,10 @@ app_include_js = "/assets/team_update_tool/js/team_update_tool.js"
 
 after_install = "team_update_tool.install.after_install"
 
-website_route_rules = []
+website_route_rules = [
+	# Dynamic route for project detail page
+	{"from_route": "/team_update_tool/project/<name>", "to_route": "team_update_tool/project"},
+]
 
 fixtures = [
 	{"dt": "Role", "filters": [["role_name", "in", ["Admin", "View-Only User"]]]},
