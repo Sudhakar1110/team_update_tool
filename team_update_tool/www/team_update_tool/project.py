@@ -20,7 +20,11 @@ def get_context(context):
 	try:
 		project = frappe.get_doc("Project", project_name)
 	except frappe.DoesNotExistError:
-		context.page_error = "Project not found"
+		context.page_error = "Project not found. It may have been deleted."
+		return
+	except Exception as e:
+		frappe.log_error(f"Error loading project {project_name}: {str(e)}", "Project View Error")
+		context.page_error = f"Error loading project: {str(e)}"
 		return
 
 	# Permission check
