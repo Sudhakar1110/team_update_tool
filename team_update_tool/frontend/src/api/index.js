@@ -28,7 +28,7 @@ export const api = {
 
   async getDashboardData() {
     return this.post(
-      '/api/method/team_update_tool.team_update_tool.page.team_update_dashboard.team_update_dashboard.get_dashboard_data'
+      '/api/method/team_update_tool.team_update_tool.api.get_dashboard_data'
     )
   },
 

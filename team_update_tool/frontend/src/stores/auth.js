@@ -11,7 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const res = await api.get('/api/method/frappe.auth.get_logged_user')
       if (res.message) {
-        const userInfo = await api.get('/api/method/frappe.api.get_user_info')
+        const userInfo = await api.get('/api/method/team_update_tool.team_update_tool.api.get_user_info')
         user.value = userInfo.message
         roles.value = userInfo.message?.roles || []
         isLoggedIn.value = true
