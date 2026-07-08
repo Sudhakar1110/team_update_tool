@@ -30,7 +30,13 @@
 {% endblock %}
 
 {% block script %}
+<script src="/assets/team_update_tool/js/team_update_tool.js"></script>
 <script>
+function escHtml(s) {
+	if (!s) return '';
+	return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 frappe.ready(function() {
 	var pathParts = window.location.pathname.split('/');
 	var projectName = pathParts[pathParts.length - 1];
