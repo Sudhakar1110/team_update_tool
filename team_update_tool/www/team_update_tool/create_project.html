@@ -83,10 +83,10 @@
 								<div class="col-md-4">
 									<label class="form-label fw-semibold small">Due Date</label>
 									<input type="date" id="due_date" name="due_date" class="form-control">
-								</div>
-								<div class="col-md-12">
-									<label class="form-label fw-semibold small">Technologies</label>
-									<div class="tut-tech-grid">
+								</div>										<div class="col-md-12">
+									<label class="form-label fw-semibold small">Technologies <span class="text-danger">*</span></label>
+									{% if technologies %}
+									<div class="tut-tech-grid" id="techGrid">
 										{% for t in technologies %}
 										<label class="tut-tech-label">
 											<input type="checkbox" name="technologies" value="{{ t.name }}">
@@ -94,6 +94,12 @@
 										</label>
 										{% endfor %}
 									</div>
+									<div id="techValidation" class="invalid-feedback">At least one technology must be selected.</div>
+									{% else %}
+									<div class="alert alert-warning border-0 rounded-3 small mb-0">
+										No technologies found. Please create Technology records in Desk first before creating a project.
+									</div>
+									{% endif %}
 								</div>
 								<div class="col-md-12">
 									<label class="form-label fw-semibold small">Description</label>
@@ -268,9 +274,18 @@ function validateStep(step) {
 		var title = document.getElementById('project_title').value.trim();
 		var category = document.getElementById('project_category').value;
 		var team = document.getElementById('team').value;
+		var techChecked = document.querySelectorAll('input[name="technologies"]:checked').length;
+		var techGrid = document.getElementById('techGrid');
 		if (!title) { valid = false; msg = 'Project title is required.'; }
 		else if (!category) { valid = false; msg = 'Project category is required.'; }
 		else if (!team) { valid = false; msg = 'Team is required.'; }
+		else if (techGrid && techChecked === 0) {
+			valid = false;
+			msg = 'At least one technology must be selected.';
+			document.getElementById('techGrid').classList.add('is-invalid');
+		} else if (techGrid) {
+			document.getElementById('techGrid').classList.remove('is-invalid');
+		}
 	} else if (step === 2) {
 		var githubUrl = document.getElementById('github_url').value.trim();
 		if (githubUrl) {
