@@ -465,45 +465,56 @@ document.getElementById('projectForm').addEventListener('submit', async function
 			submitBtn.disabled = false;
 			submitBtn.innerHTML = 'Submit Project';
 			return;
-		}
-
-		var projectName = projectResult.message.name;
+		}		var projectName = projectResult.message.name;
 		var hasErrors = false;
 
-		// Upload screenshots
+		// Helper to upload a single file and link to child table
+		async function uploadAndLink(file, linkApi, fieldname) {
+			var fileData = new FormData();
+			fileData.append('file', file);
+			fileData.append('doctype', 'Project');
+			fileData.append('docname', projectName);
+			fileData.append('fieldname', fieldname);
+			var resp = await fetch('/api/method/upload_file', {
+				method: 'POST',
+				headers: { 'X-Frappe-CSRF-Token': frappe.csrf_token },
+				body: fileData
+			});
+			var result = await resp.json();
+			if (result.message && result.message.file_url) {
+				// Link to child table
+				await fetch('/api/method/' + linkApi, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': frappe.csrf_token },
+					body: JSON.stringify({
+						project_name: projectName,
+						file_url: result.message.file_url,
+						file_name: file.name,
+					})
+				});
+				return true;
+			}
+			return false;
+		}
+
+		// Upload screenshots and link to child table
 		if (uploadedScreenshots.length > 0) {
 			for (var si = 0; si < uploadedScreenshots.length; si++) {
-				var fileData = new FormData();
-				fileData.append('file', uploadedScreenshots[si].file);
-				fileData.append('doctype', 'Project');
-				fileData.append('docname', projectName);
-				fileData.append('fieldname', 'screenshots');
 				try {
-					await fetch('/api/method/upload_file', {
-						method: 'POST',
-						headers: { 'X-Frappe-CSRF-Token': frappe.csrf_token },
-						body: fileData
-					});
+					var ok = await uploadAndLink(uploadedScreenshots[si].file, 'team_update_tool.api.projects.add_project_screenshot', 'screenshots');
+					if (!ok) hasErrors = true;
 				} catch(e) {
 					hasErrors = true;
 				}
 			}
 		}
 
-		// Upload files
+		// Upload files and link to child table
 		if (uploadedFiles.length > 0) {
 			for (var fi = 0; fi < uploadedFiles.length; fi++) {
-				var fileData2 = new FormData();
-				fileData2.append('file', uploadedFiles[fi].file);
-				fileData2.append('doctype', 'Project');
-				fileData2.append('docname', projectName);
-				fileData2.append('fieldname', 'project_files');
 				try {
-					await fetch('/api/method/upload_file', {
-						method: 'POST',
-						headers: { 'X-Frappe-CSRF-Token': frappe.csrf_token },
-						body: fileData2
-					});
+					var ok2 = await uploadAndLink(uploadedFiles[fi].file, 'team_update_tool.api.projects.add_project_file', 'project_files');
+					if (!ok2) hasErrors = true;
 				} catch(e) {
 					hasErrors = true;
 				}

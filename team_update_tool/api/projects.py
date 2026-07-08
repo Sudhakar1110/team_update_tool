@@ -421,57 +421,67 @@ def create_project(project_title, team, status=None, project_category=None,
 		frappe.throw(_("Project title is required."))
 	if not team:
 		frappe.throw(_("Team is required."))
+	if not github_url:
+		frappe.throw(_("GitHub repository URL is required. Every project must have a linked GitHub repository."))
 
 	if not status:
 		submitted = frappe.db.get_value("Project Status", {"status_name": "Submitted"}, "name")
 		if submitted:
 			status = submitted
 
-	# Validate GitHub URL if provided
-	github_repo_link = None
-	if github_url:
-		import re
-		github_pattern = r'^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(\/.*)?$'
-		if not re.match(github_pattern, github_url.strip()):
-			frappe.throw(_("Invalid GitHub URL. Must be a valid GitHub repository URL like https://github.com/user/repo"))
+	# Validate GitHub URL
+	import re
+	github_pattern = r'^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(\/.*)?$'
+	if not re.match(github_pattern, github_url.strip()):
+		frappe.throw(_("Invalid GitHub URL. Must be like https://github.com/user/repo"))
 
-		# Create or find GitHub Repository
-		repo_name = github_repo_name or github_url.strip().rstrip('/').split('/')[-1]
-		existing_repo = frappe.db.exists("GitHub Repository", {"repository_url": github_url.strip()})
-		if existing_repo:
-			github_repo_link = existing_repo
-		else:
-			repo_doc = frappe.get_doc({
-				"doctype": "GitHub Repository",
-				"repository_url": github_url.strip(),
-				"repository_name": repo_name,
-				"default_branch": github_branch or "main",
-			})
-			repo_doc.insert(ignore_permissions=False)
-			github_repo_link = repo_doc.name
+	# Create or find GitHub Repository
+	repo_name = github_repo_name or github_url.strip().rstrip('/').split('/')[-1]
+	existing_repo = frappe.db.exists("GitHub Repository", {"repository_url": github_url.strip()})
+	if existing_repo:
+		github_repo_link = existing_repo
+	else:
+		repo_doc = frappe.get_doc({
+			"doctype": "GitHub Repository",
+			"repository_url": github_url.strip(),
+			"repository_name": repo_name,
+			"default_branch": github_branch or "main",
+		})
+		repo_doc.insert(ignore_permissions=False)
+		github_repo_link = repo_doc.name
+
+	# Validate technologies
+	tech_list = []
+	if technologies:
+		if isinstance(technologies, str):
+			import json
+			technologies = json.loads(technologies)
+		tech_list = technologies if isinstance(technologies, list) else []
+
+	if not tech_list:
+		frappe.throw(_("At least one technology must be selected."))
+
+	for tech in tech_list:
+		if not frappe.db.exists("Technology", tech):
+			frappe.throw(_(f"Technology '{tech}' does not exist."))
 
 	project = frappe.get_doc({
 		"doctype": "Project",
 		"project_title": project_title,
 		"team": team,
-		"status": status or "",
 		"project_category": project_category or "",
+		"status": status or "",
 		"priority": priority,
 		"description": description or "",
 		"tags": tags or "",
 		"start_date": start_date or None,
 		"due_date": due_date or None,
-		"github_repository": github_repo_link or "",
+		"github_repository": github_repo_link,
 	})
 
 	# Add technologies
-	if technologies:
-		if isinstance(technologies, str):
-			import json
-			technologies = json.loads(technologies)
-		for tech in technologies:
-			if frappe.db.exists("Technology", tech):
-				project.append("technologies", {"technology": tech})
+	for tech in tech_list:
+		project.append("technologies", {"technology": tech})
 
 	project.insert(ignore_permissions=False)
 
@@ -480,6 +490,54 @@ def create_project(project_title, team, status=None, project_category=None,
 		"name": project.name,
 		"route": f"/team_update_tool/project/{project.name}",
 	}
+
+
+@frappe.whitelist()
+def add_project_screenshot(project_name, file_url, caption=None):
+	"""Attach a screenshot to a project's child table after file upload."""
+	_, is_admin, is_viewer = _get_user_role_info()
+	if is_viewer and not is_admin:
+		frappe.throw(_("Permission denied."), frappe.PermissionError)
+
+	if not project_name or not file_url:
+		frappe.throw(_("Project name and file URL are required."))
+
+	project = frappe.get_doc("Project", project_name)
+	if not is_admin and project.owner != frappe.session.user:
+		frappe.throw(_("You can only modify your own projects."), frappe.PermissionError)
+
+	project.append("screenshots", {
+		"screenshot": file_url,
+		"caption": caption or "",
+		"screenshot_type": "UI Screen",
+	})
+	project.save(ignore_permissions=is_admin)
+
+	return {"message": _("Screenshot added."), "success": True}
+
+
+@frappe.whitelist()
+def add_project_file(project_name, file_url, file_name=None, file_type=None):
+	"""Attach a file to a project's child table after upload."""
+	_, is_admin, is_viewer = _get_user_role_info()
+	if is_viewer and not is_admin:
+		frappe.throw(_("Permission denied."), frappe.PermissionError)
+
+	if not project_name or not file_url:
+		frappe.throw(_("Project name and file URL are required."))
+
+	project = frappe.get_doc("Project", project_name)
+	if not is_admin and project.owner != frappe.session.user:
+		frappe.throw(_("You can only modify your own projects."), frappe.PermissionError)
+
+	project.append("project_files", {
+		"file": file_url,
+		"file_name": file_name or file_url.split("/")[-1],
+		"file_type": file_type or "Other",
+	})
+	project.save(ignore_permissions=is_admin)
+
+	return {"message": _("File added."), "success": True}
 
 
 @frappe.whitelist()
