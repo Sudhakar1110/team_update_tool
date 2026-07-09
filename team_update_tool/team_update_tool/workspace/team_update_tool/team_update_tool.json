@@ -27,18 +27,13 @@
   {"hidden": 0, "is_query_report": 0, "label": "Completed Projects Report", "link_to": "Completed Projects Report", "type": "Report", "group": "Reports"},
   {"hidden": 0, "is_query_report": 0, "label": "GitHub Repository Report", "link_to": "GitHub Repository Report", "type": "Report", "group": "Reports"}
  ],
- "modified": "2026-07-08 10:00:00",
+ "modified": "2026-07-09 05:00:00",
  "modified_by": "Administrator",
  "module": "team_update_tool",
  "name": "Team Update Tool",
  "number_cards": [],
  "owner": "Administrator",
  "public": 1,
- "roles": [
-  {"role": "Admin"},
-  {"role": "View-Only User"},
-  {"role": "System Manager"}
- ],
  "sequence_id": 1.0,
  "shortcuts": [],
  "title": "Team Update Tool"
