@@ -35,12 +35,6 @@
   {"role": "System Manager"}
  ],
  "sequence_id": 1.0,
- "shortcuts": [
-  {"label": "Team", "link_to": "Team", "type": "DocType"},
-  {"label": "Technology", "link_to": "Technology", "type": "DocType"},
-  {"label": "Project Category", "link_to": "Project Category", "type": "DocType"},
-  {"label": "Project Status", "link_to": "Project Status", "type": "DocType"},
-  {"label": "Project", "link_to": "Project", "type": "DocType"}
- ],
+ "shortcuts": [],
  "title": "Team Update Tool"
 }
