@@ -69,34 +69,17 @@ def force_sync_doctypes():
 	# Sync Workspace - Force delete and recreate
 	workspace_path = os.path.join(app_path, "team_update_tool/workspace/team_update_tool/team_update_tool.json")
 	
-	# Delete existing workspace links first
-	frappe.db.delete("Workspace Link", {"parent": "Team Update Tool"})
-	
-	# Delete existing workspace
+	# Delete existing workspace completely
 	if frappe.db.exists("Workspace", "Team Update Tool"):
 		frappe.delete_doc("Workspace", "Team Update Tool", force=True)
-	
 	frappe.db.commit()
 	
-	# Import fresh workspace
-	import_file_by_path(workspace_path)
+	# Delete any orphaned workspace links
+	frappe.db.delete("Workspace Link", {"parent": "Team Update Tool"})
 	frappe.db.commit()
 	
-	# Rebuild workspace links from JSON
-	import json
-	with open(workspace_path, 'r') as f:
-		workspace_data = json.load(f)
-	
-	workspace_doc = frappe.get_doc("Workspace", "Team Update Tool")
-	
-	# Clear existing links
-	workspace_doc.set("links", [])
-	
-	# Add links from JSON
-	for link in workspace_data.get("links", []):
-		workspace_doc.append("links", link)
-	
-	workspace_doc.save(ignore_permissions=True)
+	# Import fresh workspace from JSON
+	import_file_by_path(workspace_path, force=True)
 	frappe.db.commit()
 	
 	frappe.clear_cache()

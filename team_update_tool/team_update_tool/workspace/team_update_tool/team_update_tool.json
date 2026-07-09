@@ -31,7 +31,7 @@
   {"hidden": 0, "is_query_report": 0, "item_type": "Report", "label": "Completed Projects Report", "link_type": "Report", "link_to": "Completed Projects Report", "type": "Link"},
   {"hidden": 0, "is_query_report": 0, "item_type": "Report", "label": "GitHub Repository Report", "link_type": "Report", "link_to": "GitHub Repository Report", "type": "Link"}
  ],
- "modified": "2026-07-09 07:00:00",
+ "modified": "2026-07-09 08:00:00",
  "modified_by": "Administrator",
  "module": "team_update_tool",
  "name": "Team Update Tool",
@@ -40,5 +40,6 @@
  "public": 1,
  "sequence_id": 1.0,
  "shortcuts": [],
- "title": "Team Update Tool"
+ "title": "Team Update Tool",
+ "workspace_name": "team_update_tool"
 }
