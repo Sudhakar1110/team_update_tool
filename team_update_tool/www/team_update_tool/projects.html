@@ -84,6 +84,33 @@
 
 {% block script %}
 <script>
+// Polyfill for deprecated initHighlighting() -> highlightAll()
+if (typeof hljs !== 'undefined' && hljs.initHighlighting && !hljs.highlightAll) {
+    hljs.highlightAll = function() {
+        document.querySelectorAll('pre code').forEach(function(block) {
+            hljs.highlightElement(block);
+        });
+    };
+}
+if (typeof hljs !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', function() {
+        if (typeof hljs.initHighlighting === 'function') {
+            hljs.highlightAll();
+        }
+    });
+}
+
+// Helper functions
+function escHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(d) {
+    if (!d) return '';
+    return d.substring(0,10);
+}
+
 frappe.ready(function() {
 	var currentOffset = 0;
 	var currentLimit = 12;
@@ -159,6 +186,16 @@ frappe.ready(function() {
 			.then(function(data) {
 				document.getElementById('projectsLoading').style.display = 'none';
 				document.getElementById('projectsContent').style.display = 'block';
+				
+				// Handle error responses
+				if (data.error) {
+					console.error('API Error:', data.error);
+					document.getElementById('projectsTotal').textContent = '0 projects';
+					document.getElementById('resultsInfo').textContent = '';
+					showEmpty('Unable to load projects. Please try again.');
+					return;
+				}
+				
 				if (!data.message) { showEmpty(); return; }
 				var d = data.message;
 				var projects = d.projects || [];
@@ -179,8 +216,8 @@ frappe.ready(function() {
 						imgHtml +
 						'<div class="tut-project-card-body">' +
 						'<div class="d-flex align-items-center gap-2 mb-1">' +
-						'<span class="tut-status-badge" style="background:' + color + '15;color:' + color + ';border:1px solid ' + color + '30;">' + sname + '</span>' +
-						(p.priority ? '<span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 fw-semibold" style="font-size:0.7rem;">' + p.priority + '</span>' : '') +
+						'<span class="tut-status-badge" style="background:' + color + '15;color:' + color + ';border:1px solid ' + color + '30;">' + escHtml(sname) + '</span>' +
+						(p.priority ? '<span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 fw-semibold" style="font-size:0.7rem;">' + escHtml(p.priority) + '</span>' : '') +
 						'</div>' +
 						'<h6 class="fw-semibold mb-1" style="color:#0f172a;">' + escHtml(p.project_title) + '</h6>' +
 						'<div class="d-flex align-items-center gap-2 text-muted small">' +
@@ -207,12 +244,17 @@ frappe.ready(function() {
 				window.loadProjects = loadProjects;
 			})
 			.catch(function() {
-				document.getElementById('projectsLoading').innerHTML = '<p class="text-danger text-center">Failed to load projects.</p>';
+				document.getElementById('projectsLoading').innerHTML = '<p class="text-danger text-center">Failed to load projects. Please try again.</p>';
 			});
 	}
 
-	function showEmpty() {
+	function showEmpty(msg) {
 		document.getElementById('projectsGrid').innerHTML = '';
+		if (msg) {
+			document.getElementById('projectsEmptyMsg').textContent = msg;
+		} else {
+			document.getElementById('projectsEmptyMsg').textContent = 'No projects match your search criteria.';
+		}
 		document.getElementById('projectsEmpty').style.display = 'block';
 		document.getElementById('projectsPagination').style.display = 'none';
 	}

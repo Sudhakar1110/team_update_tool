@@ -31,64 +31,84 @@ def _get_visible_filters():
 def get_projects(status=None, category=None, team=None, technology=None,
 				 search=None, limit=20, offset=0):
 	"""Get list of projects with advanced filters and search."""
-	filters, is_admin, is_viewer = _get_visible_filters()
+	try:
+		filters, is_admin, is_viewer = _get_visible_filters()
 
-	if status:
-		filters["status"] = status
-	if category:
-		filters["project_category"] = category
-	if team:
-		filters["team"] = team
+		if status:
+			filters["status"] = status
+		if category:
+			filters["project_category"] = category
+		if team:
+			filters["team"] = team
 
-	# Build OR filters for search
-	or_filters = None
-	if search:
-		or_filters = [
-			["project_title", "like", f"%{search}%"],
-			["description", "like", f"%{search}%"],
-			["tags", "like", f"%{search}%"],
-		]
+		# Build OR filters for search
+		or_filters = None
+		if search:
+			or_filters = [
+				["Project", "project_title", "like", f"%{search}%"],
+				["Project", "description", "like", f"%{search}%"],
+			]
 
-	projects = frappe.get_all("Project",
-		filters=filters,
-		or_filters=or_filters,
-		fields=["name", "project_title", "status", "team", "priority",
-				"project_category", "creation", "start_date", "completion_date",
-				"owner", "modified"],
-		limit=limit,
-		start=offset,
-		order_by="modified desc"
-	)
+		projects = frappe.get_all("Project",
+			filters=filters,
+			or_filters=or_filters,
+			fields=["name", "project_title", "status", "team", "priority",
+					"project_category", "creation", "start_date", "completion_date",
+					"owner", "modified"],
+			limit=limit,
+			start=offset,
+			order_by="modified desc"
+		)
 
-	# Enrich with names, screenshot preview, technology count
-	for p in projects:
-		if p.status:
-			status_doc = frappe.get_cached_doc("Project Status", p.status)
-			p.status_name = status_doc.status_name
-			p.status_color = status_doc.color
-		if p.project_category:
-			cat = frappe.get_cached_doc("Project Category", p.project_category)
-			p.category_name = cat.category_name
+		# Enrich with names, screenshot preview, technology count
+		for p in projects:
+			if p.status:
+				try:
+					status_doc = frappe.get_cached_doc("Project Status", p.status)
+					p.status_name = status_doc.status_name
+					p.status_color = status_doc.color
+				except:
+					p.status_name = p.status
+					p.status_color = "#6b7280"
+			if p.project_category:
+				try:
+					cat = frappe.get_cached_doc("Project Category", p.project_category)
+					p.category_name = cat.category_name
+				except:
+					p.category_name = p.project_category
 
-		# Get first screenshot as preview
-		project_doc = frappe.get_cached_doc("Project", p.name)
-		p.screenshot_preview = ""
-		if project_doc.screenshots and len(project_doc.screenshots) > 0:
-			p.screenshot_preview = project_doc.screenshots[0].screenshot
+			# Get first screenshot as preview
+			try:
+				project_doc = frappe.get_cached_doc("Project", p.name)
+				p.screenshot_preview = ""
+				if project_doc.screenshots and len(project_doc.screenshots) > 0:
+					p.screenshot_preview = project_doc.screenshots[0].screenshot
+				p.technology_count = len(project_doc.technologies or [])
+				p.update_count = len(project_doc.project_updates or [])
+			except:
+				p.screenshot_preview = ""
+				p.technology_count = 0
+				p.update_count = 0
 
-		# Technology count
-		p.technology_count = len(project_doc.technologies or [])
-		p.update_count = len(project_doc.project_updates or [])
+		total = frappe.db.count("Project", filters=filters)
 
-	total = frappe.db.count("Project", filters=filters, or_filters=or_filters)
-
-	return {
-		"projects": projects,
-		"total": total,
-		"limit": limit,
-		"offset": offset,
-		"has_more": (offset + limit) < total,
-	}
+		return {
+			"projects": projects,
+			"total": total,
+			"limit": limit,
+			"offset": offset,
+			"has_more": (offset + limit) < total,
+		}
+	except Exception as e:
+		frappe.log_error(f"Error in get_projects: {str(e)}", "get_projects API Error")
+		return {
+			"projects": [],
+			"total": 0,
+			"limit": limit,
+			"offset": offset,
+			"has_more": False,
+			"error": str(e)
+		}
 
 
 @frappe.whitelist(allow_guest=True)
