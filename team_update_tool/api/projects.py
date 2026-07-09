@@ -491,8 +491,20 @@ def create_project(project_title, team, status=None, project_category=None,
 	if existing_repo:
 		github_repo_link = existing_repo
 	else:
+		# Generate a unique name for the GitHub Repository
+		# The autoname format in doctype is not working properly, so we generate a unique name manually
+		import hashlib
+		hash_suffix = hashlib.md5(github_url.strip().encode()).hexdigest()[:8].upper()
+		repo_name_unique = f"GR-{hash_suffix}"
+		
+		# Ensure uniqueness in case of hash collision
+		while frappe.db.exists("GitHub Repository", repo_name_unique):
+			hash_suffix = hashlib.md5((github_url.strip() + frappe.generate_hash(length=8)).encode()).hexdigest()[:8].upper()
+			repo_name_unique = f"GR-{hash_suffix}"
+		
 		repo_doc = frappe.get_doc({
 			"doctype": "GitHub Repository",
+			"name": repo_name_unique,
 			"repository_url": github_url.strip(),
 			"repository_name": repo_name,
 			"default_branch": github_branch or "main",
