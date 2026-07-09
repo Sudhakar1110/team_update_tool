@@ -705,3 +705,92 @@ body {
   .tut-hero { min-height: 70vh; }
   .tut-auth-card { padding: 1.5rem; }
 }
+
+/* --- Hero Stats (Home Page) --- */
+.tut-hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+.tut-hero-stat {
+  background: var(--tut-card-bg);
+  border: 1px solid var(--tut-border);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  min-width: 110px;
+  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.tut-hero-stat:hover {
+  border-color: rgba(22,163,74,0.2);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  transform: translateY(-2px);
+}
+.tut-hero-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+  background: var(--tut-primary-light);
+  color: var(--tut-primary);
+}
+.tut-hero-stat-icon svg { width: 22px; height: 22px; }
+.tut-hero-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.1;
+}
+.tut-hero-stat-label {
+  font-size: 0.8rem;
+  color: var(--tut-text-muted);
+  margin-top: 0.25rem;
+}
+
+/* --- Hero Role Badges --- */
+.tut-hero-roles {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.tut-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 1rem;
+  background: var(--tut-card-bg);
+  border: 1px solid var(--tut-border);
+  border-radius: 50rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #475569;
+  transition: all 0.15s ease;
+}
+.tut-role-badge:hover {
+  border-color: rgba(22,163,74,0.2);
+  background: var(--tut-primary-light);
+  color: var(--tut-primary);
+}
+.tut-role-icon { font-size: 1rem; }
+
+/* --- Responsive Hero Stats --- */
+@media (max-width: 576px) {
+  .tut-hero-stats {
+    gap: 0.75rem;
+  }
+  .tut-hero-stat {
+    padding: 1rem;
+    min-width: 90px;
+  }
+  .tut-hero-stat-value { font-size: 1.4rem; }
+  .tut-hero-roles { gap: 0.5rem; }
+  .tut-role-badge { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
+}
