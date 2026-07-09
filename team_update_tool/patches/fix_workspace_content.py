@@ -45,6 +45,7 @@ def execute():
     workspace_doc = frappe.get_doc("Workspace", workspace_name)
     workspace_doc.content = content
     workspace_doc.flags.ignore_validate = True
+    workspace_doc.flags.ignore_links = True
     workspace_doc.flags.ignore_permissions = True
     workspace_doc.save(ignore_permissions=True)
 

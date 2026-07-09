@@ -103,6 +103,7 @@ def force_sync_doctypes():
 		workspace_doc.content = content
 	
 	workspace_doc.flags.ignore_validate = True
+	workspace_doc.flags.ignore_links = True
 	workspace_doc.flags.ignore_permissions = True
 	workspace_doc.save(ignore_permissions=True)
 	frappe.db.commit()
@@ -158,6 +159,7 @@ def sync_workspace():
 		workspace_doc.content = content
 	
 	workspace_doc.flags.ignore_validate = True
+	workspace_doc.flags.ignore_links = True
 	workspace_doc.flags.ignore_permissions = True
 	workspace_doc.save(ignore_permissions=True)
 	frappe.db.commit()
