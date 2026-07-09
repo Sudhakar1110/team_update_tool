@@ -165,15 +165,27 @@
 					<!-- Step 4: Documents -->
 					<div class="card border-0 shadow-sm rounded-4 step-panel" id="step4" style="display:none;">
 						<div class="card-body p-4">
-							<h5 class="fw-bold mb-3">Documents (Optional)</h5>
+							<h5 class="fw-bold mb-3">Documents <span class="text-danger">*</span></h5>
 							<div class="alert alert-info border-0 rounded-3 small mb-3">
-								Upload PDF, DOCX, TXT, or ZIP files related to your project.
+								Upload PDF, DOCX, TXT, or ZIP files related to your project. At least one document is required.
 							</div>
-							<div class="mb-3">
-								<label class="form-label fw-semibold small">Upload Files</label>
-								<input type="file" id="fileInput" accept=".pdf,.docx,.txt,.zip,.png,.jpg,.jpeg" multiple class="form-control">
+							<div class="row g-3">
+								<div class="col-md-12 mb-3">
+									<label class="form-label fw-semibold small">Upload Files <span class="text-danger">*</span></label>
+									<input type="file" id="fileInput" accept=".pdf,.docx,.txt,.zip,.png,.jpg,.jpeg" multiple class="form-control" required>
+									<div class="invalid-feedback">At least one document file is required.</div>
+								</div>
+								<div class="col-12">
+									<div id="filePreview" class="row g-2"></div>
+								</div>
+								<div class="col-md-12">
+									<label class="form-label fw-semibold small">Refer Document <span class="text-danger">*</span></label>
+									<input type="file" id="referDocInput" accept=".pdf,.docx,.txt,.md" class="form-control" required>
+									<div class="invalid-feedback">Refer document is required.</div>
+									<div class="small text-muted mt-1">Upload a reference document (PDF, DOCX, TXT, or Markdown)</div>
+								</div>
+								<div class="col-12" id="referDocPreview"></div>
 							</div>
-							<div id="filePreview" class="row g-2"></div>
 							<input type="hidden" id="filesData" name="files" value="">
 						</div>
 						<div class="card-footer bg-white border-0 px-4 py-3 d-flex justify-content-between">
@@ -228,6 +240,7 @@ var currentStep = 1;
 var maxStep = 5;
 var uploadedScreenshots = [];  // Array of {file: File, dataUrl: string}
 var uploadedFiles = [];        // Array of {file: File, name: string}
+var referDocFile = null;       // Refer document file
 
 // ============================
 // Step Navigation
@@ -323,6 +336,22 @@ function validateStep(step) {
 		} else {
 			document.getElementById('screenshotInput').classList.remove('is-invalid');
 		}
+	} else if (step === 4) {
+		// Validate Documents - at least one file required
+		if (uploadedFiles.length === 0) {
+			valid = false;
+			msg = 'At least one document file is required.';
+			document.getElementById('fileInput').classList.add('is-invalid');
+		} else {
+			document.getElementById('fileInput').classList.remove('is-invalid');
+		}
+		// Validate Refer Document
+		if (!referDocFile) {
+			if (valid) { valid = false; msg = 'Refer document is required.'; }
+			document.getElementById('referDocInput').classList.add('is-invalid');
+		} else {
+			document.getElementById('referDocInput').classList.remove('is-invalid');
+		}
 	}
 
 	if (!valid && msg) {
@@ -408,6 +437,32 @@ function removeFile(index) {
 }
 
 // ============================
+// Refer Document Handler
+// ============================
+document.getElementById('referDocInput').addEventListener('change', function(e) {
+	var file = e.target.files[0];
+	if (file) {
+		referDocFile = file;
+		var container = document.getElementById('referDocPreview');
+		var icon = file.name.endsWith('.pdf') ? '📄' : file.name.endsWith('.docx') ? '📝' : file.name.endsWith('.md') ? '📑' : '📎';
+		container.innerHTML = '<div class="col-md-12"><div class="d-flex align-items-center gap-2 p-2 border rounded-3 bg-light">' +
+			'<span>' + icon + '</span>' +
+			'<span class="small flex-grow-1 text-truncate">' + file.name + '</span>' +
+			'<button type="button" class="btn btn-outline-danger btn-sm rounded-circle" style="width:24px;height:24px;padding:0;font-size:12px;line-height:1;" onclick="removeReferDoc()">×</button></div></div>';
+		this.classList.remove('is-invalid');
+	} else {
+		referDocFile = null;
+		document.getElementById('referDocPreview').innerHTML = '';
+	}
+});
+
+function removeReferDoc() {
+	referDocFile = null;
+	document.getElementById('referDocInput').value = '';
+	document.getElementById('referDocPreview').innerHTML = '';
+}
+
+// ============================
 // Preview (Step 5)
 // ============================
 function refreshPreview() {
@@ -432,6 +487,7 @@ function refreshPreview() {
 		'<div class="col-12"><div class="bg-light rounded-3 p-3"><div class="small text-muted mb-1">Description</div><div class="small" style="white-space:pre-wrap;">' + escHtml(desc) + '</div></div></div>' +
 		(uploadedScreenshots.length ? '<div class="col-12"><div class="bg-light rounded-3 p-3"><div class="small text-muted mb-1">Screenshots (' + uploadedScreenshots.length + ')</div><div class="d-flex gap-1 flex-wrap">' + uploadedScreenshots.map(function(s) { return '<img src="' + s.dataUrl + '" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid #e2e8f0;">'; }).join('') + '</div></div></div>' : '') +
 		(uploadedFiles.length ? '<div class="col-12"><div class="bg-light rounded-3 p-3"><div class="small text-muted mb-1">Documents (' + uploadedFiles.length + ')</div><div class="small">' + uploadedFiles.map(function(f) { return '📎 ' + f.name; }).join('<br>') + '</div></div></div>' : '') +
+		(referDocFile ? '<div class="col-12"><div class="bg-light rounded-3 p-3"><div class="small text-muted mb-1">Refer Document</div><div class="small">📑 ' + referDocFile.name + '</div></div></div>' : '') +
 		'</div>';
 
 	document.getElementById('previewContent').innerHTML = html;
@@ -544,6 +600,37 @@ document.getElementById('projectForm').addEventListener('submit', async function
 				} catch(e) {
 					hasErrors = true;
 				}
+			}
+		}
+
+		// Upload refer document and create Project Readme
+		if (referDocFile) {
+			try {
+				var fileData = new FormData();
+				fileData.append('file', referDocFile);
+				fileData.append('doctype', 'Project');
+				fileData.append('docname', projectName);
+				fileData.append('fieldname', 'refer_document');
+				var resp = await fetch('/api/method/upload_file', {
+					method: 'POST',
+					headers: { 'X-Frappe-CSRF-Token': frappe.csrf_token },
+					body: fileData
+				});
+				var result = await resp.json();
+				if (result.message && result.message.file_url) {
+					// Create Project Readme with refer document
+					await fetch('/api/method/team_update_tool.api.projects.create_project_readme', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': frappe.csrf_token },
+						body: JSON.stringify({
+							project_name: projectName,
+							readme_file: result.message.file_url,
+							readme_content: ''
+						})
+					});
+				}
+			} catch(e) {
+				hasErrors = true;
 			}
 		}
 

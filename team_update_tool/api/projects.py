@@ -591,6 +591,40 @@ def add_project_file(project_name, file_url, file_name=None, file_type=None):
 
 
 @frappe.whitelist()
+def create_project_readme(project_name, readme_file=None, readme_content=None):
+	"""Create or update Project Readme for a project."""
+	__roles, is_admin, is_team_member, is_viewer = _get_user_role_info()
+	if is_viewer and not is_admin and not is_team_member:
+		frappe.throw(_("Permission denied."), frappe.PermissionError)
+
+	if not project_name:
+		frappe.throw(_("Project name is required."))
+
+	project = frappe.get_doc("Project", project_name)
+	if not is_admin and project.owner != frappe.session.user:
+		frappe.throw(_("You can only modify your own projects."), frappe.PermissionError)
+
+	# Check if Project Readme already exists for this project
+	existing = frappe.db.get_value("Project Readme", {"project": project_name}, "name")
+	if existing:
+		# Update existing
+		readme = frappe.get_doc("Project Readme", existing)
+	else:
+		# Create new
+		readme = frappe.new_doc("Project Readme")
+		readme.project = project_name
+
+	if readme_file:
+		readme.readme_file = readme_file
+	if readme_content:
+		readme.readme_content = readme_content
+
+	readme.save(ignore_permissions=is_admin)
+
+	return {"message": _("Project Readme created."), "success": True}
+
+
+@frappe.whitelist()
 def update_project(name, project_title=None, description=None, tags=None,
 				   priority=None, project_category=None, team=None,
 				   start_date=None, due_date=None):
