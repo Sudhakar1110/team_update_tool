@@ -73,6 +73,7 @@ def force_sync_doctypes():
 	frappe.db.commit()
 	
 	frappe.clear_cache()
+	frappe.publish_realtime("clear_cache")
 
 
 def create_roles():
