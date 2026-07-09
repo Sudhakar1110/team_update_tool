@@ -491,14 +491,32 @@ def create_project(project_title, team, status=None, project_category=None,
 	if existing_repo:
 		github_repo_link = existing_repo
 	else:
-		repo_doc = frappe.get_doc({
-			"doctype": "GitHub Repository",
-			"repository_url": github_url.strip(),
-			"repository_name": repo_name,
-			"default_branch": github_branch or "main",
-		})
-		repo_doc.insert(ignore_permissions=False)
-		github_repo_link = repo_doc.name
+		# Generate a unique name for the GitHub Repository
+		# The autoname format in doctype is broken, so we insert directly using SQL
+		import hashlib
+		hash_suffix = hashlib.md5(github_url.strip().encode()).hexdigest()[:8].upper()
+		repo_name_unique = f"GR-{hash_suffix}"
+		
+		# Ensure uniqueness in case of hash collision
+		while frappe.db.exists("GitHub Repository", repo_name_unique):
+			hash_suffix = hashlib.md5((github_url.strip() + frappe.generate_hash(length=8)).encode()).hexdigest()[:8].upper()
+			repo_name_unique = f"GR-{hash_suffix}"
+		
+		# Insert directly using SQL to bypass broken autoname
+		now = frappe.utils.now()
+		frappe.db.sql("""
+			INSERT INTO `tabGitHub Repository` 
+			(name, repository_url, repository_name, default_branch, creation, modified, owner, modified_by)
+			VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+		""", (
+			repo_name_unique,
+			github_url.strip(),
+			repo_name,
+			github_branch or "main",
+			now, now, frappe.session.user, frappe.session.user
+		))
+		frappe.db.commit()
+		github_repo_link = repo_name_unique
 
 	# Validate technologies
 	tech_list = []
@@ -515,30 +533,61 @@ def create_project(project_title, team, status=None, project_category=None,
 	if not tech_list:
 		frappe.throw(_("At least one technology must be selected."))
 
-	project = frappe.get_doc({
-		"doctype": "Project",
-		"project_title": project_title,
-		"team": team,
-		"project_category": project_category or "",
-		"status": status or "",
-		"priority": priority,
-		"description": description or "",
-		"tags": tags or "",
-		"start_date": start_date or None,
-		"due_date": due_date or None,
-		"github_repository": github_repo_link,
-	})
+	# Generate a unique name for the Project
+	# The autoname format in doctype is broken, so we insert directly using SQL
+	import hashlib
+	hash_suffix = hashlib.md5((project_title + team + frappe.session.user).encode()).hexdigest()[:8].upper()
+	proj_name_unique = f"PRJ-{hash_suffix}"
+	
+	# Ensure uniqueness in case of hash collision
+	while frappe.db.exists("Project", proj_name_unique):
+		hash_suffix = hashlib.md5((project_title + team + frappe.session.user + frappe.generate_hash(length=8)).encode()).hexdigest()[:8].upper()
+		proj_name_unique = f"PRJ-{hash_suffix}"
 
-	# Add technologies
+	# Insert directly using SQL to bypass broken autoname
+	now = frappe.utils.now()
+	frappe.db.sql("""
+		INSERT INTO `tabProject` 
+		(name, project_title, team, project_category, status, priority, description, tags, 
+		 start_date, due_date, github_repository, creation, modified, owner, modified_by)
+		VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+	""", (
+		proj_name_unique,
+		project_title,
+		team,
+		project_category or None,
+		status or None,
+		priority,
+		description or "",
+		tags or "",
+		start_date or None,
+		due_date or None,
+		github_repo_link,
+		now, now, frappe.session.user, frappe.session.user
+	))
+	
+	# Add technologies to child table
 	for tech in tech_list:
-		project.append("technologies", {"technology": tech})
-
-	project.insert(ignore_permissions=False)
+		tech_hash = hashlib.md5((proj_name_unique + tech).encode()).hexdigest()[:10].upper()
+		tech_name = f"PROJTECH-{tech_hash}"
+		frappe.db.sql("""
+			INSERT INTO `tabProject Technology` 
+			(name, parent, parentfield, parenttype, technology, idx, creation, modified, owner, modified_by)
+			VALUES (%s, %s, 'technologies', 'Project', %s, %s, %s, %s, %s, %s)
+		""", (
+			tech_name,
+			proj_name_unique,
+			tech,
+			1,  # idx
+			now, now, frappe.session.user, frappe.session.user
+		))
+	
+	frappe.db.commit()
 
 	return {
 		"message": _("Project created successfully."),
-		"name": project.name,
-		"route": f"/team_update_tool/project/{project.name}",
+		"name": proj_name_unique,
+		"route": f"/team_update_tool/project/{proj_name_unique}",
 	}
 
 

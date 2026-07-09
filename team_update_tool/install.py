@@ -74,15 +74,19 @@ def force_sync_doctypes():
 		frappe.delete_doc("Workspace", "Team Update Tool", force=True)
 	frappe.db.commit()
 	
-	# Delete any orphaned workspace links
-	frappe.db.delete("Workspace Link", {"parent": "Team Update Tool"})
+	# Delete all related workspace child records
+	frappe.db.sql("DELETE FROM `tabWorkspace Link` WHERE parent = 'Team Update Tool'")
+	frappe.db.sql("DELETE FROM `tabWorkspace Shortcut` WHERE parent = 'Team Update Tool'")
+	frappe.db.sql("DELETE FROM `tabWorkspace Chart` WHERE parent = 'Team Update Tool'")
+	frappe.db.sql("DELETE FROM `tabWorkspace Number Card` WHERE parent = 'Team Update Tool'")
 	frappe.db.commit()
 	
 	# Import fresh workspace from JSON
 	import_file_by_path(workspace_path, force=True)
 	frappe.db.commit()
 	
-	# Sync Workspace
+	# Sync Workspace: re-apply fixture data and ensure content field is set
+	# (content field is needed to prevent onboarding_list AttributeError in Frappe v15)
 	import json
 	with open(workspace_path, 'r') as f:
 		workspace_data = json.load(f)
@@ -127,11 +131,18 @@ def sync_workspace():
 		frappe.delete_doc("Workspace", "Team Update Tool", force=True)
 	frappe.db.commit()
 	
+	# Delete all related workspace child records
+	frappe.db.sql("DELETE FROM `tabWorkspace Link` WHERE parent = 'Team Update Tool'")
+	frappe.db.sql("DELETE FROM `tabWorkspace Shortcut` WHERE parent = 'Team Update Tool'")
+	frappe.db.sql("DELETE FROM `tabWorkspace Chart` WHERE parent = 'Team Update Tool'")
+	frappe.db.sql("DELETE FROM `tabWorkspace Number Card` WHERE parent = 'Team Update Tool'")
+	frappe.db.commit()
+	
 	# Import fresh workspace from JSON
 	import_file_by_path(workspace_path, force=True)
 	frappe.db.commit()
 	
-	# Read JSON and re-apply links explicitly
+	# Read JSON and re-apply links and content explicitly
 	with open(workspace_path, 'r') as f:
 		workspace_data = json.load(f)
 	
