@@ -28,6 +28,9 @@ def force_sync_doctypes():
 	from frappe.modules.import_file import import_file_by_path
 	import os
 	
+	app_path = frappe.get_app_path("team_update_tool")
+	
+	# Sync Doctypes
 	doctype_list = [
 		("masters/doctype/team/team.json", "Team"),
 		("masters/doctype/team_member/team_member.json", "Team Member"),
@@ -42,18 +45,14 @@ def force_sync_doctypes():
 		("transactions/doctype/github_repository/github_repository.json", "GitHub Repository"),
 	]
 	
-	app_path = frappe.get_app_path("team_update_tool")
-	
 	for json_path, dt_name in doctype_list:
 		full_path = os.path.join(app_path, json_path)
-		# Delete existing doctype record
 		if frappe.db.exists("DocType", dt_name):
 			frappe.delete_doc("DocType", dt_name, force=True)
-		# Re-import from JSON
 		import_file_by_path(full_path)
 		frappe.db.commit()
 	
-	# Sync reports
+	# Sync Reports
 	report_list = [
 		"reports/project_summary_report/project_summary_report.json",
 		"reports/team_activity_report/team_activity_report.json",
@@ -65,6 +64,13 @@ def force_sync_doctypes():
 		full_path = os.path.join(app_path, json_path)
 		import_file_by_path(full_path)
 		frappe.db.commit()
+	
+	# Sync Workspace
+	workspace_path = os.path.join(app_path, "team_update_tool/workspace/team_update_tool/team_update_tool.json")
+	if frappe.db.exists("Workspace", "Team Update Tool"):
+		frappe.delete_doc("Workspace", "Team Update Tool", force=True)
+	import_file_by_path(workspace_path)
+	frappe.db.commit()
 	
 	frappe.clear_cache()
 
