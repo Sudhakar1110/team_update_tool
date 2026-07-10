@@ -839,6 +839,9 @@ def get_all_public_stats():
 		fields=["name", "technology_name", "description"])
 	statuses = frappe.get_all("Project Status",
 		fields=["name", "status_name", "color"])
+	teams = frappe.get_all("Team",
+		fields=["name", "team_name"],
+		filters={"is_active": 1})
 
 	return {
 		"total_projects": total_projects,
@@ -849,6 +852,7 @@ def get_all_public_stats():
 		"categories": categories,
 		"technologies": technologies,
 		"statuses": statuses,
+		"teams": teams,
 	}
 
 
