@@ -191,8 +191,17 @@ def get_project_detail(name):
 				"default_branch": repo.default_branch,
 				"languages": repo.languages,
 			}
-		except frappe.DoesNotExistError:
-			pass
+		except Exception as e:
+			frappe.log_error(f"Error loading GitHub repo {project.github_repository}: {str(e)}", "get_project_detail GitHub Error")
+			# Return basic info from the field if doc not found
+			github_info = {
+				"name": project.github_repository,
+				"repository_url": "",
+				"repository_name": "GitHub Repository",
+				"commit_hash": "",
+				"default_branch": "main",
+				"languages": "",
+			}
 
 	# Team name
 	team_name = project.team
