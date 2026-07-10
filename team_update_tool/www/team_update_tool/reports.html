@@ -4,94 +4,775 @@
 
 {% block style %}
 <link rel="stylesheet" href="/assets/team_update_tool/css/team_update_tool.css">
+<style>
+/* =====================================
+   ERPNext 15 Professional Reports UI
+   ===================================== */
+
+/* Page Header - ERPNext 15 Style */
+.erp-page-header {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    border-bottom: none;
+    padding: 2.5rem 0 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.erp-page-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+.erp-page-header::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: 10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 50%;
+}
+
+.erp-page-header .container {
+    position: relative;
+    z-index: 1;
+}
+
+.erp-page-header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.erp-page-header p {
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0.5rem 0 0;
+    font-size: 0.95rem;
+}
+
+.erp-header-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.erp-header-icon svg {
+    width: 24px;
+    height: 24px;
+    color: #ffffff;
+}
+
+/* Main Content Area */
+.erp-reports-content {
+    background: #f5f7fa;
+    min-height: calc(100vh - var(--tut-navbar-height));
+    padding: 2rem 0;
+}
+
+/* Summary Cards Grid */
+.erp-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1200px) {
+    .erp-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .erp-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Summary Card - ERPNext 15 Style */
+.erp-stat-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.erp-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.erp-stat-icon-wrapper {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.erp-stat-icon-wrapper.blue {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1976d2;
+}
+
+.erp-stat-icon-wrapper.green {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #388e3c;
+}
+
+.erp-stat-icon-wrapper.purple {
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    color: #7b1fa2;
+}
+
+.erp-stat-icon-wrapper.orange {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    color: #f57c00;
+}
+
+.erp-stat-icon-wrapper svg {
+    width: 24px;
+    height: 24px;
+}
+
+.erp-stat-info {
+    flex: 1;
+}
+
+.erp-stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1c1e21;
+    line-height: 1.2;
+    margin-bottom: 0.25rem;
+}
+
+.erp-stat-label {
+    font-size: 0.875rem;
+    color: #5f6368;
+    font-weight: 500;
+}
+
+.erp-stat-trend {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.erp-stat-trend.up {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.erp-stat-trend.down {
+    background: #ffebee;
+    color: #c62828;
+}
+
+/* Report Cards - ERPNext 15 Style */
+.erp-report-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 992px) {
+    .erp-report-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.erp-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.erp-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.erp-card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e8eaed;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, #ffffff, #fafafa);
+}
+
+.erp-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1c1e21;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.erp-card-title-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.erp-card-title-icon.blue {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.erp-card-title-icon.green {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.erp-card-title-icon.purple {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.erp-card-title-icon.orange {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.erp-card-title-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.erp-card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.erp-btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5f6368;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.erp-btn-icon:hover {
+    background: #f5f5f5;
+    border-color: #d0d0d0;
+    color: #1c1e21;
+}
+
+.erp-btn-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.erp-card-body {
+    padding: 0;
+}
+
+/* Data Tables - ERPNext 15 Style */
+.erp-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.erp-data-table thead {
+    background: #f8f9fa;
+}
+
+.erp-data-table th {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #5f6368;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid #e8eaed;
+}
+
+.erp-data-table td {
+    padding: 0.875rem 1rem;
+    color: #1c1e21;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+}
+
+.erp-data-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.erp-data-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.erp-data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Status Badge */
+.erp-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.erp-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Progress Bar */
+.erp-progress-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.erp-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: #e8eaed;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.erp-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.erp-progress-value {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #5f6368;
+    min-width: 36px;
+    text-align: right;
+}
+
+/* Link Style */
+.erp-link {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+
+.erp-link:hover {
+    color: #1557b0;
+    text-decoration: underline;
+}
+
+/* Badge Styles */
+.erp-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.erp-badge-success {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.erp-badge-warning {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.erp-badge-info {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.erp-badge-danger {
+    background: #ffebee;
+    color: #c62828;
+}
+
+/* Loading State */
+.erp-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+}
+
+.erp-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e8eaed;
+    border-top-color: #1a73e8;
+    border-radius: 50%;
+    animation: erp-spin 0.8s linear infinite;
+}
+
+@keyframes erp-spin {
+    to { transform: rotate(360deg); }
+}
+
+.erp-loading p {
+    color: #5f6368;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+}
+
+/* Empty State */
+.erp-empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #5f6368;
+}
+
+.erp-empty-state svg {
+    width: 48px;
+    height: 48px;
+    color: #9aa0a6;
+    margin-bottom: 1rem;
+}
+
+.erp-empty-state h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1c1e21;
+    margin: 0 0 0.5rem;
+}
+
+.erp-empty-state p {
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .erp-page-header {
+        padding: 1.5rem 0 1.25rem;
+    }
+    
+    .erp-page-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .erp-reports-content {
+        padding: 1.5rem 0;
+    }
+    
+    .erp-card-header {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .erp-data-table th,
+    .erp-data-table td {
+        padding: 0.75rem;
+    }
+}
+
+/* Additional Report Card Variants */
+.erp-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.erp-github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    color: #1c1e21;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.erp-github-link:hover {
+    background: #e8eaed;
+    color: #1c1e21;
+}
+
+.erp-github-link svg {
+    width: 14px;
+    height: 14px;
+}
+</style>
 {% endblock %}
 
 {% block page_content %}
-<div class="tut-page-header">
+<!-- ERPNext 15 Style Page Header -->
+<div class="erp-page-header">
 	<div class="container">
-		<div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+		<div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
 			<div>
-				<h1 class="m-0">Reports</h1>
-				<p class="m-0">Project analytics and summaries</p>
+				<div class="erp-header-icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2z"/>
+						<path d="M15 5v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2z"/>
+						<path d="M9 12V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2z"/>
+						<path d="M21 19V9a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2z"/>
+					</svg>
+				</div>
+				<h1>Reports & Analytics</h1>
+				<p>Comprehensive overview of project metrics and team performance</p>
 			</div>
 		</div>
 	</div>
 </div>
 
-<div class="tut-main-area">
-	<div class="container py-4">
-		<div class="tut-loading" id="reportsLoading">
-			<div class="spinner-border text-success" role="status"></div>
-			<p class="text-muted mt-2">Loading reports...</p>
+<!-- Main Content Area -->
+<div class="erp-reports-content">
+	<div class="container">
+		<!-- Loading State -->
+		<div class="erp-loading" id="reportsLoading">
+			<div class="erp-spinner"></div>
+			<p>Loading reports data...</p>
 		</div>
 
+		<!-- Reports Content -->
 		<div id="reportsContent" style="display:none;">
-			<div class="row g-3 mb-4" id="reportSummaryCards"></div>
+			
+			<!-- Summary Cards Grid -->
+			<div class="erp-summary-grid" id="reportSummaryCards"></div>
 
-			<div class="row g-4">
-				<div class="col-lg-6">
-					<div class="card border-0 shadow-sm rounded-4">
-						<div class="card-body p-4">
-							<h5 class="fw-bold mb-3">Project Status Summary</h5>
-							<div class="table-responsive">
-								<table class="table table-borderless table-sm mb-0" id="statusTable">
-									<thead><tr><th class="small text-muted fw-semibold">Status</th><th class="small text-muted fw-semibold">Count</th><th></th></tr></thead>
-									<tbody id="statusTableBody"></tbody>
-								</table>
-							</div>
+			<!-- Report Cards Grid -->
+			<div class="erp-report-grid">
+				
+				<!-- Project Status Summary -->
+				<div class="erp-card">
+					<div class="erp-card-header">
+						<h3 class="erp-card-title">
+							<span class="erp-card-title-icon blue">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+									<polyline points="22 4 12 14.01 9 11.01"/>
+								</svg>
+							</span>
+							Project Status Overview
+						</h3>
+						<div class="erp-card-actions">
+							<button class="erp-btn-icon" title="Export">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+									<polyline points="7 10 12 15 17 10"/>
+									<line x1="12" y1="15" x2="12" y2="3"/>
+								</svg>
+							</button>
 						</div>
 					</div>
+					<div class="erp-card-body">
+						<table class="erp-data-table" id="statusTable">
+							<thead>
+								<tr>
+									<th>Status</th>
+									<th>Count</th>
+									<th style="width: 50%;">Distribution</th>
+								</tr>
+							</thead>
+							<tbody id="statusTableBody"></tbody>
+						</table>
+					</div>
+				</div>
 
-					<div class="card border-0 shadow-sm rounded-4 mt-4" id="categoryReportSection" style="display:none;">
-						<div class="card-body p-4">
-							<h5 class="fw-bold mb-3">Projects by Category</h5>
-							<div class="table-responsive">
-								<table class="table table-borderless table-sm mb-0" id="categoryTable">
-									<thead><tr><th class="small text-muted fw-semibold">Category</th><th class="small text-muted fw-semibold">Count</th></tr></thead>
-									<tbody id="categoryTableBody"></tbody>
-								</table>
-							</div>
+				<!-- Projects by Team -->
+				<div class="erp-card" id="teamReportSection" style="display:none;">
+					<div class="erp-card-header">
+						<h3 class="erp-card-title">
+							<span class="erp-card-title-icon purple">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+									<circle cx="9" cy="7" r="4"/>
+									<path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+									<path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+								</svg>
+							</span>
+							Projects by Team
+						</h3>
+						<div class="erp-card-actions">
+							<button class="erp-btn-icon" title="Export">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+									<polyline points="7 10 12 15 17 10"/>
+									<line x1="12" y1="15" x2="12" y2="3"/>
+								</svg>
+							</button>
 						</div>
+					</div>
+					<div class="erp-card-body">
+						<table class="erp-data-table" id="teamTable">
+							<thead>
+								<tr>
+									<th>Team</th>
+									<th>Projects</th>
+								</tr>
+							</thead>
+							<tbody id="teamTableBody"></tbody>
+						</table>
 					</div>
 				</div>
 
-				<div class="col-lg-6">
-					<div class="card border-0 shadow-sm rounded-4" id="teamReportSection" style="display:none;">
-						<div class="card-body p-4">
-							<h5 class="fw-bold mb-3">Projects by Team</h5>
-							<div class="table-responsive">
-								<table class="table table-borderless table-sm mb-0" id="teamTable">
-									<thead><tr><th class="small text-muted fw-semibold">Team</th><th class="small text-muted fw-semibold">Count</th></tr></thead>
-									<tbody id="teamTableBody"></tbody>
-								</table>
-							</div>
+				<!-- Projects by Category -->
+				<div class="erp-card" id="categoryReportSection" style="display:none;">
+					<div class="erp-card-header">
+						<h3 class="erp-card-title">
+							<span class="erp-card-title-icon green">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+								</svg>
+							</span>
+							Projects by Category
+						</h3>
+						<div class="erp-card-actions">
+							<button class="erp-btn-icon" title="Export">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+									<polyline points="7 10 12 15 17 10"/>
+									<line x1="12" y1="15" x2="12" y2="3"/>
+								</svg>
+							</button>
 						</div>
 					</div>
-
-					<div class="card border-0 shadow-sm rounded-4 mt-4" id="completedSection" style="display:none;">
-						<div class="card-body p-4">
-							<h5 class="fw-bold mb-3">Approved Projects</h5>
-							<div class="table-responsive">
-								<table class="table table-sm table-hover mb-0" id="completedTable">
-									<thead><tr><th class="small text-muted fw-semibold">Project</th><th class="small text-muted fw-semibold">Team</th><th class="small text-muted fw-semibold">Completed</th><th class="small text-muted fw-semibold">Priority</th></tr></thead>
-									<tbody id="completedTableBody"></tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-
-					<div class="card border-0 shadow-sm rounded-4 mt-4" id="githubReportSection" style="display:none;">
-						<div class="card-body p-4">
-							<h5 class="fw-bold mb-3">GitHub Repositories</h5>
-							<div class="table-responsive">
-								<table class="table table-sm table-hover mb-0" id="githubTable">
-									<thead><tr><th class="small text-muted fw-semibold">Repository</th><th class="small text-muted fw-semibold">Branch</th><th class="small text-muted fw-semibold">Languages</th><th></th></tr></thead>
-									<tbody id="githubTableBody"></tbody>
-								</table>
-							</div>
-						</div>
+					<div class="erp-card-body">
+						<table class="erp-data-table" id="categoryTable">
+							<thead>
+								<tr>
+									<th>Category</th>
+									<th>Count</th>
+								</tr>
+							</thead>
+							<tbody id="categoryTableBody"></tbody>
+						</table>
 					</div>
 				</div>
+
+				<!-- Approved Projects -->
+				<div class="erp-card" id="completedSection" style="display:none;">
+					<div class="erp-card-header">
+						<h3 class="erp-card-title">
+							<span class="erp-card-title-icon green">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+									<polyline points="22 4 12 14.01 9 11.01"/>
+								</svg>
+							</span>
+							Approved Projects
+						</h3>
+						<div class="erp-card-actions">
+							<button class="erp-btn-icon" title="Export">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+									<polyline points="7 10 12 15 17 10"/>
+									<line x1="12" y1="15" x2="12" y2="3"/>
+								</svg>
+							</button>
+						</div>
+					</div>
+					<div class="erp-card-body">
+						<table class="erp-data-table" id="completedTable">
+							<thead>
+								<tr>
+									<th>Project</th>
+									<th>Team</th>
+									<th>Completed</th>
+									<th>Priority</th>
+								</tr>
+							</thead>
+							<tbody id="completedTableBody"></tbody>
+						</table>
+					</div>
+				</div>
+
+				<!-- GitHub Repositories - Full Width -->
+				<div class="erp-card full-width" id="githubReportSection" style="display:none;">
+					<div class="erp-card-header">
+						<h3 class="erp-card-title">
+							<span class="erp-card-title-icon" style="background: #24292e; color: #ffffff;">
+								<svg viewBox="0 0 24 24" fill="currentColor">
+									<path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+								</svg>
+							</span>
+							GitHub Repositories
+						</h3>
+						<div class="erp-card-actions">
+							<button class="erp-btn-icon" title="Export">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+									<polyline points="7 10 12 15 17 10"/>
+									<line x1="12" y1="15" x2="12" y2="3"/>
+								</svg>
+							</button>
+						</div>
+					</div>
+					<div class="erp-card-body">
+						<table class="erp-data-table" id="githubTable">
+							<thead>
+								<tr>
+									<th>Repository</th>
+									<th>Branch</th>
+									<th>Languages</th>
+									<th>Last Commit</th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							<tbody id="githubTableBody"></tbody>
+						</table>
+					</div>
+				</div>
+
 			</div>
 		</div>
 	</div>
@@ -120,41 +801,70 @@ function loadReports() {
 			}
 			var d = data.message;
 			
-			// Check for error in response
 			if (d.error) {
 				showError('Server error: ' + d.error);
 				return;
 			}
 
-			// Summary cards
+			// Summary cards - ERPNext 15 Style
 			var cardsHtml = '';
-			[{icon:'green', label:'Total Projects', value:d.total_projects || 0}].forEach(function(s) {
-				cardsHtml += '<div class="col-md-3 col-sm-6"><div class="tut-stat-card"><div class="tut-stat-icon tut-stat-icon-' + s.icon + '"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><div class="tut-stat-number">' + s.value + '</div><div class="tut-stat-label">' + s.label + '</div></div></div></div>';
+			var stats = [
+				{icon: 'blue', label: 'Total Projects', value: d.total_projects || 0, iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'},
+				{icon: 'green', label: 'Completed', value: getCompletedCount(d), iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'},
+				{icon: 'purple', label: 'In Progress', value: getInProgressCount(d), iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'},
+				{icon: 'orange', label: 'Repositories', value: (d.github_repos ? d.github_repos.length : 0), iconSvg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>'}
+			];
+			
+			stats.forEach(function(s) {
+				cardsHtml += '<div class="erp-stat-card">';
+				cardsHtml += '<div class="erp-stat-icon-wrapper ' + s.icon + '">' + s.iconSvg + '</div>';
+				cardsHtml += '<div class="erp-stat-info">';
+				cardsHtml += '<div class="erp-stat-value">' + s.value + '</div>';
+				cardsHtml += '<div class="erp-stat-label">' + s.label + '</div>';
+				cardsHtml += '</div></div>';
 			});
 			document.getElementById('reportSummaryCards').innerHTML = cardsHtml;
 
 			// Status table
 			if (d.status_summary && d.status_summary.length) {
+				var totalCount = d.status_summary.reduce(function(sum, s) { return sum + s.count; }, 0);
 				var bodyHtml = '';
 				d.status_summary.forEach(function(s) {
-					bodyHtml += '<tr><td><span class="tut-status-dot d-inline-block me-1" style="background:' + s.color + '"></span>' + escHtml(s.status) + '</td><td class="fw-bold">' + s.count + '</td><td><div style="height:6px;background:#f1f5f9;border-radius:3px;max-width:160px"><div style="height:100%;width:' + Math.min(100, s.count * 10) + '%;background:' + s.color + ';border-radius:3px"></div></div></td></tr>';
+					var percentage = totalCount > 0 ? Math.round((s.count / totalCount) * 100) : 0;
+					bodyHtml += '<tr>';
+					bodyHtml += '<td><span class="erp-status-badge" style="background:' + hexToRgba(s.color, 0.1) + '; color:' + s.color + '"><span class="erp-status-dot" style="background:' + s.color + '"></span>' + escHtml(s.status) + '</span></td>';
+					bodyHtml += '<td class="fw-semibold">' + s.count + '</td>';
+					bodyHtml += '<td><div class="erp-progress-wrapper"><div class="erp-progress-bar"><div class="erp-progress-fill" style="width:' + percentage + '%; background:' + s.color + '"></div></div><span class="erp-progress-value">' + percentage + '%</span></div></td>';
+					bodyHtml += '</tr>';
 				});
 				document.getElementById('statusTableBody').innerHTML = bodyHtml;
+			} else {
+				document.getElementById('statusTableBody').innerHTML = '<tr><td colspan="3"><div class="erp-empty-state"><h4>No status data</h4><p>Status information will appear here once projects are created.</p></div></td></tr>';
 			}
 
 			// Category table
 			if (d.category_summary && d.category_summary.length) {
 				var catHtml = '';
-				d.category_summary.forEach(function(c) { catHtml += '<tr><td>' + escHtml(c.category) + '</td><td class="fw-bold">' + c.count + '</td></tr>'; });
+				d.category_summary.forEach(function(c) { 
+					catHtml += '<tr><td><span class="erp-link">' + escHtml(c.category) + '</span></td><td class="fw-semibold">' + c.count + '</td></tr>'; 
+				});
 				document.getElementById('categoryTableBody').innerHTML = catHtml;
+				document.getElementById('categoryReportSection').style.display = 'block';
+			} else {
+				document.getElementById('categoryTableBody').innerHTML = '<tr><td colspan="2"><div class="erp-empty-state"><h4>No categories</h4><p>Category data will appear here once projects are categorized.</p></div></td></tr>';
 				document.getElementById('categoryReportSection').style.display = 'block';
 			}
 
 			// Team table
 			if (d.team_summary && d.team_summary.length) {
 				var teamHtml = '';
-				d.team_summary.forEach(function(t) { teamHtml += '<tr><td>' + escHtml(t.team) + '</td><td class="fw-bold">' + t.count + '</td></tr>'; });
+				d.team_summary.forEach(function(t) { 
+					teamHtml += '<tr><td><span class="erp-link">' + escHtml(t.team) + '</span></td><td class="fw-semibold">' + t.count + '</td></tr>'; 
+				});
 				document.getElementById('teamTableBody').innerHTML = teamHtml;
+				document.getElementById('teamReportSection').style.display = 'block';
+			} else {
+				document.getElementById('teamTableBody').innerHTML = '<tr><td colspan="2"><div class="erp-empty-state"><h4>No teams</h4><p>Team data will appear here once teams are assigned.</p></div></td></tr>';
 				document.getElementById('teamReportSection').style.display = 'block';
 			}
 
@@ -162,9 +872,18 @@ function loadReports() {
 			if (d.completed_projects && d.completed_projects.length) {
 				var compHtml = '';
 				d.completed_projects.forEach(function(p) {
-					compHtml += '<tr><td><a href="/team_update_tool/project/' + p.name + '" class="fw-medium text-decoration-none">' + escHtml(p.project_title) + '</a></td><td>' + escHtml(p.team || '-') + '</td><td class="small">' + (p.completion_date || '-') + '</td><td>' + (p.priority ? '<span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 fw-semibold" style="font-size:0.7rem;">' + escHtml(p.priority) + '</span>' : '-') + '</td></tr>';
+					var priorityClass = getPriorityClass(p.priority);
+					compHtml += '<tr>';
+					compHtml += '<td><a href="/team_update_tool/project/' + p.name + '" class="erp-link">' + escHtml(p.project_title) + '</a></td>';
+					compHtml += '<td>' + escHtml(p.team || '-') + '</td>';
+					compHtml += '<td class="text-muted">' + (p.completion_date || '-') + '</td>';
+					compHtml += '<td>' + (p.priority ? '<span class="erp-badge erp-badge-' + priorityClass + '">' + escHtml(p.priority) + '</span>' : '-') + '</td>';
+					compHtml += '</tr>';
 				});
 				document.getElementById('completedTableBody').innerHTML = compHtml;
+				document.getElementById('completedSection').style.display = 'block';
+			} else {
+				document.getElementById('completedTableBody').innerHTML = '<tr><td colspan="4"><div class="erp-empty-state"><h4>No completed projects</h4><p>Approved projects will appear here.</p></div></td></tr>';
 				document.getElementById('completedSection').style.display = 'block';
 			}
 
@@ -172,9 +891,18 @@ function loadReports() {
 			if (d.github_repos && d.github_repos.length) {
 				var gitHtml = '';
 				d.github_repos.forEach(function(r) {
-					gitHtml += '<tr><td><a href="' + escHtml(r.repository_url) + '" target="_blank" class="fw-medium text-decoration-none">' + escHtml(r.repository_name || 'Repository') + '</a></td><td class="small">' + escHtml(r.default_branch || '-') + '</td><td class="small">' + escHtml(r.languages || '-') + '</td><td><a href="' + escHtml(r.repository_url) + '" target="_blank" class="btn btn-outline-dark btn-sm rounded-pill px-3" style="font-size:0.75rem;">Open</a></td></tr>';
+					gitHtml += '<tr>';
+					gitHtml += '<td><span class="erp-link">' + escHtml(r.repository_name || 'Repository') + '</span><br><small class="text-muted">' + escHtml(r.repository_url || '') + '</small></td>';
+					gitHtml += '<td><span class="erp-badge erp-badge-info">' + escHtml(r.default_branch || 'main') + '</span></td>';
+					gitHtml += '<td>' + escHtml(r.languages || '-') + '</td>';
+					gitHtml += '<td><code class="small" style="background:#f1f3f4;padding:2px 6px;border-radius:4px;">' + escHtml(r.commit_hash || '-') + '</code></td>';
+					gitHtml += '<td><a href="' + escHtml(r.repository_url) + '" target="_blank" class="erp-github-link">Open <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a></td>';
+					gitHtml += '</tr>';
 				});
 				document.getElementById('githubTableBody').innerHTML = gitHtml;
+				document.getElementById('githubReportSection').style.display = 'block';
+			} else {
+				document.getElementById('githubTableBody').innerHTML = '<tr><td colspan="5"><div class="erp-empty-state"><h4>No repositories</h4><p>GitHub repositories will appear here once linked to projects.</p></div></td></tr>';
 				document.getElementById('githubReportSection').style.display = 'block';
 			}
 
@@ -187,8 +915,44 @@ function loadReports() {
 		});
 }
 
+function hexToRgba(hex, alpha) {
+	hex = hex.replace('#', '');
+	var r = parseInt(hex.substring(0, 2), 16);
+	var g = parseInt(hex.substring(2, 4), 16);
+	var b = parseInt(hex.substring(4, 6), 16);
+	return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
+}
+
+function getCompletedCount(data) {
+	if (!data.status_summary) return 0;
+	var completed = data.status_summary.find(function(s) { 
+		return s.status && s.status.toLowerCase().indexOf('approved') !== -1 || s.status && s.status.toLowerCase().indexOf('complete') !== -1; 
+	});
+	return completed ? completed.count : 0;
+}
+
+function getInProgressCount(data) {
+	if (!data.status_summary) return 0;
+	var inProgress = data.status_summary.reduce(function(sum, s) { 
+		if (s.status && s.status.toLowerCase().indexOf('progress') !== -1 || s.status && s.status.toLowerCase().indexOf('working') !== -1) {
+			return sum + s.count;
+		}
+		return sum;
+	}, 0);
+	return inProgress || (data.total_projects || 0) - getCompletedCount(data);
+}
+
+function getPriorityClass(priority) {
+	if (!priority) return 'info';
+	priority = priority.toLowerCase();
+	if (priority === 'high' || priority === 'urgent' || priority === 'critical') return 'danger';
+	if (priority === 'medium') return 'warning';
+	if (priority === 'low') return 'success';
+	return 'info';
+}
+
 function showError(msg) {
-	document.getElementById('reportsLoading').innerHTML = '<div class="text-center py-5"><p class="text-danger mb-2">' + msg + '</p><button class="btn btn-outline-secondary btn-sm" onclick="location.reload()">Refresh Page</button></div>';
+	document.getElementById('reportsLoading').innerHTML = '<div class="erp-empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><h4>Error Loading Reports</h4><p>' + msg + '</p><button class="btn btn-primary btn-sm mt-3" onclick="location.reload()">Refresh Page</button></div>';
 }
 </script>
 {% endblock %}
