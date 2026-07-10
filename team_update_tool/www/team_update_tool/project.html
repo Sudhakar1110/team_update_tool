@@ -4,52 +4,818 @@
 
 {% block style %}
 <link rel="stylesheet" href="/assets/team_update_tool/css/team_update_tool.css">
+<style>
+/* =====================================
+   ERPNext 15 Professional Project Detail UI
+   ===================================== */
+
+/* Toast Container */
+.erp-toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Page Header - ERPNext 15 Style */
+.erp-page-header {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    border-bottom: none;
+    padding: 2rem 0 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.erp-page-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+.erp-page-header::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: 10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 50%;
+}
+
+.erp-page-header .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Breadcrumb */
+.erp-breadcrumb {
+    margin-bottom: 1rem;
+}
+
+.erp-breadcrumb ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.erp-breadcrumb li {
+    display: flex;
+    align-items: center;
+}
+
+.erp-breadcrumb li:not(:last-child)::after {
+    content: '/';
+    margin-left: 0.5rem;
+    color: rgba(255,255,255,0.5);
+}
+
+.erp-breadcrumb a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.erp-breadcrumb a:hover {
+    color: #ffffff;
+}
+
+.erp-breadcrumb li.active {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+/* Main Content Area */
+.erp-project-content {
+    background: #f5f7fa;
+    min-height: calc(100vh - var(--tut-navbar-height));
+    padding: 2rem 0;
+}
+
+/* Loading State */
+.erp-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+}
+
+.erp-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e8eaed;
+    border-top-color: #1a73e8;
+    border-radius: 50%;
+    animation: erp-spin 0.8s linear infinite;
+}
+
+@keyframes erp-spin {
+    to { transform: rotate(360deg); }
+}
+
+.erp-loading p {
+    color: #5f6368;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+}
+
+/* Error State */
+.erp-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.erp-error-icon {
+    width: 80px;
+    height: 80px;
+    background: #ffebee;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    color: #c62828;
+}
+
+.erp-error-state h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1c1e21;
+    margin: 0 0 0.5rem;
+}
+
+.erp-error-state p {
+    color: #5f6368;
+    margin: 0 0 1.5rem;
+}
+
+/* Project Hero Section */
+.erp-project-hero {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.erp-project-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+.erp-project-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: 10%;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 50%;
+}
+
+.erp-project-hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.erp-project-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Status Badge */
+.erp-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.erp-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Priority Badge */
+.erp-priority-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.erp-priority-badge.high { background: #ffebee; color: #c62828; }
+.erp-priority-badge.medium { background: #fff3e0; color: #e65100; }
+.erp-priority-badge.low { background: #e8f5e9; color: #2e7d32; }
+.erp-priority-badge.urgent { background: #ff1744; color: #ffffff; }
+.erp-priority-badge.critical { background: #b71c1c; color: #ffffff; }
+
+.erp-project-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 1rem;
+    line-height: 1.3;
+}
+
+.erp-project-info-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.erp-project-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+}
+
+.erp-project-info-item svg {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+}
+
+/* Main Grid Layout */
+.erp-project-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+}
+
+@media (max-width: 992px) {
+    .erp-project-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Content Cards */
+.erp-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.erp-card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e8eaed;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(to bottom, #ffffff, #fafafa);
+}
+
+.erp-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.erp-card-icon.blue { background: #e3f2fd; color: #1976d2; }
+.erp-card-icon.green { background: #e8f5e9; color: #388e3c; }
+.erp-card-icon.purple { background: #f3e5f5; color: #7b1fa2; }
+.erp-card-icon.orange { background: #fff3e0; color: #f57c00; }
+.erp-card-icon.cyan { background: #e0f7fa; color: #00838f; }
+
+.erp-card-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.erp-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1c1e21;
+    margin: 0;
+}
+
+.erp-card-subtitle {
+    font-size: 0.8rem;
+    color: #5f6368;
+    margin: 0.15rem 0 0;
+}
+
+.erp-card-body {
+    padding: 1.5rem;
+}
+
+/* Description Text */
+.erp-description-text {
+    color: #1c1e21;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+/* Technologies Grid */
+.erp-tech-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.erp-tech-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #e3f2fd 0%, #e8eaf6 100%);
+    border: 1px solid #c5cae9;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #3949ab;
+}
+
+/* Screenshot Gallery */
+.erp-screenshot-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.erp-screenshot-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 16/10;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+
+.erp-screenshot-item:hover {
+    border-color: #1a73e8;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.erp-screenshot-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.erp-screenshot-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.5rem 0.75rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* File List */
+.erp-file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.erp-file-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.erp-file-card:hover {
+    background: #e8eaed;
+    border-color: #d0d0d0;
+}
+
+.erp-file-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5f6368;
+    flex-shrink: 0;
+}
+
+.erp-file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.erp-file-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1c1e21;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.erp-file-desc {
+    font-size: 0.8rem;
+    color: #5f6368;
+    margin-top: 0.15rem;
+}
+
+.erp-file-action {
+    color: #5f6368;
+    transition: color 0.15s ease;
+}
+
+.erp-file-card:hover .erp-file-action {
+    color: #1a73e8;
+}
+
+/* README Content */
+.erp-readme-content {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Timeline */
+.erp-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.erp-timeline::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(180deg, #1a73e8 0%, #e8eaed 100%);
+    border-radius: 1px;
+}
+
+.erp-timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.erp-timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.erp-timeline-marker {
+    position: absolute;
+    left: -2rem;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #1a73e8;
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 0 2px #1a73e8;
+}
+
+.erp-timeline-content {
+    background: #f8f9fa;
+    padding: 1.25rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.erp-timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.erp-timeline-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1c1e21;
+    margin: 0;
+}
+
+.erp-timeline-date {
+    font-size: 0.8rem;
+    color: #5f6368;
+    white-space: nowrap;
+}
+
+.erp-timeline-desc {
+    font-size: 0.875rem;
+    color: #5f6368;
+    line-height: 1.6;
+    margin: 0 0 0.5rem;
+}
+
+.erp-timeline-author {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    color: #5f6368;
+}
+
+/* Sidebar */
+.erp-project-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Sidebar Card */
+.erp-sidebar-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.erp-sidebar-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(to bottom, #ffffff, #fafafa);
+    border-bottom: 1px solid #e8eaed;
+}
+
+.erp-sidebar-card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1c1e21;
+    margin: 0;
+}
+
+.erp-sidebar-card-body {
+    padding: 1.25rem 1.5rem;
+}
+
+/* Detail List */
+.erp-detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.erp-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.erp-detail-label {
+    font-size: 0.85rem;
+    color: #5f6368;
+}
+
+.erp-detail-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1c1e21;
+    text-align: right;
+}
+
+/* GitHub Card */
+.erp-github-card .erp-sidebar-card-header {
+    gap: 0.75rem;
+}
+
+.erp-github-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.erp-github-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: #24292e;
+    color: #ffffff;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.erp-github-btn:hover {
+    background: #1a1f24;
+    color: #ffffff;
+}
+
+.erp-github-info {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.erp-github-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #5f6368;
+}
+
+.erp-github-languages {
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    color: #5f6368;
+}
+
+/* Tag List */
+.erp-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.erp-tag-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    background: #f1f3f4;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #5f6368;
+}
+
+/* Back Button */
+.erp-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    background: #ffffff;
+    color: #1a73e8;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.erp-back-btn:hover {
+    background: #1a73e8;
+    color: #ffffff;
+    border-color: #1a73e8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .erp-page-header {
+        padding: 1.5rem 0 1.25rem;
+    }
+    
+    .erp-project-content {
+        padding: 1.5rem 0;
+    }
+    
+    .erp-project-hero {
+        padding: 1.5rem;
+    }
+    
+    .erp-project-title {
+        font-size: 1.5rem;
+    }
+    
+    .erp-card-header {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .erp-card-body {
+        padding: 1rem;
+    }
+}
+</style>
 {% endblock %}
 
 {% block page_content %}
 <!-- Toast Container -->
-<div class="tut-toast-container" id="toastContainer"></div>
+<div class="erp-toast-container" id="toastContainer"></div>
 
-<!-- Modern Page Header -->
-<div class="tut-project-header">
+<!-- Page Header with Breadcrumb -->
+<div class="erp-page-header">
     <div class="container">
-        <div class="tut-project-header-content">
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="tut-breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/team_update_tool">Home</a></li>
-                    <li class="breadcrumb-item"><a href="/team_update_tool/projects">Projects</a></li>
-                    <li class="breadcrumb-item active" id="breadcrumbTitle">Loading...</li>
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <nav class="erp-breadcrumb">
+                <ol>
+                    <li><a href="/team_update_tool">Home</a></li>
+                    <li><a href="/team_update_tool/projects">Projects</a></li>
+                    <li class="active" id="breadcrumbTitle">Loading...</li>
                 </ol>
             </nav>
+            <a href="/team_update_tool/projects" class="erp-back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5"/>
+                    <path d="M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Projects
+            </a>
         </div>
     </div>
 </div>
 
 <!-- Main Content -->
-<div class="tut-main-area">
-    <div class="container py-4">
+<div class="erp-project-content">
+    <div class="container">
         <!-- Loading State -->
-        <div class="tut-loading-modern" id="projectLoading">
-            <div class="tut-loading-spinner">
-                <div class="spinner"></div>
-            </div>
-            <p class="tut-loading-text">Loading project details...</p>
+        <div class="erp-loading" id="projectLoading">
+            <div class="erp-spinner"></div>
+            <p>Loading project details...</p>
         </div>
 
         <!-- Error State -->
-        <div class="tut-error-state" id="projectError" style="display:none;">
-            <div class="tut-error-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <div class="erp-error-state" id="projectError" style="display:none;">
+            <div class="erp-error-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="15" y1="9" x2="9" y2="15"/>
                     <line x1="9" y1="9" x2="15" y2="15"/>
                 </svg>
             </div>
-            <h3 class="tut-error-title" id="errorMsg">Project not found</h3>
-            <p class="tut-error-desc">The project you're looking for doesn't exist or has been removed.</p>
-            <a href="/team_update_tool/projects" class="tut-btn tut-btn-primary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+            <h3 id="errorMsg">Project not found</h3>
+            <p>The project you're looking for doesn't exist or has been removed.</p>
+            <a href="/team_update_tool/projects" class="erp-back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5"/>
+                    <path d="M12 19l-7-7 7-7"/>
+                </svg>
                 Back to Projects
             </a>
         </div>
@@ -82,13 +848,6 @@ function getFileIcon(filename) {
         'zip': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'
     };
     return icons[ext] || '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
-}
-
-function formatFileSize(bytes) {
-    if (!bytes) return '';
-    var sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    var i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
 }
 
 frappe.ready(function() {
@@ -139,148 +898,117 @@ function renderProject(p) {
     var html = '';
 
     // Hero Section
-    html += '<div class="tut-project-hero">' +
-        '<div class="tut-project-hero-bg"></div>' +
-        '<div class="tut-project-hero-content">' +
-            '<div class="tut-project-meta">' +
-                '<span class="tut-project-status" style="background:' + color + '20;color:' + color + ';border:1px solid ' + color + '30;">' +
-                    '<span class="tut-status-dot" style="background:' + color + '"></span>' + sname +
+    html += '<div class="erp-project-hero">' +
+        '<div class="erp-project-hero-content">' +
+            '<div class="erp-project-meta">' +
+                '<span class="erp-status-badge" style="background:rgba(255,255,255,0.2);color:#ffffff;">' +
+                    '<span class="erp-status-dot" style="background:#ffffff;"></span>' + sname +
                 '</span>' +
-                (p.priority ? '<span class="tut-priority-badge ' + p.priority.toLowerCase() + '">' + p.priority + '</span>' : '') +
+                (p.priority ? '<span class="erp-priority-badge ' + p.priority.toLowerCase() + '">' + p.priority + '</span>' : '') +
             '</div>' +
-            '<h1 class="tut-project-title">' + escHtml(p.project_title) + '</h1>' +
-            '<div class="tut-project-info-row">' +
-                '<div class="tut-project-info-item">' +
+            '<h1 class="erp-project-title">' + escHtml(p.project_title) + '</h1>' +
+            '<div class="erp-project-info-row">' +
+                '<div class="erp-project-info-item">' +
                     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' +
                     '<span>' + escHtml(p.team_name || p.team || 'No Team') + '</span>' +
-                '</div>' +
-                (p.project_category ? '<div class="tut-project-info-item">' +
+                '</div>';
+    if (p.project_category) {
+        html += '<div class="erp-project-info-item">' +
                     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' +
                     '<span>' + escHtml(p.project_category) + '</span>' +
-                '</div>' : '') +
-            '</div>' +
-        '</div>' +
-    '</div>';
+                '</div>';
+    }
+    html += '</div></div>';
 
-    // Main Content Grid
-    html += '<div class="tut-project-grid"><div class="tut-project-main">';
+    // Main Grid Layout
+    html += '<div class="erp-project-grid">';
+
+    // Main Content Area
+    html += '<div class="erp-project-main">';
 
     // Description Section
     if (p.description) {
-        html += '<div class="tut-content-card">' +
-            '<div class="tut-content-card-header">' +
-                '<div class="tut-content-card-icon green">' +
-                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' +
+        html += '<div class="erp-card">' +
+            '<div class="erp-card-header">' +
+                '<div class="erp-card-icon blue">' +
+                    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>' +
                 '</div>' +
                 '<div>' +
-                    '<h3 class="tut-content-card-title">Description</h3>' +
-                    '<p class="tut-content-card-subtitle">Project overview and details</p>' +
+                    '<h3 class="erp-card-title">Description</h3>' +
+                    '<p class="erp-card-subtitle">Project overview and details</p>' +
                 '</div>' +
             '</div>' +
-            '<div class="tut-content-card-body">' +
-                '<p class="tut-description-text">' + escHtml(p.description) + '</p>' +
+            '<div class="erp-card-body">' +
+                '<p class="erp-description-text">' + escHtml(p.description) + '</p>' +
             '</div>' +
         '</div>';
     }
 
-    // README Section
-    if (p.readme) {
-        html += '<div class="tut-content-card">' +
-            '<div class="tut-content-card-header">' +
-                '<div class="tut-content-card-icon blue">' +
-                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>' +
+    // Technologies
+    if (p.technologies && p.technologies.length > 0) {
+        html += '<div class="erp-card">' +
+            '<div class="erp-card-header">' +
+                '<div class="erp-card-icon purple">' +
+                    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>' +
                 '</div>' +
                 '<div>' +
-                    '<h3 class="tut-content-card-title">README</h3>' +
-                    '<p class="tut-content-card-subtitle">Project documentation</p>' +
+                    '<h3 class="erp-card-title">Technologies</h3>' +
+                    '<p class="erp-card-subtitle">' + p.technologies.length + ' technology stack</p>' +
                 '</div>' +
             '</div>' +
-            '<div class="tut-content-card-body">';
-        
-        if (p.readme.readme_content) {
-            html += '<div class="tut-readme-content">' + escHtml(p.readme.readme_content) + '</div>';
-        }
-        
-        if (p.readme.readme_file) {
-            html += '<a href="' + p.readme.readme_file + '" target="_blank" class="tut-download-btn">' +
-                '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
-                'Download README File' +
-            '</a>';
-        }
-        
-        html += '</div></div>';
-    }
-
-    // Technologies Section
-    if (p.technologies && p.technologies.length) {
-        html += '<div class="tut-content-card">' +
-            '<div class="tut-content-card-header">' +
-                '<div class="tut-content-card-icon purple">' +
-                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>' +
-                '</div>' +
-                '<div>' +
-                    '<h3 class="tut-content-card-title">Technologies</h3>' +
-                    '<p class="tut-content-card-subtitle">Tech stack used in this project</p>' +
-                '</div>' +
-            '</div>' +
-            '<div class="tut-content-card-body">' +
-                '<div class="tut-tech-grid">';
-        p.technologies.forEach(function(t) { 
-            html += '<span class="tut-tech-badge">' + escHtml(t) + '</span>'; 
+            '<div class="erp-card-body">' +
+                '<div class="erp-tech-grid">';
+        p.technologies.forEach(function(t) {
+            html += '<span class="erp-tech-badge">' + escHtml(t) + '</span>';
         });
         html += '</div></div></div>';
     }
 
-    // Screenshots Section
-    if (p.screenshots && p.screenshots.length) {
-        html += '<div class="tut-content-card">' +
-            '<div class="tut-content-card-header">' +
-                '<div class="tut-content-card-icon teal">' +
-                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
+    // Screenshots
+    if (p.screenshots && p.screenshots.length > 0) {
+        html += '<div class="erp-card">' +
+            '<div class="erp-card-header">' +
+                '<div class="erp-card-icon cyan">' +
+                    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
                 '</div>' +
                 '<div>' +
-                    '<h3 class="tut-content-card-title">Screenshots</h3>' +
-                    '<p class="tut-content-card-subtitle">' + p.screenshots.length + ' image(s)</p>' +
+                    '<h3 class="erp-card-title">Screenshots</h3>' +
+                    '<p class="erp-card-subtitle">' + p.screenshots.length + ' project image' + (p.screenshots.length > 1 ? 's' : '') + '</p>' +
                 '</div>' +
             '</div>' +
-            '<div class="tut-content-card-body">' +
-                '<div class="tut-screenshot-gallery">';
-        p.screenshots.forEach(function(s, i) {
-            html += '<div class="tut-screenshot-item" data-index="' + i + '">' +
-                '<img src="' + s.screenshot + '" alt="' + escHtml(s.caption || 'Screenshot ' + (i+1)) + '" loading="lazy">' +
-                '<div class="tut-screenshot-overlay">' +
-                    '<a href="' + s.screenshot + '" target="_blank" class="tut-screenshot-btn">' +
-                        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>' +
-                    '</a>' +
-                '</div>' +
-                (s.caption ? '<div class="tut-screenshot-caption">' + escHtml(s.caption) + '</div>' : '') +
+            '<div class="erp-card-body">' +
+                '<div class="erp-screenshot-gallery">';
+        p.screenshots.forEach(function(s) {
+            html += '<div class="erp-screenshot-item">' +
+                '<img src="' + escHtml(s.screenshot) + '" alt="' + escHtml(s.caption || 'Screenshot') + '" loading="lazy" />' +
+                (s.caption ? '<div class="erp-screenshot-caption">' + escHtml(s.caption) + '</div>' : '') +
             '</div>';
         });
         html += '</div></div></div>';
     }
 
-    // Files Section
-    if (p.files && p.files.length) {
-        html += '<div class="tut-content-card">' +
-            '<div class="tut-content-card-header">' +
-                '<div class="tut-content-card-icon orange">' +
-                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' +
+    // Files
+    if (p.files && p.files.length > 0) {
+        html += '<div class="erp-card">' +
+            '<div class="erp-card-header">' +
+                '<div class="erp-card-icon orange">' +
+                    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
                 '</div>' +
                 '<div>' +
-                    '<h3 class="tut-content-card-title">Files</h3>' +
-                    '<p class="tut-content-card-subtitle">' + p.files.length + ' file(s)</p>' +
+                    '<h3 class="erp-card-title">Files</h3>' +
+                    '<p class="erp-card-subtitle">' + p.files.length + ' attached file' + (p.files.length > 1 ? 's' : '') + '</p>' +
                 '</div>' +
             '</div>' +
-            '<div class="tut-content-card-body">' +
-                '<div class="tut-file-list">';
+            '<div class="erp-card-body">' +
+                '<div class="erp-file-list">';
         p.files.forEach(function(f) {
-            html += '<a href="' + f.file + '" target="_blank" class="tut-file-card">' +
-                '<div class="tut-file-icon">' + getFileIcon(f.file_name || f.file) + '</div>' +
-                '<div class="tut-file-info">' +
-                    '<div class="tut-file-name">' + escHtml(f.file_name || f.file) + '</div>' +
-                    (f.description ? '<div class="tut-file-desc">' + escHtml(f.description) + '</div>' : '') +
+            html += '<a href="' + escHtml(f.file) + '" class="erp-file-card" download>' +
+                '<div class="erp-file-icon">' + getFileIcon(f.file_name || f.file) + '</div>' +
+                '<div class="erp-file-info">' +
+                    '<div class="erp-file-name">' + escHtml(f.file_name || 'File') + '</div>' +
+                    (f.file_type ? '<div class="erp-file-desc">' + escHtml(f.file_type) + '</div>' : '') +
                 '</div>' +
-                '<div class="tut-file-action">' +
+                '<div class="erp-file-action">' +
                     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
                 '</div>' +
             '</a>';
@@ -288,30 +1016,48 @@ function renderProject(p) {
         html += '</div></div></div>';
     }
 
-    // Updates Section
-    if (p.updates && p.updates.length) {
-        html += '<div class="tut-content-card">' +
-            '<div class="tut-content-card-header">' +
-                '<div class="tut-content-card-icon green">' +
-                    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>' +
+    // README
+    if (p.readme && p.readme.readme_content) {
+        html += '<div class="erp-card">' +
+            '<div class="erp-card-header">' +
+                '<div class="erp-card-icon green">' +
+                    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15l3 3 3-3"/></svg>' +
                 '</div>' +
                 '<div>' +
-                    '<h3 class="tut-content-card-title">Updates</h3>' +
-                    '<p class="tut-content-card-subtitle">Project progress and changes</p>' +
+                    '<h3 class="erp-card-title">README</h3>' +
+                    '<p class="erp-card-subtitle">Project documentation</p>' +
                 '</div>' +
             '</div>' +
-            '<div class="tut-content-card-body">' +
-                '<div class="tut-timeline">';
+            '<div class="erp-card-body">' +
+                '<pre class="erp-readme-content">' + escHtml(p.readme.readme_content) + '</pre>' +
+            '</div>' +
+        '</div>';
+    }
+
+    // Project Updates (Timeline)
+    if (p.updates && p.updates.length > 0) {
+        html += '<div class="erp-card">' +
+            '<div class="erp-card-header">' +
+                '<div class="erp-card-icon green">' +
+                    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>' +
+                '</div>' +
+                '<div>' +
+                    '<h3 class="erp-card-title">Updates</h3>' +
+                    '<p class="erp-card-subtitle">Project progress and changes</p>' +
+                '</div>' +
+            '</div>' +
+            '<div class="erp-card-body">' +
+                '<div class="erp-timeline">';
         p.updates.forEach(function(u) {
-            html += '<div class="tut-timeline-item">' +
-                '<div class="tut-timeline-marker"></div>' +
-                '<div class="tut-timeline-content">' +
-                    '<div class="tut-timeline-header">' +
-                        '<h4 class="tut-timeline-title">' + escHtml(u.update_title) + '</h4>' +
-                        '<span class="tut-timeline-date">' + (u.update_date ? formatDate(u.update_date) : '') + '</span>' +
+            html += '<div class="erp-timeline-item">' +
+                '<div class="erp-timeline-marker"></div>' +
+                '<div class="erp-timeline-content">' +
+                    '<div class="erp-timeline-header">' +
+                        '<h4 class="erp-timeline-title">' + escHtml(u.update_title) + '</h4>' +
+                        '<span class="erp-timeline-date">' + (u.update_date ? formatDate(u.update_date) : '') + '</span>' +
                     '</div>' +
-                    (u.update_description ? '<p class="tut-timeline-desc">' + escHtml(u.update_description) + '</p>' : '') +
-                    (u.updated_by ? '<div class="tut-timeline-author">' +
+                    (u.update_description ? '<p class="erp-timeline-desc">' + escHtml(u.update_description) + '</p>' : '') +
+                    (u.updated_by ? '<div class="erp-timeline-author">' +
                         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' +
                         escHtml(u.updated_by) + '</div>' : '') +
                 '</div>' +
@@ -320,47 +1066,47 @@ function renderProject(p) {
         html += '</div></div></div>';
     }
 
-    html += '</div>'; // end tut-project-main
+    html += '</div>';
 
     // Sidebar
-    html += '<div class="tut-project-sidebar">';
+    html += '<div class="erp-project-sidebar">';
 
     // Project Info Card
-    html += '<div class="tut-sidebar-card">' +
-        '<div class="tut-sidebar-card-header">' +
-            '<h4 class="tut-sidebar-card-title">Project Details</h4>' +
+    html += '<div class="erp-sidebar-card">' +
+        '<div class="erp-sidebar-card-header">' +
+            '<h4 class="erp-sidebar-card-title">Project Details</h4>' +
         '</div>' +
-        '<div class="tut-sidebar-card-body">' +
-            '<div class="tut-detail-list">';
+        '<div class="erp-sidebar-card-body">' +
+            '<div class="erp-detail-list">';
 
     if (p.creation) {
-        html += '<div class="tut-detail-item">' +
-            '<div class="tut-detail-label">Created</div>' +
-            '<div class="tut-detail-value">' + formatDate(p.creation) + '</div>' +
+        html += '<div class="erp-detail-item">' +
+            '<div class="erp-detail-label">Created</div>' +
+            '<div class="erp-detail-value">' + formatDate(p.creation) + '</div>' +
         '</div>';
     }
     if (p.start_date) {
-        html += '<div class="tut-detail-item">' +
-            '<div class="tut-detail-label">Start Date</div>' +
-            '<div class="tut-detail-value">' + formatDate(p.start_date) + '</div>' +
+        html += '<div class="erp-detail-item">' +
+            '<div class="erp-detail-label">Start Date</div>' +
+            '<div class="erp-detail-value">' + formatDate(p.start_date) + '</div>' +
         '</div>';
     }
     if (p.due_date) {
-        html += '<div class="tut-detail-item">' +
-            '<div class="tut-detail-label">Due Date</div>' +
-            '<div class="tut-detail-value">' + formatDate(p.due_date) + '</div>' +
+        html += '<div class="erp-detail-item">' +
+            '<div class="erp-detail-label">Due Date</div>' +
+            '<div class="erp-detail-value">' + formatDate(p.due_date) + '</div>' +
         '</div>';
     }
     if (p.completion_date) {
-        html += '<div class="tut-detail-item">' +
-            '<div class="tut-detail-label">Completed</div>' +
-            '<div class="tut-detail-value">' + formatDate(p.completion_date) + '</div>' +
+        html += '<div class="erp-detail-item">' +
+            '<div class="erp-detail-label">Completed</div>' +
+            '<div class="erp-detail-value">' + formatDate(p.completion_date) + '</div>' +
         '</div>';
     }
     if (p.approved_by) {
-        html += '<div class="tut-detail-item">' +
-            '<div class="tut-detail-label">Approved By</div>' +
-            '<div class="tut-detail-value">' + escHtml(p.approved_by) + '</div>' +
+        html += '<div class="erp-detail-item">' +
+            '<div class="erp-detail-label">Approved By</div>' +
+            '<div class="erp-detail-value">' + escHtml(p.approved_by) + '</div>' +
         '</div>';
     }
 
@@ -370,27 +1116,27 @@ function renderProject(p) {
     if (p.github_repository) {
         var g = p.github_info || {};
         var repoUrl = (g && g.repository_url) ? g.repository_url : '#';
-        html += '<div class="tut-sidebar-card tut-github-card">' +
-            '<div class="tut-sidebar-card-header">' +
-                '<div class="tut-github-icon">' +
+        html += '<div class="erp-sidebar-card erp-github-card">' +
+            '<div class="erp-sidebar-card-header">' +
+                '<div class="erp-github-icon">' +
                     '<svg width="24" height="24" viewBox="0 0 24 24" fill="#24292e"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>' +
                 '</div>' +
-                '<h4 class="tut-sidebar-card-title">Repository</h4>' +
+                '<h4 class="erp-sidebar-card-title">Repository</h4>' +
             '</div>' +
-            '<div class="tut-sidebar-card-body">' +
-                '<a href="' + repoUrl + '" target="_blank" class="tut-github-btn">' +
+            '<div class="erp-sidebar-card-body">' +
+                '<a href="' + repoUrl + '" target="_blank" class="erp-github-btn">' +
                     '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>' +
                     'Open Repository' +
                 '</a>';
         
         if (g.default_branch) {
-            html += '<div class="tut-github-info">' +
-                '<div class="tut-github-info-item">' +
+            html += '<div class="erp-github-info">' +
+                '<div class="erp-github-info-item">' +
                     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' +
                     '<span>Branch: <strong>' + escHtml(g.default_branch) + '</strong></span>' +
                 '</div>';
             if (g.commit_hash) {
-                html += '<div class="tut-github-info-item">' +
+                html += '<div class="erp-github-info-item">' +
                     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg>' +
                     '<span>' + escHtml(g.commit_hash.substring(0,7)) + '...</span>' +
                 '</div>';
@@ -399,7 +1145,7 @@ function renderProject(p) {
         }
         
         if (g.languages) {
-            html += '<div class="tut-github-languages">' + escHtml(g.languages) + '</div>';
+            html += '<div class="erp-github-languages">' + escHtml(g.languages) + '</div>';
         }
         
         html += '</div></div>';
@@ -407,20 +1153,20 @@ function renderProject(p) {
 
     // Tags Card
     if (p.tags) {
-        html += '<div class="tut-sidebar-card">' +
-            '<div class="tut-sidebar-card-header">' +
-                '<h4 class="tut-sidebar-card-title">Tags</h4>' +
+        html += '<div class="erp-sidebar-card">' +
+            '<div class="erp-sidebar-card-header">' +
+                '<h4 class="erp-sidebar-card-title">Tags</h4>' +
             '</div>' +
-            '<div class="tut-sidebar-card-body">' +
-                '<div class="tut-tag-list">';
+            '<div class="erp-sidebar-card-body">' +
+                '<div class="erp-tag-list">';
         p.tags.split(',').forEach(function(t) {
             t = t.trim();
-            if (t) html += '<span class="tut-tag-item">' + escHtml(t) + '</span>';
+            if (t) html += '<span class="erp-tag-item">' + escHtml(t) + '</span>';
         });
         html += '</div></div></div>';
     }
 
-    html += '</div></div>'; // end tut-project-sidebar and tut-project-grid
+    html += '</div></div>';
 
     // Update breadcrumb
     document.getElementById('breadcrumbTitle').textContent = p.project_title;
