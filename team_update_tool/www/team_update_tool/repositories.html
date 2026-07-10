@@ -44,20 +44,6 @@
 
 {% block script %}
 <script>
-// Polyfill for deprecated initHighlighting() -> highlightAll()
-if (typeof hljs !== 'undefined' && hljs.initHighlighting && !hljs.highlightAll) {
-    hljs.highlightAll = function() {
-        document.querySelectorAll('pre code').forEach(function(block) {
-            hljs.highlightElement(block);
-        });
-    };
-}
-// Also replace any initHighlighting calls with highlightAll
-if (typeof hljs !== 'undefined') {
-    window.addEventListener('DOMContentLoaded', function() {
-        if (typeof hljs.initHighlighting === 'function') {
-            hljs.highlightAll();
-        }
     });
 }
 
@@ -74,7 +60,7 @@ function loadRepos(offset) {
 	document.getElementById('reposContent').style.display = 'none';
 
 	fetch('/api/method/team_update_tool.api.projects.get_repositories?limit=20&offset=' + offset)
-		.then(function(r) { return r.json(); })
+		.then(function(r) { if (!r.ok) throw new Error('API request failed'); return r.json(); })
 		.then(function(data) {
 			document.getElementById('reposLoading').style.display = 'none';
 			if (!data.message) return;

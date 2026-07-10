@@ -256,119 +256,175 @@ def get_project_detail(name):
 @frappe.whitelist(allow_guest=True)
 def get_dashboard_stats():
 	"""Get comprehensive dashboard statistics."""
-	filters, is_admin, is_viewer = _get_visible_filters()
+	try:
+		filters, is_admin, is_viewer = _get_visible_filters()
 
-	total_projects = frappe.db.count("Project", filters=filters)
+		total_projects = frappe.db.count("Project", filters=filters)
 
-	# Status-wise counts (even zero)
-	status_counts = []
-	statuses = frappe.get_all("Project Status", fields=["name", "status_name", "color"], order_by="status_name asc")
-	for s in statuses:
-		f = dict(filters)
-		f["status"] = s.name
-		count = frappe.db.count("Project", filters=f)
-		status_counts.append({
-			"name": s.status_name,
-			"slug": s.name,
-			"count": count,
-			"color": s.color,
-		})
+		# Status-wise counts (even zero)
+		status_counts = []
+		try:
+			statuses = frappe.get_all("Project Status", fields=["name", "status_name", "color"], order_by="status_name asc")
+			for s in statuses:
+				f = dict(filters)
+				f["status"] = s.name
+				count = frappe.db.count("Project", filters=f)
+				status_counts.append({
+					"name": s.status_name,
+					"slug": s.name,
+					"count": count,
+					"color": s.color,
+				})
+		except Exception:
+			status_counts = []
 
-	# Category counts
-	cat_filters = dict(filters)
-	categories = frappe.get_all("Project Category", fields=["name", "category_name"])
-	category_counts = []
-	for c in categories:
-		f = dict(filters)
-		f["project_category"] = c.name
-		count = frappe.db.count("Project", filters=f)
-		if count:
-			category_counts.append({
-				"name": c.category_name,
-				"count": count,
-			})
+		# Category counts
+		category_counts = []
+		try:
+			categories = frappe.get_all("Project Category", fields=["name", "category_name"])
+			for c in categories:
+				f = dict(filters)
+				f["project_category"] = c.name
+				count = frappe.db.count("Project", filters=f)
+				if count:
+					category_counts.append({
+						"name": c.category_name,
+						"count": count,
+					})
+		except Exception:
+			pass
 
-	# Latest projects
-	recent = frappe.get_all("Project",
-		filters=filters,
-		fields=["name", "project_title", "status", "owner", "creation", "modified"],
-		limit=6,
-		order_by="modified desc"
-	)
-	for p in recent:
-		if p.status:
-			s = frappe.get_cached_doc("Project Status", p.status)
-			p.status_name = s.status_name
-			p.status_color = s.color
+		# Latest projects
+		recent = []
+		try:
+			recent = frappe.get_all("Project",
+				filters=filters,
+				fields=["name", "project_title", "status", "owner", "creation", "modified"],
+				limit=6,
+				order_by="modified desc"
+			)
+			for p in recent:
+				if p.status:
+					try:
+						s = frappe.get_cached_doc("Project Status", p.status)
+						p.status_name = s.status_name
+						p.status_color = s.color
+					except Exception:
+						pass
+		except Exception:
+			recent = []
 
-	# Recent GitHub uploads
-	recent_repos = frappe.get_all("GitHub Repository",
-		fields=["name", "repository_name", "repository_url", "creation"],
-		limit=5,
-		order_by="creation desc"
-	)
+		# Recent GitHub uploads
+		recent_repos = []
+		try:
+			recent_repos = frappe.get_all("GitHub Repository",
+				fields=["name", "repository_name", "repository_url", "creation"],
+				limit=5,
+				order_by="creation desc"
+			)
+		except Exception:
+			recent_repos = []
 
-	# Recent screenshots
-	projects = frappe.get_all("Project", filters=filters, pluck="name")
-	recent_screenshots = []
-	for p_name in projects[:10]:
-		doc = frappe.get_cached_doc("Project", p_name)
-		for s in doc.screenshots or []:
-			recent_screenshots.append({
-				"screenshot": s.screenshot,
-				"caption": s.caption or "",
-				"project": p_name,
-				"project_title": doc.project_title,
-			})
-			if len(recent_screenshots) >= 6:
-				break
-		if len(recent_screenshots) >= 6:
-			break
-	recent_screenshots.reverse()
+		# Recent screenshots
+		recent_screenshots = []
+		try:
+			projects = frappe.get_all("Project", filters=filters, pluck="name")
+			for p_name in projects[:10]:
+				try:
+					doc = frappe.get_cached_doc("Project", p_name)
+					for s in doc.screenshots or []:
+						recent_screenshots.append({
+							"screenshot": s.screenshot,
+							"caption": s.caption or "",
+							"project": p_name,
+							"project_title": getattr(doc, "project_title", p_name),
+						})
+						if len(recent_screenshots) >= 6:
+							break
+					if len(recent_screenshots) >= 6:
+						break
+				except Exception:
+					continue
+			recent_screenshots.reverse()
+		except Exception:
+			recent_screenshots = []
 
-	# Team and technology counts
-	total_teams = frappe.db.count("Team", filters={"is_active": 1})
-	total_technologies = frappe.db.count("Technology")
-	total_categories = frappe.db.count("Project Category")
+		# Team and technology counts
+		total_teams = 0
+		total_technologies = 0
+		total_categories = 0
+		try:
+			total_teams = frappe.db.count("Team", filters={"is_active": 1})
+			total_technologies = frappe.db.count("Technology")
+			total_categories = frappe.db.count("Project Category")
+		except Exception:
+			pass
 
-	# User's own projects
-	my_projects = 0
-	if frappe.session.user != "Guest" and not is_viewer:
-		my_projects = frappe.db.count("Project", filters={"owner": frappe.session.user})
+		# User's own projects
+		my_projects = 0
+		if frappe.session.user != "Guest" and not is_viewer:
+			try:
+				my_projects = frappe.db.count("Project", filters={"owner": frappe.session.user})
+			except Exception:
+				pass
 
-	# Recent documents (files)
-	recent_documents = []
-	for p_name in projects[:10]:
-		doc = frappe.get_cached_doc("Project", p_name)
-		for f in doc.project_files or []:
-			recent_documents.append({
-				"file": f.file,
-				"file_name": f.file_name or f.file,
-				"file_type": f.file_type or "",
-				"project": p_name,
-				"project_title": doc.project_title,
-			})
-			if len(recent_documents) >= 5:
-				break
-		if len(recent_documents) >= 5:
-			break
-	recent_documents.reverse()
+		# Recent documents (files)
+		recent_documents = []
+		try:
+			for p_name in projects[:10]:
+				try:
+					doc = frappe.get_cached_doc("Project", p_name)
+					for f in doc.project_files or []:
+						recent_documents.append({
+							"file": f.file,
+							"file_name": f.file_name or f.file,
+							"file_type": f.file_type or "",
+							"project": p_name,
+							"project_title": getattr(doc, "project_title", p_name),
+						})
+						if len(recent_documents) >= 5:
+							break
+					if len(recent_documents) >= 5:
+						break
+				except Exception:
+					continue
+			recent_documents.reverse()
+		except Exception:
+			recent_documents = []
 
-	return {
-		"total_projects": total_projects,
-		"total_teams": total_teams,
-		"total_technologies": total_technologies,
-		"total_categories": total_categories,
-		"my_projects": my_projects,
-		"status_counts": status_counts,
-		"category_counts": category_counts,
-		"recent_projects": recent,
-		"recent_repos": recent_repos,
-		"recent_screenshots": recent_screenshots,
-		"recent_documents": recent_documents,
-		"is_admin": is_admin,
-		"is_viewer": is_viewer,
-	}
+		return {
+			"total_projects": total_projects,
+			"total_teams": total_teams,
+			"total_technologies": total_technologies,
+			"total_categories": total_categories,
+			"my_projects": my_projects,
+			"status_counts": status_counts,
+			"category_counts": category_counts,
+			"recent_projects": recent,
+			"recent_repos": recent_repos,
+			"recent_screenshots": recent_screenshots,
+			"recent_documents": recent_documents,
+			"is_admin": is_admin,
+			"is_viewer": is_viewer,
+		}
+	except Exception as e:
+		frappe.log_error(f"Error in get_dashboard_stats: {str(e)}", "get_dashboard_stats Error")
+		return {
+			"total_projects": 0,
+			"total_teams": 0,
+			"total_technologies": 0,
+			"total_categories": 0,
+			"my_projects": 0,
+			"status_counts": [],
+			"category_counts": [],
+			"recent_projects": [],
+			"recent_repos": [],
+			"recent_screenshots": [],
+			"recent_documents": [],
+			"is_admin": False,
+			"is_viewer": False,
+			"error": str(e),
+		}
 
 
 @frappe.whitelist()
