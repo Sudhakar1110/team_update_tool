@@ -4,14 +4,15 @@
 
 {% block style %}
 <link rel="stylesheet" href="/assets/team_update_tool/css/team_update_tool.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block page_content %}
-<div class="tut-page-header">
+<div class="tut-page-header royal-header">
 	<div class="container">
 		<div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
 			<div>
-				<h1 class="m-0">Screenshot Gallery</h1>
+				<h1 class="m-0"><i class="fas fa-images me-2" style="color: var(--tut-gold);"></i>Screenshot Gallery</h1>
 				<p class="m-0" id="galleryTotal">Loading...</p>
 			</div>
 		</div>
@@ -20,17 +21,17 @@
 
 <div class="tut-main-area">
 	<div class="container py-4">
-		<div class="tut-loading" id="galleryLoading">
-			<div class="spinner-border text-success" role="status"></div>
+		<div class="tut-loading royal-loading" id="galleryLoading">
+			<div class="spinner-border royal-spinner" role="status"></div>
 			<p class="text-muted mt-2">Loading screenshots...</p>
 		</div>
 
 		<div id="galleryContent" style="display:none;">
 			<div class="tut-masonry-grid" id="galleryGrid"></div>
 
-			<div id="galleryEmpty" class="tut-empty-state" style="display:none;">
-				<div class="empty-icon mx-auto mb-2">
-					<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+			<div id="galleryEmpty" class="tut-empty-state royal-empty" style="display:none;">
+				<div class="empty-icon mx-auto mb-3">
+					<i class="fas fa-images"></i>
 				</div>
 				<h4>No Screenshots Yet</h4>
 				<p>Screenshots from projects will appear here once uploaded.</p>
@@ -40,6 +41,85 @@
 		</div>
 	</div>
 </div>
+
+<style>
+.royal-header {
+    background: var(--tut-dark-gradient);
+    padding: 2.5rem 0;
+    position: relative;
+    overflow: hidden;
+}
+.royal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%237c3aed' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+}
+.royal-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: #ffffff;
+    font-size: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.royal-header h1::before {
+    content: '';
+    width: 6px;
+    height: 35px;
+    background: linear-gradient(180deg, var(--tut-gold) 0%, var(--tut-gold-light) 100%);
+    border-radius: 3px;
+}
+.royal-header p {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.95rem;
+}
+.royal-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+}
+.royal-spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 0.25em solid rgba(124, 58, 237, 0.2);
+    border-top-color: var(--tut-primary);
+}
+.royal-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--tut-glass);
+    backdrop-filter: blur(10px);
+    border-radius: 1.25rem;
+    border: 2px dashed var(--tut-royal-border);
+}
+.royal-empty .empty-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--tut-primary-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+.royal-empty .empty-icon i {
+    font-size: 2rem;
+    color: #fff;
+}
+.royal-empty h4 {
+    font-family: 'Playfair Display', serif;
+    color: #1e1b4b;
+    font-weight: 700;
+}
+</style>
 {% endblock %}
 
 {% block script %}

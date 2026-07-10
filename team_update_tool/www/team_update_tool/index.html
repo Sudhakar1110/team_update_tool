@@ -5,24 +5,29 @@
 {% block style %}
 <link rel="stylesheet" href="/assets/team_update_tool/css/team_update_tool.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block page_content %}
-<!-- Hero Section -->
+<!-- Hero Section - Royal -->
 <div class="tut-home-hero">
-	<!-- Floating Shapes -->
+	<!-- Royal Floating Shapes -->
 	<div class="tut-hero-shape tut-hero-shape-1"></div>
 	<div class="tut-hero-shape tut-hero-shape-2"></div>
 	<div class="tut-hero-shape tut-hero-shape-3"></div>
+	<!-- Crown Decoration -->
+	<div class="tut-royal-crown-home">
+		<i class="fas fa-crown"></i>
+	</div>
 	
 	<div class="container">
 		<div class="row align-items-center min-vh-75">
 			<div class="col-lg-8 mx-auto text-center">
-				<div class="tut-hero-badge fade-in">
-					<i class="fas fa-rocket me-1"></i>
+				<div class="tut-hero-badge fade-in royal-badge">
+					<i class="fas fa-crown me-1"></i>
 					Next-Generation Project Management
 				</div>
-				<h1 class="tut-hero-title fade-in">
+				<h1 class="tut-hero-title fade-in royal-title">
 					Team Update <span class="tut-highlight">Tool</span>
 				</h1>
 				<p class="tut-hero-desc fade-in">
@@ -30,17 +35,17 @@
 					Featuring GitHub integration, stunning screenshot galleries, and intelligent role-based access.
 				</p>
 				<div class="d-flex flex-wrap gap-3 justify-content-center mt-5 fade-in">
-					<a href="/team_update_tool/projects" class="btn btn-lg px-4 shadow-lg">
+					<a href="/team_update_tool/projects" class="btn btn-lg px-4 shadow-lg royal-primary-btn">
 						<i class="fas fa-folder-open me-2"></i>
 						Browse Projects
 					</a>
 					{% if is_logged_in %}
-					<a href="/team_update_tool/dashboard" class="btn btn-outline-primary btn-lg px-4">
+					<a href="/team_update_tool/dashboard" class="btn btn-outline-royal btn-lg px-4">
 						<i class="fas fa-chart-line me-2"></i>
 						Dashboard
 					</a>
 					{% else %}
-					<a href="/team_update_tool/login" class="btn btn-outline-primary btn-lg px-4">
+					<a href="/team_update_tool/login" class="btn btn-outline-royal btn-lg px-4">
 						<i class="fas fa-sign-in-alt me-2"></i>
 						Sign In
 					</a>
@@ -50,6 +55,139 @@
 		</div>
 	</div>
 </div>
+
+<style>
+/* Royal Home Hero */
+.tut-home-hero {
+	background: var(--tut-dark-gradient);
+	min-height: 85vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	overflow: hidden;
+}
+
+.tut-home-hero::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%237c3aed' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+	opacity: 0.5;
+}
+
+.tut-hero-shape-1 {
+	width: 500px;
+	height: 500px;
+	background: rgba(217, 119, 6, 0.12);
+	top: -150px;
+	right: -100px;
+}
+
+.tut-hero-shape-2 {
+	width: 400px;
+	height: 400px;
+	background: rgba(124, 58, 237, 0.15);
+	bottom: -100px;
+	left: -100px;
+}
+
+.tut-hero-shape-3 {
+	width: 300px;
+	height: 300px;
+	background: rgba(109, 40, 217, 0.1);
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.tut-royal-crown-home {
+	position: absolute;
+	top: 8%;
+	right: 10%;
+	font-size: 4rem;
+	color: var(--tut-gold);
+	opacity: 0.2;
+	animation: crownFloat 4s ease-in-out infinite;
+}
+
+.royal-badge {
+	background: linear-gradient(135deg, rgba(217, 119, 6, 0.2) 0%, rgba(251, 191, 36, 0.1) 100%);
+	border: 1px solid rgba(217, 119, 6, 0.3);
+	color: var(--tut-gold-light);
+	font-weight: 600;
+	padding: 8px 20px;
+	border-radius: 50rem;
+	font-size: 0.9rem;
+	display: inline-flex;
+	align-items: center;
+}
+
+.royal-title {
+	font-family: 'Playfair Display', serif;
+	font-size: clamp(2.5rem, 6vw, 4rem);
+	font-weight: 700;
+	color: #ffffff;
+	margin-bottom: 1.5rem;
+	letter-spacing: -0.03em;
+	text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tut-highlight {
+	background: linear-gradient(135deg, var(--tut-gold) 0%, var(--tut-gold-light) 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.tut-hero-desc {
+	font-size: 1.2rem;
+	color: rgba(255, 255, 255, 0.8);
+	max-width: 600px;
+	margin: 0 auto 2rem;
+	line-height: 1.7;
+}
+
+.royal-primary-btn {
+	background: linear-gradient(135deg, var(--tut-primary) 0%, var(--tut-primary-dark) 100%) !important;
+	border: none !important;
+	color: #fff !important;
+	padding: 1rem 2rem !important;
+	border-radius: 50rem !important;
+	font-weight: 700 !important;
+	box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.royal-primary-btn:hover {
+	transform: translateY(-4px) scale(1.02);
+	box-shadow: 0 15px 40px rgba(124, 58, 237, 0.5);
+	color: #fff;
+}
+
+.btn-outline-royal {
+	background: transparent !important;
+	border: 2px solid var(--tut-primary) !important;
+	color: var(--tut-primary) !important;
+	padding: 1rem 2rem !important;
+	border-radius: 50rem !important;
+	font-weight: 700 !important;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-outline-royal:hover {
+	background: var(--tut-primary) !important;
+	color: #fff !important;
+	transform: translateY(-4px);
+	box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+}
+
+@keyframes crownFloat {
+	0%, 100% { transform: translateY(0) rotate(-5deg); }
+	50% { transform: translateY(-15px) rotate(5deg); }
+}
+</style>
 
 <!-- Stats Section -->
 <section class="tut-stats-section">

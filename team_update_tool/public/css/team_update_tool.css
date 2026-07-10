@@ -1,75 +1,83 @@
 /* =====================================
-   Team Update Tool — Premium Pro UI
-   Rich Gradient Colors & Modern Design
+   Team Update Tool — Royal Professional UI
+   Premium Purple, Gold & Modern Design
    ===================================== */
 
-/* --- Rich Professional Root Variables --- */
+/* --- Royal Professional Root Variables --- */
 :root {
-  /* Primary Gradient Palette */
-  --tut-primary: #6366f1;
-  --tut-primary-dark: #4f46e5;
-  --tut-primary-light: rgba(99, 102, 241, 0.12);
-  --tut-primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-  --tut-primary-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  /* Royal Primary Gradient Palette - Deep Purple */
+  --tut-primary: #7c3aed;
+  --tut-primary-dark: #4c1d95;
+  --tut-primary-light: rgba(124, 58, 237, 0.12);
+  --tut-primary-gradient: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%);
+  --tut-primary-gradient-hover: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+  
+  /* Royal Gold Accent */
+  --tut-gold: #d97706;
+  --tut-gold-light: #fbbf24;
+  --tut-gold-gradient: linear-gradient(135deg, #d97706 0%, #fbbf24 100%);
   
   /* Secondary Accent Colors */
   --tut-secondary: #ec4899;
   --tut-secondary-dark: #db2777;
   --tut-secondary-light: rgba(236, 72, 153, 0.12);
   
-  /* Success/Violet Gradient */
-  --tut-success: #10b981;
-  --tut-success-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  /* Success/Emerald Gradient */
+  --tut-success: #059669;
+  --tut-success-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
   
   /* Warning/Orange Gradient */
-  --tut-warning: #f59e0b;
-  --tut-warning-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  --tut-warning: #d97706;
+  --tut-warning-gradient: linear-gradient(135deg, #d97706 0%, #fbbf24 100%);
   
   /* Danger/Red Gradient */
-  --tut-danger: #ef4444;
-  --tut-danger-gradient: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+  --tut-danger: #dc2626;
+  --tut-danger-gradient: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
   
   /* Info/Cyan Gradient */
-  --tut-info: #06b6d4;
-  --tut-info-gradient: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
+  --tut-info: #0891b2;
+  --tut-info-gradient: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%);
   
-  /* Rich Dark Theme */
+  /* Royal Dark Theme */
   --tut-dark: #0f172a;
-  --tut-dark-light: #1e293b;
-  --tut-dark-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  --tut-dark-light: #1e1b4b;
+  --tut-dark-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
   
   /* Background Colors */
-  --tut-bg: #f8fafc;
-  --tut-bg-dark: #f1f5f9;
+  --tut-bg: #f8f5ff;
+  --tut-bg-dark: #f3f0ff;
   --tut-card-bg: #ffffff;
   
-  /* Border Colors */
-  --tut-border: rgba(0, 0, 0, 0.06);
+  /* Royal Border Colors */
+  --tut-border: rgba(124, 58, 237, 0.1);
   --tut-border-light: #e2e8f0;
-  --tut-border-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --tut-border-gradient: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%);
+  --tut-royal-border: rgba(139, 92, 246, 0.2);
   
   /* Text Colors */
-  --tut-text: #0f172a;
-  --tut-text-muted: #64748b;
-  --tut-text-light: #94a3b8;
+  --tut-text: #1e1b4b;
+  --tut-text-muted: #6b7280;
+  --tut-text-light: #9ca3af;
   --tut-text-white: #ffffff;
   
   /* Glass Effect */
-  --tut-glass: rgba(255, 255, 255, 0.85);
-  --tut-glass-dark: rgba(15, 23, 42, 0.85);
+  --tut-glass: rgba(255, 255, 255, 0.95);
+  --tut-glass-dark: rgba(30, 27, 75, 0.85);
   
   /* Layout */
   --tut-navbar-height: 70px;
   --tut-sidebar-width: 270px;
   
-  /* Shadows */
-  --tut-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --tut-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --tut-shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --tut-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  --tut-shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  --tut-shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
-  --tut-shadow-glow-pink: 0 0 40px rgba(236, 72, 153, 0.3);
+  /* Royal Shadows */
+  --tut-shadow-sm: 0 1px 2px 0 rgba(76, 29, 149, 0.05);
+  --tut-shadow: 0 4px 6px -1px rgba(76, 29, 149, 0.1), 0 2px 4px -2px rgba(76, 29, 149, 0.1);
+  --tut-shadow-md: 0 10px 15px -3px rgba(76, 29, 149, 0.1), 0 4px 6px -4px rgba(76, 29, 149, 0.1);
+  --tut-shadow-lg: 0 20px 25px -5px rgba(76, 29, 149, 0.15), 0 8px 10px -6px rgba(76, 29, 149, 0.1);
+  --tut-shadow-xl: 0 25px 50px -12px rgba(76, 29, 149, 0.25);
+  --tut-shadow-glow: 0 0 40px rgba(124, 58, 237, 0.3);
+  --tut-shadow-glow-gold: 0 0 40px rgba(217, 119, 6, 0.3);
+  --tut-royal-shadow: 0 25px 50px -12px rgba(76, 29, 149, 0.25);
+  --tut-royal-glow: 0 0 60px rgba(109, 40, 217, 0.15);
   
   /* Border Radius */
   --tut-radius-sm: 0.5rem;
