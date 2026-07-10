@@ -1,8 +1,8 @@
-# Team Update Tool
+# Team Update Tool 🚀
 
 A custom **Frappe Framework v15** application for tracking completed team projects with GitHub integration, screenshot uploads, and role-based access control.
 
-## Features
+## ✨ Features
 
 - **Role-Based Access**: `Admin` (full CRUD) and `View-Only User` (read-only, server-enforced)
 - **Master Data**: Project Categories, Teams, Technologies, Project Statuses
@@ -12,15 +12,23 @@ A custom **Frappe Framework v15** application for tracking completed team projec
 - **Notifications**: In-app alerts for new projects, approvals, and status changes
 - **Reports**: Project Summary, Team Activity, Completed Projects, GitHub Repository
 
-## Modules
+## 🔐 Login Types
 
-| Module | Description |
-|--------|-------------|
-| **Masters** | Project Category, Team, Technology, Project Status |
-| **Transactions** | Project, Project Files, Project Screenshots, GitHub Repository, Project Update |
-| **Reports** | Project Summary, Team Activity, Completed Projects, GitHub Repository |
+The application supports two types of users:
 
-## Installation
+### Admin Login
+- Full access to all features
+- Can create, edit, delete, approve, and reject projects
+- Access to admin desk and settings
+- Manage all team members and projects
+
+### User Login (View-Only)
+- Read-only access to approved projects
+- Can view project details, screenshots, and documentation
+- Cannot modify or delete any content
+- Server-enforced permissions
+
+## 🛠️ Installation
 
 ```bash
 cd ~/frappe-bench
@@ -31,22 +39,14 @@ bench build --app team_update_tool
 bench restart
 ```
 
-## Roles
+## 👥 Roles & Permissions
 
-| Role | Permissions |
-|------|-------------|
-| **Admin** | Full CRUD on all DocTypes. Can create, edit, delete, approve, reject |
-| **View-Only User** | Read-only. Can view approved projects, GitHub repos, screenshots. Server-enforced |
+| Role | Permissions | Access Level |
+|------|-------------|--------------|
+| **Admin** | Full CRUD on all DocTypes. Can create, edit, delete, approve, reject | Full Access |
+| **View-Only User** | Read-only. Can view approved projects, GitHub repos, screenshots | Restricted |
 
-## Naming Series
-
-| Doctype | Format |
-|---------|--------|
-| Project | PRJ-.YYYY.-.##### |
-| GitHub Repository | GR-.YYYY.-.##### |
-| Project Update | PU-.YYYY.-.##### |
-
-## Permissions
+### Permission Layers
 
 Permissions are enforced in three layers:
 
@@ -54,7 +54,35 @@ Permissions are enforced in three layers:
 2. **`get_permission_query_conditions()`** - View-Only Users only see Approved projects in list views
 3. **`has_permission()`** - Doc-level read check for View-Only Users
 
-## Frappe v15 Compatible
+## 📁 Documents & Files
+
+Documents are organized by project with approval status:
+
+- **Approved Documents** - Visible to all users (Admin and View-Only)
+- **Pending Documents** - Visible only to Admin users
+- Each document shows:
+  - Project name
+  - File type (PDF, DOCX, Images, etc.)
+  - Upload date
+  - Approval status
+
+## 📋 Naming Series
+
+| Doctype | Format |
+|---------|--------|
+| Project | PRJ-.YYYY.-.##### |
+| GitHub Repository | GR-.YYYY.-.##### |
+| Project Update | PU-.YYYY.-.##### |
+
+## 📦 Modules
+
+| Module | Description |
+|--------|-------------|
+| **Masters** | Project Category, Team, Technology, Project Status |
+| **Transactions** | Project, Project Files, Project Screenshots, GitHub Repository, Project Update |
+| **Reports** | Project Summary, Team Activity, Completed Projects, GitHub Repository |
+
+## 🔧 Frappe v15 Compatible
 
 - All code lives inside `apps/team_update_tool` only
 - Uses Frappe ORM (`frappe.get_doc`, `frappe.get_all`, `frappe.db.count`)

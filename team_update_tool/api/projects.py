@@ -535,6 +535,20 @@ def get_documents(limit=20, offset=0):
 		for p_name in projects:
 			try:
 				doc = frappe.get_cached_doc("Project", p_name)
+				
+				# Get project status info
+				status_name = "Unknown"
+				status_color = "#6b7280"
+				is_approved = False
+				if doc.status:
+					try:
+						status_doc = frappe.get_cached_doc("Project Status", doc.status)
+						status_name = status_doc.status_name
+						status_color = status_doc.color
+						is_approved = (status_name.lower() == "approved")
+					except:
+						status_name = doc.status
+				
 				for f in doc.project_files or []:
 					all_files.append({
 						"file": f.file,
@@ -543,6 +557,9 @@ def get_documents(limit=20, offset=0):
 						"description": f.file_description or "",
 						"project": p_name,
 						"project_title": getattr(doc, "project_title", p_name),
+						"status": status_name,
+						"status_color": status_color,
+						"is_approved": is_approved,
 					})
 			except Exception as proj_error:
 				frappe.log_error(f"Error loading project {p_name}: {str(proj_error)}", "get_documents Project Error")

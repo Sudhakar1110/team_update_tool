@@ -4,15 +4,17 @@
 
 {% block style %}
 <link rel="stylesheet" href="/assets/team_update_tool/css/team_update_tool.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 {% endblock %}
 
 {% block page_content %}
-<div class="tut-page-header">
+<!-- Page Header -->
+<div class="tut-projects-hero">
 	<div class="container">
-		<div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+		<div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
 			<div>
-				<h1 class="m-0">Documents</h1>
-				<p class="m-0">Project files and documentation</p>
+				<h1><i class="fas fa-file-alt me-2" style="color: #22c55e;"></i>Documents</h1>
+				<p>Project files, README and documentation</p>
 			</div>
 		</div>
 	</div>
@@ -20,28 +22,64 @@
 
 <div class="tut-main-area">
 	<div class="container py-4">
-		<div class="tut-loading" id="docsLoading">
-			<div class="spinner-border text-success" role="status"></div>
-			<p class="text-muted mt-2">Loading documents...</p>
+		<!-- Loading -->
+		<div class="tut-pro-loading" id="docsLoading">
+			<div class="spinner"></div>
+			<p>Loading documents...</p>
 		</div>
 
 		<div id="docsContent" style="display:none;">
+			<!-- Stats Row -->
 			<div class="row g-3 mb-4">
-				<div class="col-md-3 col-sm-6" id="docsStats"></div>
-				<div class="col-md-3 col-sm-6" id="docsProjects"></div>
+				<div class="col-md-4 col-sm-6">
+					<div class="tut-stat-card" id="docsStats">
+						<div class="tut-stat-icon" style="background: var(--tut-info-gradient);">
+							<i class="fas fa-file-alt"></i>
+						</div>
+						<div>
+							<div class="tut-stat-number" id="totalDocs">0</div>
+							<div class="tut-stat-label">Total Documents</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4 col-sm-6">
+					<div class="tut-stat-card">
+						<div class="tut-stat-icon" style="background: var(--tut-success-gradient);">
+							<i class="fas fa-check-circle"></i>
+						</div>
+						<div>
+							<div class="tut-stat-number" id="approvedDocs">0</div>
+							<div class="tut-stat-label">Approved Projects</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4 col-sm-6">
+					<div class="tut-stat-card">
+						<div class="tut-stat-icon" style="background: var(--tut-warning-gradient);">
+							<i class="fas fa-clock"></i>
+						</div>
+						<div>
+							<div class="tut-stat-number" id="pendingDocs">0</div>
+							<div class="tut-stat-label">Pending Approval</div>
+						</div>
+					</div>
+				</div>
 			</div>
 
-			<div id="docsList"></div>
+			<!-- Documents List -->
+			<div class="row g-3" id="docsList"></div>
 
-			<div id="docsEmpty" class="tut-empty-state" style="display:none;">
-				<div class="empty-icon mx-auto mb-2">
-					<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+			<!-- Empty State -->
+			<div class="tut-pro-empty-state" id="docsEmpty" style="display:none;">
+				<div class="tut-pro-empty-icon">
+					<i class="fas fa-folder-open"></i>
 				</div>
-				<h4>No Documents</h4>
+				<h4>No Documents Found</h4>
 				<p id="docsEmptyMsg">No project files have been uploaded yet.</p>
 			</div>
 
-			<div id="docsPagination" class="tut-pagination" style="display:none;"></div>
+			<!-- Pagination -->
+			<div class="tut-pro-pagination" id="docsPagination" style="display:none;"></div>
 		</div>
 	</div>
 </div>
@@ -56,10 +94,22 @@ function escHtml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function getFileIcon(file_type) {
+    var type = (file_type || '').toLowerCase();
+    if (type === 'pdf') return '<i class="fas fa-file-pdf" style="color: #ef4444;"></i>';
+    if (type.includes('image') || type === 'png' || type === 'jpg' || type === 'jpeg') return '<i class="fas fa-file-image" style="color: #06b6d4;"></i>';
+    if (type === 'docx' || type === 'doc' || type.includes('word')) return '<i class="fas fa-file-word" style="color: #3b82f6;"></i>';
+    if (type === 'xlsx' || type === 'xls' || type.includes('excel')) return '<i class="fas fa-file-excel" style="color: #22c55e;"></i>';
+    if (type === 'pptx' || type === 'ppt') return '<i class="fas fa-file-powerpoint" style="color: #f59e0b;"></i>';
+    if (type === 'txt' || type === 'md') return '<i class="fas fa-file-code" style="color: #8b5cf6;"></i>';
+    return '<i class="fas fa-file" style="color: #64748b;"></i>';
+}
+
 function loadDocuments(offset) {
-	document.getElementById('docsLoading').style.display = 'block';
+	document.getElementById('docsLoading').style.display = 'flex';
 	document.getElementById('docsContent').style.display = 'none';
 	document.getElementById('docsEmpty').style.display = 'none';
+	document.getElementById('docsPagination').style.display = 'none';
 
 	fetch('/api/method/team_update_tool.api.projects.get_documents?limit=20&offset=' + offset)
 		.then(function(r) {
@@ -68,57 +118,172 @@ function loadDocuments(offset) {
 		})
 		.then(function(data) {
 			document.getElementById('docsLoading').style.display = 'none';
+			document.getElementById('docsContent').style.display = 'block';
+			
 			if (!data.message) {
 				document.getElementById('docsEmpty').style.display = 'block';
-				document.getElementById('docsContent').style.display = 'block';
+				document.getElementById('docsEmptyMsg').textContent = 'No data received from server.';
 				return;
 			}
+			
 			var d = data.message;
 			
-			// Show stats
-			document.getElementById('docsStats').innerHTML = '<div class="tut-stat-card"><div class="tut-stat-icon tut-stat-icon-blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div><div class="tut-stat-number">' + d.total + '</div><div class="tut-stat-label">Total Documents</div></div></div>';
+			// Update stats
+			document.getElementById('totalDocs').textContent = d.total || 0;
 			
-			// Show debug info if available
-			if (d.debug) {
-				document.getElementById('docsProjects').innerHTML = '<div class="tut-stat-card"><div class="tut-stat-icon tut-stat-icon-green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div><div><div class="tut-stat-number">' + d.debug.projects_count + '</div><div class="tut-stat-label">Visible Projects</div></div></div>';
+			// Count approved vs pending
+			var approvedCount = 0;
+			var pendingCount = 0;
+			if (d.documents && d.documents.length) {
+				d.documents.forEach(function(f) {
+					if (f.is_approved) approvedCount++;
+					else pendingCount++;
+				});
 			}
+			document.getElementById('approvedDocs').textContent = approvedCount;
+			document.getElementById('pendingDocs').textContent = pendingCount;
 
 			if (d.documents && d.documents.length) {
 				var html = '';
 				d.documents.forEach(function(f) {
-					html += '<a href="' + f.file + '" target="_blank" class="tut-file-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><div><div class="tut-file-name">' + escHtml(f.file_name) + '</div><div class="tut-file-desc">' + escHtml(f.project_title) + (f.file_type ? ' — ' + f.file_type : '') + '</div></div></a>';
+					var statusClass = f.is_approved ? 'approved' : 'pending';
+					var statusIcon = f.is_approved ? 'fa-check-circle' : 'fa-clock';
+					var statusBg = f.is_approved ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)';
+					var statusColor = f.is_approved ? '#10b981' : '#f59e0b';
+					var statusText = f.is_approved ? 'Approved' : 'Pending';
+					
+					html += '<div class="col-12 col-md-6 col-lg-4">';
+					html += '<div class="tut-doc-card">';
+					html += '<div class="tut-doc-header">';
+					html += '<div class="tut-doc-icon">' + getFileIcon(f.file_type) + '</div>';
+					html += '<span class="tut-doc-status" style="background:' + statusBg + '; color:' + statusColor + ';">';
+					html += '<i class="fas ' + statusIcon + ' me-1"></i>' + statusText;
+					html += '</span>';
+					html += '</div>';
+					html += '<div class="tut-doc-body">';
+					html += '<h5 class="tut-doc-filename">' + escHtml(f.file_name) + '</h5>';
+					html += '<div class="tut-doc-project">';
+					html += '<i class="fas fa-folder me-1"></i> ' + escHtml(f.project_title);
+					html += '</div>';
+					if (f.description) {
+						html += '<p class="tut-doc-desc">' + escHtml(f.description) + '</p>';
+					}
+					html += '</div>';
+					html += '<div class="tut-doc-footer">';
+					html += '<span class="tut-doc-type">' + (f.file_type || 'File') + '</span>';
+					html += '<a href="' + f.file + '" target="_blank" class="tut-doc-download">';
+					html += '<i class="fas fa-download me-1"></i> View';
+					html += '</a>';
+					html += '</div>';
+					html += '</div></div>';
 				});
 				document.getElementById('docsList').innerHTML = html;
 
+				// Pagination
 				if (d.has_more || offset > 0) {
-					var pagHtml = '<div class="d-flex align-items-center gap-2">';
-					if (offset > 0) pagHtml += '<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="loadDocuments(' + (offset - 20) + ')">← Previous</button>';
-					pagHtml += '<span class="text-muted small fw-semibold">' + (offset + 1) + '–' + Math.min(offset + 20, d.total) + ' of ' + d.total + '</span>';
-					if (d.has_more) pagHtml += '<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="loadDocuments(' + (offset + 20) + ')">Next →</button>';
-					pagHtml += '</div>';
+					var pagHtml = '<button ' + (offset > 0 ? 'onclick="loadDocuments(' + (offset - 20) + ')"' : 'disabled') + '>';
+					pagHtml += '<i class="fas fa-chevron-left"></i> Previous</button>';
+					pagHtml += '<span class="page-info">' + (offset + 1) + '–' + Math.min(offset + 20, d.total) + ' of ' + d.total + '</span>';
+					pagHtml += '<button ' + (d.has_more ? 'onclick="loadDocuments(' + (offset + 20) + ')"' : 'disabled') + '>';
+					pagHtml += 'Next <i class="fas fa-chevron-right"></i></button>';
 					document.getElementById('docsPagination').innerHTML = pagHtml;
 					document.getElementById('docsPagination').style.display = 'flex';
 				}
-				document.getElementById('docsContent').style.display = 'block';
 			} else {
-				// Show helpful message based on debug info
 				var emptyMsg = 'No project files have been uploaded yet.';
-				if (d.debug) {
-					if (d.debug.projects_count === 0) {
-						emptyMsg = 'No projects are visible to you. Either no projects exist, or (if you are a Viewer) projects must be approved first.';
-					} else if (d.debug.projects_with_files === 0) {
-						emptyMsg = 'There are ' + d.debug.projects_count + ' visible projects, but none of them have files attached yet.';
-					}
-				}
 				document.getElementById('docsEmptyMsg').textContent = emptyMsg;
 				document.getElementById('docsEmpty').style.display = 'block';
-				document.getElementById('docsContent').style.display = 'block';
 			}
 		})
 		.catch(function(err) {
 			console.error('Documents load error:', err);
-			document.getElementById('docsLoading').innerHTML = '<div class="text-center py-5"><p class="text-danger">Failed to load documents.</p><p class="text-muted small">Check browser console for details.</p><button class="btn btn-outline-secondary btn-sm" onclick="loadDocuments(0)">Try Again</button></div>';
+			document.getElementById('docsLoading').innerHTML = '<div class="tut-pro-empty-state"><div class="tut-pro-empty-icon"><i class="fas fa-exclamation-triangle"></i></div><h4>Failed to Load</h4><p>' + err.message + '</p><button class="btn btn-outline-secondary" onclick="loadDocuments(0)"><i class="fas fa-rotate me-1"></i> Try Again</button></div>';
 		});
 }
 </script>
+<style>
+.tut-doc-card {
+    background: var(--tut-card-bg);
+    border: 1px solid var(--tut-border);
+    border-radius: var(--tut-radius-xl);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+.tut-doc-card:hover {
+    box-shadow: var(--tut-shadow-lg);
+    transform: translateY(-4px);
+    border-color: transparent;
+}
+.tut-doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    background: var(--tut-bg);
+    border-bottom: 1px solid var(--tut-border);
+}
+.tut-doc-icon {
+    font-size: 2rem;
+}
+.tut-doc-status {
+    padding: 0.35rem 0.75rem;
+    border-radius: 50rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
+.tut-doc-body {
+    padding: 1.25rem;
+}
+.tut-doc-filename {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--tut-text);
+    margin-bottom: 0.5rem;
+    word-break: break-word;
+}
+.tut-doc-project {
+    font-size: 0.85rem;
+    color: var(--tut-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+.tut-doc-desc {
+    font-size: 0.85rem;
+    color: var(--tut-text-muted);
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+.tut-doc-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--tut-border);
+    background: var(--tut-bg);
+}
+.tut-doc-type {
+    font-size: 0.75rem;
+    color: var(--tut-text-light);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.tut-doc-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--tut-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.tut-doc-download:hover {
+    color: var(--tut-primary-dark);
+    gap: 0.5rem;
+}
+</style>
 {% endblock %}
