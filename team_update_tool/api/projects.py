@@ -622,39 +622,67 @@ def get_gallery(limit=30, offset=0):
 			frappe.log_error("Project DocType does not exist in database", "get_gallery Error")
 			return {"screenshots": [], "total": 0, "has_more": False, "error": "Project doctype not found"}
 		
-		# Build filters - show all projects to all users (no status restriction)
-		filters = {}
-		# Removed: No status filtering for view-only users - everyone can see all screenshots
-		
-		projects = frappe.get_all("Project", filters=filters, pluck="name")
-
 		all_screenshots = []
-		for p_name in projects:
-			try:
-				doc = frappe.get_cached_doc("Project", p_name)
-				for s in doc.screenshots or []:
+		
+		# Method 1: Try to fetch from Project Screenshots doctype directly
+		try:
+			# Get all screenshots from Project Screenshots doctype
+			screenshot_records = frappe.get_all("Project Screenshots",
+				fields=["name", "screenshot", "caption", "screenshot_type", "project"]
+			)
+			
+			for ss in screenshot_records:
+				# Get project title
+				project_title = ss.project
+				try:
+					if ss.project:
+						proj_doc = frappe.get_cached_doc("Project", ss.project)
+						project_title = getattr(proj_doc, "project_title", ss.project)
+				except:
+					pass
+				
+				if ss.screenshot:
 					all_screenshots.append({
-						"screenshot": s.screenshot,
-						"caption": s.caption or "",
-						"screenshot_type": s.screenshot_type or "",
-						"project": p_name,
-						"project_title": getattr(doc, "project_title", p_name),
+						"screenshot": ss.screenshot,
+						"caption": ss.caption or "",
+						"screenshot_type": ss.screenshot_type or "",
+						"project": ss.project or "",
+						"project_title": project_title,
 					})
-			except Exception as proj_error:
-				frappe.log_error(f"Error loading project {p_name}: {str(proj_error)}", "get_gallery Project Error")
-				continue
-
+		except Exception as ss_error:
+			frappe.log_error(f"Error fetching from Project Screenshots: {str(ss_error)}", "get_gallery Error")
+		
+		# Method 2: Also check for screenshots in Project child table
+		try:
+			projects = frappe.get_all("Project", pluck="name")
+			for p_name in projects:
+				try:
+					doc = frappe.get_cached_doc("Project", p_name)
+					for s in doc.screenshots or []:
+						# Check if this screenshot is already added
+						screenshot_url = s.screenshot
+						if screenshot_url and not any(ss.get('screenshot') == screenshot_url for ss in all_screenshots):
+							all_screenshots.append({
+								"screenshot": s.screenshot,
+								"caption": s.caption or "",
+								"screenshot_type": s.screenshot_type or "",
+								"project": p_name,
+								"project_title": getattr(doc, "project_title", p_name),
+							})
+				except Exception as proj_error:
+					continue
+		except Exception as proj_error:
+			frappe.log_error(f"Error loading project screenshots: {str(proj_error)}", "get_gallery Error")
+		
 		all_screenshots.reverse()
 		total = len(all_screenshots)
 		limited = all_screenshots[offset:offset + limit]
-
+		
 		return {"screenshots": limited, "total": total, "has_more": (offset + limit) < total}
 	except Exception as e:
 		frappe.log_error(f"Error in get_gallery: {str(e)}", "get_gallery Error")
 		return {"screenshots": [], "total": 0, "has_more": False, "error": str(e)}
 
-
-@frappe.whitelist()
 def create_project(project_title, team, status=None, project_category=None,
 				   priority="Medium", description=None, tags=None,
 				   start_date=None, due_date=None,
