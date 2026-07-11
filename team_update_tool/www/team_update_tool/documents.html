@@ -197,6 +197,11 @@ function loadDocuments(offset) {
 					var statusColor = f.is_approved ? '#10b981' : '#f59e0b';
 					var statusText = f.is_approved ? 'Approved' : 'Pending';
 					
+					// Ensure file URL is complete
+					var fileUrl = f.file;
+					if (fileUrl && !fileUrl.startsWith('http://') && !fileUrl.startsWith('https://')) {
+						fileUrl = window.location.origin + (fileUrl.startsWith('/') ? '' : '/') + fileUrl;
+					}
 					html += '<div class="col-12 col-md-6 col-lg-4">';
 					html += '<div class="tut-doc-card">';
 					html += '<div class="tut-doc-header">';
@@ -216,7 +221,7 @@ function loadDocuments(offset) {
 					html += '</div>';
 					html += '<div class="tut-doc-footer">';
 					html += '<span class="tut-doc-type">' + (f.file_type || 'File') + '</span>';
-					html += '<a href="' + f.file + '" target="_blank" class="tut-doc-download">';
+					html += '<a href="' + fileUrl + '" target="_blank" class="tut-doc-download">';
 					html += '<i class="fas fa-download me-1"></i> View';
 					html += '</a>';
 					html += '</div>';

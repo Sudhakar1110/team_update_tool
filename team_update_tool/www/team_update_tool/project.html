@@ -1067,8 +1067,14 @@ function renderProject(p) {
             '<div class="erp-card-body">' +
                 '<div class="erp-screenshot-gallery">';
         p.screenshots.forEach(function(s) {
+            // Ensure screenshot URL is complete
+            var screenshotUrl = s.screenshot;
+            if (screenshotUrl && !screenshotUrl.startsWith('http://') && !screenshotUrl.startsWith('https://')) {
+                screenshotUrl = window.location.origin + (screenshotUrl.startsWith('/') ? '' : '/') + screenshotUrl;
+            }
+
             html += '<div class="erp-screenshot-item">' +
-                '<img src="' + escHtml(s.screenshot) + '" alt="' + escHtml(s.caption || 'Screenshot') + '" loading="lazy" />' +
+                '<img src="' + screenshotUrl + '" alt="' + escHtml(s.caption || 'Screenshot') + '" loading="lazy" />' +
                 (s.caption ? '<div class="erp-screenshot-caption">' + escHtml(s.caption) + '</div>' : '') +
             '</div>';
         });

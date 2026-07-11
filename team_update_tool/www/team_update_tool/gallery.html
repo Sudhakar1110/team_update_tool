@@ -156,7 +156,12 @@ function loadGallery(offset) {
 			if (d.screenshots && d.screenshots.length) {
 				var html = '';
 				d.screenshots.forEach(function(s) {
-					html += '<div class="tut-gallery-card"><a href="' + s.screenshot + '" target="_blank"><img src="' + s.screenshot + '" alt="' + escHtml(s.caption || 'Screenshot') + '" loading="lazy"></a>' +
+					// Ensure screenshot URL is complete
+					var screenshotUrl = s.screenshot;
+					if (screenshotUrl && !screenshotUrl.startsWith('http://') && !screenshotUrl.startsWith('https://')) {
+						screenshotUrl = window.location.origin + (screenshotUrl.startsWith('/') ? '' : '/') + screenshotUrl;
+					}
+					html += '<div class="tut-gallery-card"><a href="' + screenshotUrl + '" target="_blank"><img src="' + screenshotUrl + '" alt="' + escHtml(s.caption || 'Screenshot') + '" loading="lazy"></a>' +
 						'<div class="card-body">' +
 						'<div class="d-flex align-items-center justify-content-between gap-2">' +
 						'<a href="/team_update_tool/project/' + s.project + '" class="fw-semibold small text-truncate text-decoration-none" style="color:#0f172a;">' + escHtml(s.project_title || 'View Project') + '</a>' +
