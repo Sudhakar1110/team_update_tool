@@ -529,9 +529,103 @@ def get_documents(limit=20, offset=0):
 		filters = {}
 		# Removed: No status filtering for view-only users - everyone can see all documents
 		
-		projects = frappe.get_all("Project", filters=filters, pluck="name")
-
 		all_files = []
+		
+		# Method 1: Fetch from Project Files doctype directly
+		try:
+			file_records = frappe.get_all("Project Files",
+				fields=["name", "file", "file_name", "file_type", "file_description", "project"]
+			)
+			
+			for fr in file_records:
+				# Get project title and status
+				project_title = fr.project or ""
+				status_name = "Unknown"
+				status_color = "#6b7280"
+				is_approved = False
+				
+				try:
+					if fr.project:
+						proj_doc = frappe.get_cached_doc("Project", fr.project)
+						project_title = getattr(proj_doc, "project_title", fr.project)
+						if proj_doc.status:
+							try:
+								status_doc = frappe.get_cached_doc("Project Status", proj_doc.status)
+								status_name = status_doc.status_name
+								status_color = status_doc.color
+								is_approved = (status_name.lower() == "approved")
+							except:
+								status_name = proj_doc.status
+				except:
+					pass
+				
+				if fr.file:
+					all_files.append({
+						"file": fr.file,
+						"file_name": fr.file_name or fr.file,
+						"file_type": fr.file_type or "",
+						"description": fr.file_description or "",
+						"project": fr.project or "",
+						"project_title": project_title,
+						"status": status_name,
+						"status_color": status_color,
+						"is_approved": is_approved,
+						"document_type": "file",
+					})
+		except Exception as file_error:
+			frappe.log_error(f"Error fetching from Project Files: {str(file_error)}", "get_documents Error")
+		
+		# Method 2: Fetch from Project Readme doctype directly
+		try:
+			readme_records = frappe.get_all("Project Readme",
+				fields=["name", "readme_content", "readme_file", "project"]
+			)
+			
+			for rm in readme_records:
+				# Get project title and status
+				project_title = rm.project or ""
+				status_name = "Unknown"
+				status_color = "#6b7280"
+				is_approved = False
+				
+				try:
+					if rm.project:
+						proj_doc = frappe.get_cached_doc("Project", rm.project)
+						project_title = getattr(proj_doc, "project_title", rm.project)
+						if proj_doc.status:
+							try:
+								status_doc = frappe.get_cached_doc("Project Status", proj_doc.status)
+								status_name = status_doc.status_name
+								status_color = status_doc.color
+								is_approved = (status_name.lower() == "approved")
+							except:
+								status_name = proj_doc.status
+				except:
+					pass
+				
+				readme_desc = ""
+				if rm.readme_content:
+					readme_desc = rm.readme_content[:200] + "..." if len(rm.readme_content) > 200 else rm.readme_content
+				readme_name = rm.readme_file.split("/")[-1] if rm.readme_file else "README - " + project_title
+				
+				all_files.append({
+					"file": rm.readme_file or "",
+					"file_name": readme_name,
+					"file_type": "md",
+					"description": readme_desc,
+					"project": rm.project or "",
+					"project_title": project_title,
+					"status": status_name,
+					"status_color": status_color,
+					"is_approved": is_approved,
+					"document_type": "readme",
+					"readme_content": rm.readme_content or "",
+				})
+		except Exception as readme_error:
+			frappe.log_error(f"Error fetching from Project Readme: {str(readme_error)}", "get_documents Error")
+		
+		# Method 3: Also check for files in Project child tables as fallback
+		projects = frappe.get_all("Project", filters=filters, pluck="name")
 		for p_name in projects:
 			try:
 				doc = frappe.get_cached_doc("Project", p_name)
