@@ -441,8 +441,13 @@
 					</svg>
 				</div>
 				<h1>My Projects</h1>
+				{% if is_viewer %}
+				<p>All projects — {{ full_name }}</p>
+				{% else %}
 				<p>Projects you own — {{ full_name }}</p>
+				{% endif %}
 			</div>
+			{% if not is_viewer %}
 			<a href="/team_update_tool/create_project" class="erp-new-btn">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
 					<line x1="12" y1="5" x2="12" y2="19"/>
@@ -450,6 +455,7 @@
 				</svg>
 				New Project
 			</a>
+			{% endif %}
 		</div>
 	</div>
 </div>
@@ -484,7 +490,15 @@
 					</div>
 					<h3 class="erp-project-title">{{ p.project_title }}</h3>
 					<div class="erp-project-meta">
-						{% if p.team %}
+						{% if is_viewer and p.owner %}
+						<span class="erp-project-meta-item">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+								<circle cx="12" cy="7" r="4"/>
+							</svg>
+							{{ p.owner }}
+						</span>
+						{% elif p.team %}
 						<span class="erp-project-meta-item">
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 								<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>

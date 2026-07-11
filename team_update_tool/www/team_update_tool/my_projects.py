@@ -17,12 +17,27 @@ def get_context(context):
 		frappe.local.flags.redirect_location = "/team_update_tool/login?redirect-to=/team_update_tool/my_projects"
 		raise frappe.Redirect
 
-	context.projects = frappe.get_all("Project",
-		filters={"owner": user},
-		fields=["name", "project_title", "status", "team", "priority",
-				"project_category", "creation", "completion_date"],
-		order_by="modified desc"
-	)
+	roles = frappe.get_roles(user)
+	is_admin = "Admin" in roles or "System Manager" in roles
+	is_viewer = "View-Only User" in roles and not is_admin
+
+	# For admin/team members: show owned projects
+	# For view-only users: show all projects (since we removed status filtering)
+	if is_viewer:
+		# View-only users can see all projects (no status restriction)
+		context.projects = frappe.get_all("Project",
+			fields=["name", "project_title", "status", "team", "priority",
+					"project_category", "creation", "completion_date", "owner"],
+			order_by="modified desc"
+		)
+	else:
+		# Admin and team members: show owned projects
+		context.projects = frappe.get_all("Project",
+			filters={"owner": user},
+			fields=["name", "project_title", "status", "team", "priority",
+					"project_category", "creation", "completion_date", "owner"],
+			order_by="modified desc"
+		)
 
 	for p in context.projects:
 		if p.status:
@@ -33,3 +48,5 @@ def get_context(context):
 		p.formatted_creation = frappe.format(p.creation, "Datetime") if p.creation else ""
 
 	context.full_name = frappe.utils.get_fullname(user)
+	context.is_admin = is_admin
+	context.is_viewer = is_viewer

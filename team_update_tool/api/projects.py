@@ -17,17 +17,12 @@ def _get_user_role_info():
 
 
 def _get_visible_filters():
-	"""Get base filters for View-Only Users."""
+	"""Get base filters for View-Only Users.
+	Returns empty filters for all user types so all projects are visible to everyone.
+	"""
 	roles, is_admin, is_team_member, is_viewer = _get_user_role_info()
+	# Don't filter by status - show all projects to all users (admin, team member, and view-only)
 	filters = {}
-	if is_viewer:
-		try:
-			approved = frappe.db.get_value("Project Status", {"status_name": "Approved"}, "name")
-			if approved:
-				filters["status"] = approved
-		except Exception:
-			# If Project Status doesn't exist, don't apply filter
-			pass
 	return filters, is_admin, is_viewer
 
 
@@ -530,15 +525,9 @@ def get_documents(limit=20, offset=0):
 			frappe.log_error("Project DocType does not exist in database", "get_documents Error")
 			return {"documents": [], "total": 0, "has_more": False, "error": "Project doctype not found"}
 		
-		# Build filters - for viewers, only show approved projects
+		# Build filters - show all projects to all users (no status restriction)
 		filters = {}
-		if is_viewer and not is_admin and not is_team_member:
-			try:
-				approved = frappe.db.get_value("Project Status", {"status_name": "Approved"}, "name")
-				if approved:
-					filters["status"] = approved
-			except Exception:
-				pass
+		# Removed: No status filtering for view-only users - everyone can see all screenshots
 		
 		projects = frappe.get_all("Project", filters=filters, pluck="name")
 
@@ -601,15 +590,9 @@ def get_gallery(limit=30, offset=0):
 			frappe.log_error("Project DocType does not exist in database", "get_gallery Error")
 			return {"screenshots": [], "total": 0, "has_more": False, "error": "Project doctype not found"}
 		
-		# Build filters - for viewers, only show approved projects
+		# Build filters - show all projects to all users (no status restriction)
 		filters = {}
-		if is_viewer and not is_admin and not is_team_member:
-			try:
-				approved = frappe.db.get_value("Project Status", {"status_name": "Approved"}, "name")
-				if approved:
-					filters["status"] = approved
-			except Exception:
-				pass
+		# Removed: No status filtering for view-only users - everyone can see all screenshots
 		
 		projects = frappe.get_all("Project", filters=filters, pluck="name")
 
