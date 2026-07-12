@@ -732,25 +732,26 @@ def get_gallery(limit=30, offset=0):
 	"""Get all screenshots from visible projects."""
 	import frappe
 	
-	def build_screenshot_url(screenshot_path):
-		"""Build a complete URL from a screenshot path."""
-		if not screenshot_path:
+	def get_screenshot_path(screenshot_value):
+		"""Get the correct screenshot path (relative) for frontend URL construction."""
+		if not screenshot_value:
 			return None
 		
-		# If already a full URL, return as is
-		if screenshot_path.startswith("http://") or screenshot_path.startswith("https://"):
-			return screenshot_path
+		# If it's already a full URL, return as is
+		if screenshot_value.startswith("http://") or screenshot_value.startswith("https://"):
+			return screenshot_value
 		
-		# Get base URL
-		base_url = frappe.request.host_url.rstrip("/") if frappe.request and frappe.request.host_url else "http://team.update.bizaxl.local"
-		
-		# Handle different path formats
-		if screenshot_path.startswith("/files/"):
-			return base_url + screenshot_path
-		elif screenshot_path.startswith("files/"):
-			return base_url + "/" + screenshot_path
+		# Handle different path formats that might be stored in Frappe
+		# Return relative path starting with /
+		if screenshot_value.startswith("/files/"):
+			return screenshot_value
+		elif screenshot_value.startswith("files/"):
+			return "/" + screenshot_value
+		elif screenshot_value.startswith("/"):
+			return "/files" + screenshot_value
 		else:
-			return base_url + "/files/" + screenshot_path
+			return "/files/" + screenshot_value
+
 	
 	try:
 		all_screenshots = []
@@ -784,11 +785,11 @@ def get_gallery(limit=30, offset=0):
 					except:
 						pass
 				
-				screenshot_url = build_screenshot_url(ss.screenshot)
-				if screenshot_url:
+				screenshot_path = get_screenshot_path(ss.screenshot)
+				if screenshot_path:
 					debug_info["method1_count"] += 1
 					all_screenshots.append({
-						"screenshot": screenshot_url,
+						"screenshot": screenshot_path,
 						"caption": ss.caption or "",
 						"screenshot_type": ss.screenshot_type or "",
 						"project": ss.project or "",
@@ -814,16 +815,16 @@ def get_gallery(limit=30, offset=0):
 						if not s.screenshot:
 							continue
 						
-						screenshot_url = build_screenshot_url(s.screenshot)
+						screenshot_path = get_screenshot_path(s.screenshot)
 						
 						# Check for duplicates
-						if screenshot_url and not any(ss.get('screenshot') == screenshot_url for ss in all_screenshots):
-							debug_info["method2_count"] += 1
-							child_screenshot_count += 1
-							all_screenshots.append({
-								"screenshot": screenshot_url,
-								"caption": s.caption or "",
-								"screenshot_type": s.screenshot_type or "",
+						if screenshot_path and not any(ss.get("screenshot") == screenshot_path for ss in all_screenshots):
+								debug_info["method2_count"] += 1
+								child_screenshot_count += 1
+								all_screenshots.append({
+									"screenshot": screenshot_path,
+									"caption": s.caption or "",
+									"screenshot_type": s.screenshot_type or "",
 								"project": p_name,
 								"project_title": project_title,
 							})

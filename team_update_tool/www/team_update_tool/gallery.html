@@ -157,10 +157,18 @@ function loadGallery(offset) {
 				var html = '';
 				d.screenshots.forEach(function(s) {
 					// Ensure screenshot URL is complete
-					var screenshotUrl = s.screenshot;
+					var screenshotUrl = s.screenshot || '';
+					
+					// If screenshot is a relative path (not starting with http), construct full URL
 					if (screenshotUrl && !screenshotUrl.startsWith('http://') && !screenshotUrl.startsWith('https://')) {
-						screenshotUrl = window.location.origin + (screenshotUrl.startsWith('/') ? '' : '/') + screenshotUrl;
+						var baseUrl = window.location.origin;
+						if (screenshotUrl.startsWith('/')) {
+							screenshotUrl = baseUrl + screenshotUrl;
+						} else {
+							screenshotUrl = baseUrl + '/' + screenshotUrl;
+						}
 					}
+					
 					html += '<div class="tut-gallery-card"><a href="' + screenshotUrl + '" target="_blank"><img src="' + screenshotUrl + '" alt="' + escHtml(s.caption || 'Screenshot') + '" loading="lazy"></a>' +
 						'<div class="card-body">' +
 						'<div class="d-flex align-items-center justify-content-between gap-2">' +
