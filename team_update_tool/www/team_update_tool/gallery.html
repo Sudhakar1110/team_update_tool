@@ -151,6 +151,12 @@ var galleryLimit = 30;
 function imgError(img) {
 img.style.display = 'none';
 img.nextElementSibling.style.display = 'flex';
+// Hide the card body if no image
+var card = img.closest('.tut-gallery-card');
+if (card) {
+card.style.opacity = '0.6';
+card.style.border = '2px dashed #dc3545';
+}
 }
 
 
