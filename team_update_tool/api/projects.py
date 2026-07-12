@@ -715,50 +715,59 @@ def get_documents(limit=20, offset=0):
 @frappe.whitelist(allow_guest=True)
 def get_gallery(limit=30, offset=0):
 	"""Get all screenshots from visible projects."""
+	import frappe
+	
+	def build_screenshot_url(screenshot_path):
+		"""Build a complete URL from a screenshot path."""
+		if not screenshot_path:
+			return None
+		
+		# If already a full URL, return as is
+		if screenshot_path.startswith("http://") or screenshot_path.startswith("https://"):
+			return screenshot_path
+		
+		# Get base URL
+		base_url = frappe.request.host_url.rstrip("/") if frappe.request and frappe.request.host_url else "http://team.update.bizaxl.local"
+		
+		# Handle different path formats
+		if screenshot_path.startswith("/files/"):
+			return base_url + screenshot_path
+		elif screenshot_path.startswith("files/"):
+			return base_url + "/" + screenshot_path
+		else:
+			return base_url + "/files/" + screenshot_path
+	
 	try:
-		roles, is_admin, is_team_member, is_viewer = _get_user_role_info()
+		all_screenshots = []
 		
 		# Validate limit and offset
 		limit = min(max(int(limit) if limit else 30, 1), 100)
 		offset = max(int(offset) if offset else 0, 0)
 		
-		# Check if Project doctype exists
-		if not frappe.db.exists("DocType", "Project"):
-			frappe.log_error("Project DocType does not exist in database", "get_gallery Error")
-			return {"screenshots": [], "total": 0, "has_more": False, "error": "Project doctype not found"}
-		
-		all_screenshots = []
-		
-		# Method 1: Try to fetch from Project Screenshots doctype directly
+		# Method 1: Fetch from Project Screenshots doctype directly
 		try:
-			# Get all screenshots from Project Screenshots doctype
 			screenshot_records = frappe.db.sql("""
 				SELECT name, screenshot, caption, screenshot_type, project
 				FROM `tabProject Screenshots`
+				WHERE screenshot IS NOT NULL AND screenshot != ''
 				ORDER BY creation DESC
 			""", as_dict=True)
 			
 			for ss in screenshot_records:
+				if not ss.screenshot:
+					continue
+				
 				# Get project title
-				project_title = ss.project
-				try:
-					if ss.project:
+				project_title = ss.project or "Unknown Project"
+				if ss.project:
+					try:
 						proj_doc = frappe.get_cached_doc("Project", ss.project, ignore_permissions=True)
 						project_title = getattr(proj_doc, "project_title", ss.project)
-				except:
-					pass
+					except:
+						pass
 				
-				if ss.screenshot:
-					# Build correct file URL
-					screenshot_url = ss.screenshot
-					if screenshot_url:
-						if not screenshot_url.startswith("http://") and not screenshot_url.startswith("https://"):
-							if screenshot_url.startswith("/files/"):
-								screenshot_url = (frappe.request.host_url or "http://localhost").rstrip("/") + screenshot_url
-							elif screenshot_url.startswith("files/"):
-								screenshot_url = (frappe.request.host_url or "http://localhost").rstrip("/") + "/" + screenshot_url
-							else:
-								screenshot_url = (frappe.request.host_url or "http://localhost").rstrip("/") + "/files/" + screenshot_url
+				screenshot_url = build_screenshot_url(ss.screenshot)
+				if screenshot_url:
 					all_screenshots.append({
 						"screenshot": screenshot_url,
 						"caption": ss.caption or "",
@@ -769,38 +778,36 @@ def get_gallery(limit=30, offset=0):
 		except Exception as ss_error:
 			frappe.log_error(f"Error fetching from Project Screenshots: {str(ss_error)}", "get_gallery Error")
 		
-		# Method 2: Also check for screenshots in Project child table
+		# Method 2: Fetch from Project child table (screenshots)
 		try:
 			projects = frappe.db.sql("SELECT name FROM `tabProject`", as_dict=True)
 			for proj in projects:
 				p_name = proj.name
 				try:
 					doc = frappe.get_cached_doc("Project", p_name, ignore_permissions=True)
+					project_title = getattr(doc, "project_title", p_name)
+					
 					for s in doc.screenshots or []:
-						# Check if this screenshot is already added
-						# Build correct file URL
-						final_url = s.screenshot
-						if final_url:
-							if not final_url.startswith("http://") and not final_url.startswith("https://"):
-								if final_url.startswith("/files/"):
-									final_url = (frappe.request.host_url or "http://localhost").rstrip("/") + final_url
-								elif final_url.startswith("files/"):
-									final_url = (frappe.request.host_url or "http://localhost").rstrip("/") + "/" + final_url
-								else:
-									final_url = (frappe.request.host_url or "http://localhost").rstrip("/") + "/files/" + final_url
-						if final_url and not any(ss.get('screenshot') == final_url for ss in all_screenshots):
+						if not s.screenshot:
+							continue
+						
+						screenshot_url = build_screenshot_url(s.screenshot)
+						
+						# Check for duplicates
+						if screenshot_url and not any(ss.get('screenshot') == screenshot_url for ss in all_screenshots):
 							all_screenshots.append({
-								"screenshot": final_url,
+								"screenshot": screenshot_url,
 								"caption": s.caption or "",
 								"screenshot_type": s.screenshot_type or "",
 								"project": p_name,
-								"project_title": getattr(doc, "project_title", p_name),
+								"project_title": project_title,
 							})
 				except Exception as proj_error:
 					continue
 		except Exception as proj_error:
 			frappe.log_error(f"Error loading project screenshots: {str(proj_error)}", "get_gallery Error")
 		
+		# Sort by creation (newest first) and apply pagination
 		all_screenshots.reverse()
 		total = len(all_screenshots)
 		limited = all_screenshots[offset:offset + limit]
