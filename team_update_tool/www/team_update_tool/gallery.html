@@ -124,73 +124,73 @@
 
 {% block script %}
 <script>
-frappe.ready(function() { loadGallery(0); });
-
-var galleryLimit = 24;
-
-function escHtml(s) {
-    if (!s) return '';
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+var galleryLimit = 30;
+function escHtml(str) {
+if (!str) return '';
+return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function loadGallery(offset) {
-	document.getElementById('galleryLoading').style.display = 'block';
-	document.getElementById('galleryContent').style.display = 'none';
-	document.getElementById('galleryEmpty').style.display = 'none';
+document.getElementById('galleryLoading').style.display = 'block';
+document.getElementById('galleryContent').style.display = 'none';
+document.getElementById('galleryEmpty').style.display = 'none';
 
-	fetch('/api/method/team_update_tool.api.projects.get_gallery?limit=' + galleryLimit + '&offset=' + offset)
-		.then(function(r) {
-			if (!r.ok) throw new Error('API request failed');
-			return r.json();
-		})
-		.then(function(data) {
-			document.getElementById('galleryLoading').style.display = 'none';
-			if (!data.message) {
-				document.getElementById('galleryEmpty').style.display = 'block';
-				document.getElementById('galleryContent').style.display = 'block';
-				return;
-			}
-			var d = data.message;
-			document.getElementById('galleryTotal').textContent = d.total + ' screenshot' + (d.total !== 1 ? 's' : '');
-				// Show debug info for troubleshooting
-				if (d.debug) {
-					console.log('Gallery Debug Info:', JSON.stringify(d.debug, null, 2));
-				}
+frappe.call({
+method: 'team_update_tool.api.projects.get_gallery',
+args: {
+limit: galleryLimit,
+offset: offset
+},
+callback: function(data) {
+document.getElementById('galleryLoading').style.display = 'none';
+if (!data.message) {
+document.getElementById('galleryEmpty').style.display = 'block';
+document.getElementById('galleryContent').style.display = 'block';
+return;
+}
+var d = data.message;
+document.getElementById('galleryTotal').textContent = d.total + ' screenshot' + (d.total !== 1 ? 's' : '');
 
-			if (d.screenshots && d.screenshots.length) {
-				var html = '';
-				d.screenshots.forEach(function(s) {
-					// Use screenshot URL directly (API returns full URLs)
-					var screenshotUrl = s.screenshot || '';
-					
-					html += '<div class="tut-gallery-card"><a href="' + screenshotUrl + '" target="_blank"><img src="' + screenshotUrl + '" alt="' + escHtml(s.caption || 'Screenshot') + '" loading="lazy"></a>' +
-						'<div class="card-body">' +
-						'<div class="d-flex align-items-center justify-content-between gap-2">' +
-						'<a href="/team_update_tool/project/' + s.project + '" class="fw-semibold small text-truncate text-decoration-none" style="color:#0f172a;">' + escHtml(s.project_title || s.project || 'Project') + '</a>' +
-						(s.screenshot_type ? '<span class="badge bg-light text-muted fw-normal" style="font-size:0.7rem;">' + escHtml(s.screenshot_type) + '</span>' : '') +
-						'</div></div></div>';
-				});
-				document.getElementById('galleryGrid').innerHTML = html;
+// Show debug info for troubleshooting
+if (d.debug) {
+console.log('Gallery Debug Info:', d.debug);
+}
 
-				if (d.has_more || offset > 0) {
-					var pagHtml = '<div class="d-flex align-items-center gap-2">';
-					if (offset > 0) pagHtml += '<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="loadGallery(' + (offset - galleryLimit) + ')">← Previous</button>';
-					pagHtml += '<span class="text-muted small fw-semibold">' + (offset + 1) + '–' + Math.min(offset + galleryLimit, d.total) + ' of ' + d.total + '</span>';
-					if (d.has_more) pagHtml += '<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="loadGallery(' + (offset + galleryLimit) + ')">Next →</button>';
-					pagHtml += '</div>';
-					document.getElementById('galleryPagination').innerHTML = pagHtml;
-					document.getElementById('galleryPagination').style.display = 'flex';
-				}
-				document.getElementById('galleryContent').style.display = 'block';
-			} else {
-				document.getElementById('galleryEmpty').style.display = 'block';
-				document.getElementById('galleryContent').style.display = 'block';
-			}
-		})
-		.catch(function(err) {
-			console.error('Gallery load error:', err);
-			document.getElementById('galleryLoading').innerHTML = '<div class="text-center py-5"><p class="text-danger">Failed to load gallery.</p><p class="text-muted small">Check browser console for details.</p><button class="btn btn-outline-secondary btn-sm" onclick="loadGallery(0)">Try Again</button></div>';
-		});
+if (d.screenshots && d.screenshots.length) {
+var html = '';
+d.screenshots.forEach(function(s) {
+// Use screenshot URL directly (API returns full URLs)
+var screenshotUrl = s.screenshot || '';
+
+html += '<div class="tut-gallery-card"><a href="' + screenshotUrl + '" target="_blank"><img src="' + screenshotUrl + '" alt="' + escHtml(s.caption || 'Screenshot') + '" loading="lazy"></a>' +
+'<div class="card-body">' +
+'<div class="d-flex align-items-center justify-content-between gap-2">' +
+'<a href="/team_update_tool/project/' + s.project + '" class="fw-semibold small text-truncate text-decoration-none" style="color:#0f172a;">' + escHtml(s.project_title || s.project || 'Project') + '</a>' +
+(s.screenshot_type ? '<span class="badge bg-light text-muted fw-normal" style="font-size:0.7rem;">' + escHtml(s.screenshot_type) + '</span>' : '') +
+'</div></div></div>';
+});
+document.getElementById('galleryGrid').innerHTML = html;
+
+if (d.has_more || offset > 0) {
+var pagHtml = '<div class="d-flex align-items-center gap-2">';
+if (offset > 0) pagHtml += '<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="loadGallery(' + (offset - galleryLimit) + ')">← Previous</button>';
+pagHtml += '<span class="text-muted small fw-semibold">' + (offset + 1) + '–' + Math.min(offset + galleryLimit, d.total) + ' of ' + d.total + '</span>';
+if (d.has_more) pagHtml += '<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="loadGallery(' + (offset + galleryLimit) + ')">Next →</button>';
+pagHtml += '</div>';
+document.getElementById('galleryPagination').innerHTML = pagHtml;
+document.getElementById('galleryPagination').style.display = 'flex';
+}
+document.getElementById('galleryContent').style.display = 'block';
+} else {
+document.getElementById('galleryEmpty').style.display = 'block';
+document.getElementById('galleryContent').style.display = 'block';
+}
+},
+error: function(err) {
+console.error('Gallery load error:', err);
+document.getElementById('galleryLoading').innerHTML = '<div class="text-center py-5"><p class="text-danger">Failed to load gallery.</p><p class="text-muted small">Check browser console for details.</p><button class="btn btn-outline-secondary btn-sm" onclick="loadGallery(0)">Try Again</button></div>';
+}
+});
 }
 </script>
 {% endblock %}
