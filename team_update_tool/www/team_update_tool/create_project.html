@@ -4,14 +4,15 @@
 
 {% block style %}
 <link rel="stylesheet" href="/assets/team_update_tool/css/team_update_tool.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <style>
 /* =====================================
-   ERPNext 15 Professional Create Project UI
+   Royal Professional Create Project UI
    ===================================== */
 
-/* Page Header - ERPNext 15 Style */
+/* Page Header - Royal Style */
 .erp-page-header {
-    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    background: var(--tut-dark-gradient);
     border-bottom: none;
     padding: 2.5rem 0 2rem;
     position: relative;
@@ -25,8 +26,8 @@
     right: -10%;
     width: 400px;
     height: 400px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 50%;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%237c3aed' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
 }
 
 .erp-page-header::after {
@@ -36,7 +37,7 @@
     left: 10%;
     width: 300px;
     height: 300px;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(217, 119, 6, 0.1);
     border-radius: 50%;
 }
 
@@ -46,15 +47,27 @@
 }
 
 .erp-page-header h1 {
+    font-family: 'Playfair Display', serif;
     font-size: 1.75rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #ffffff;
     margin: 0;
     letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.erp-page-header h1::before {
+    content: '';
+    width: 6px;
+    height: 35px;
+    background: linear-gradient(180deg, var(--tut-gold) 0%, var(--tut-gold-light) 100%);
+    border-radius: 3px;
 }
 
 .erp-page-header p {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.75);
     margin: 0.5rem 0 0;
     font-size: 0.95rem;
 }
@@ -66,7 +79,7 @@
     padding: 2rem 0;
 }
 
-/* Step Progress - ERPNext 15 Style */
+/* Step Progress - Royal Style */
 .erp-step-progress {
     display: flex;
     justify-content: space-between;
@@ -93,7 +106,7 @@
     top: 20px;
     left: 40px;
     height: 3px;
-    background: linear-gradient(90deg, #1a73e8, #34a853);
+    background: linear-gradient(90deg, var(--tut-primary) 0%, var(--tut-gold) 100%);
     border-radius: 2px;
     z-index: 1;
     transition: width 0.3s ease;
@@ -119,21 +132,21 @@
     justify-content: center;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #5f6368;
+    color: #ffffff;
     transition: all 0.3s ease;
     margin-bottom: 0.5rem;
 }
 
 .erp-step-item.active .erp-step-circle {
-    background: #1a73e8;
-    border-color: #1a73e8;
+    background: var(--tut-primary);
+    border-color: var(--tut-primary);
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
 }
 
 .erp-step-item.completed .erp-step-circle {
-    background: #34a853;
-    border-color: #34a853;
+    background: var(--tut-gold);
+    border-color: var(--tut-gold);
     color: #ffffff;
 }
 
@@ -146,20 +159,20 @@
 
 .erp-step-desc {
     font-size: 0.75rem;
-    color: #5f6368;
+    color: #ffffff;
     text-align: center;
 }
 
 .erp-step-item.active .erp-step-label {
-    color: #1a73e8;
+    color: var(--tut-primary);
 }
 
-/* Form Card */
+/* Form Card - Royal Style */
 .erp-form-card {
     background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.1);
     overflow: hidden;
     margin-bottom: 1.5rem;
 }
@@ -170,24 +183,26 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    background: linear-gradient(to bottom, #ffffff, #fafafa);
+    background: linear-gradient(135deg, #fafafa 0%, #f5f3ff 100%);
 }
 
 .erp-form-card-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 56px;
+    height: 56px;
+    background: var(--tut-primary-gradient);
+    border-radius: 50%;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
 
-.erp-form-card-icon.blue { background: #e3f2fd; color: #1976d2; }
-.erp-form-card-icon.green { background: #e8f5e9; color: #388e3c; }
-.erp-form-card-icon.purple { background: #f3e5f5; color: #7b1fa2; }
-.erp-form-card-icon.orange { background: #fff3e0; color: #f57c00; }
-.erp-form-card-icon.cyan { background: #e0f7fa; color: #00838f; }
+.erp-form-card-icon.blue { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: #1565c0; }
+.erp-form-card-icon.green { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32; }
+.erp-form-card-icon.purple { background: var(--tut-primary-light); color: var(--tut-primary); }
+.erp-form-card-icon.orange { background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #e65100; }
+.erp-form-card-icon.cyan { background: linear-gradient(135deg, #e0f7fa, #b2ebf2); color: #00838f; }
 
 .erp-form-card-icon svg {
     width: 24px;
@@ -195,15 +210,16 @@
 }
 
 .erp-form-card-title {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
     color: #1c1e21;
     margin: 0;
 }
 
 .erp-form-card-subtitle {
     font-size: 0.85rem;
-    color: #5f6368;
+    color: #ffffff;
     margin: 0.25rem 0 0;
 }
 
@@ -232,7 +248,7 @@
     color: #c62828;
 }
 
-/* Input Styles */
+/* Input Styles - Royal */
 .erp-form-input,
 .erp-form-select,
 .erp-form-textarea {
@@ -241,9 +257,9 @@
     font-size: 0.95rem;
     color: #1c1e21;
     background: #ffffff;
-    border: 1px solid #d0d0d0;
-    border-radius: 8px;
-    transition: all 0.2s ease;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    transition: all 0.3s ease;
     font-family: inherit;
 }
 
@@ -251,8 +267,8 @@
 .erp-form-select:focus,
 .erp-form-textarea:focus {
     outline: none;
-    border-color: #1a73e8;
-    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+    border-color: var(--tut-primary);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
 }
 
 .erp-form-input::placeholder,
@@ -269,7 +285,7 @@
 
 .erp-form-select {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237c3aed' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 40px;
@@ -280,7 +296,7 @@
     min-height: 120px;
 }
 
-/* Tech Grid */
+/* Tech Grid - Royal */
 .erp-tech-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -292,63 +308,65 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background: #f8f9fa;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    background: var(--tut-primary-light);
+    border: 2px solid transparent;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     font-size: 0.875rem;
     color: #1c1e21;
 }
 
 .erp-tech-label:hover {
-    background: #e8eaed;
-    border-color: #d0d0d0;
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    border-color: var(--tut-primary);
 }
 
 .erp-tech-label input {
     width: 18px;
     height: 18px;
-    accent-color: #1a73e8;
+    accent-color: var(--tut-primary);
 }
 
 .erp-tech-label.selected {
-    background: #e3f2fd;
-    border-color: #1a73e8;
-    color: #1976d2;
+    background: var(--tut-primary-light);
+    border-color: var(--tut-primary);
+    color: var(--tut-primary);
 }
 
 /* File Upload Area */
 .erp-upload-area {
-    border: 2px dashed #d0d0d0;
-    border-radius: 12px;
+    border: 2px dashed var(--tut-primary);
+    border-radius: 16px;
     padding: 2rem;
     text-align: center;
-    background: #fafafa;
-    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f3ff 100%);
+    transition: all 0.3s ease;
     cursor: pointer;
 }
 
 .erp-upload-area:hover {
-    border-color: #1a73e8;
-    background: #f0f4ff;
+    border-color: var(--tut-primary);
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
 }
 
 .erp-upload-area.dragover {
-    border-color: #1a73e8;
-    background: #e3f2fd;
+    border-color: var(--tut-primary);
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
 }
 
 .erp-upload-icon {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
+    background: var(--tut-primary-gradient);
+    border-radius: 50%;
     margin: 0 auto 1rem;
-    background: #e8eaed;
+    background: var(--tut-primary-gradient);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #5f6368;
+    color: #ffffff;
 }
 
 .erp-upload-text {
@@ -359,7 +377,7 @@
 
 .erp-upload-hint {
     font-size: 0.8rem;
-    color: #5f6368;
+    color: #ffffff;
 }
 
 /* Preview Images */
@@ -372,10 +390,10 @@
 
 .erp-preview-item {
     position: relative;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     aspect-ratio: 16/10;
-    border: 1px solid #e0e0e0;
+    border: 2px solid var(--tut-primary-light);
 }
 
 .erp-preview-item img {
@@ -418,20 +436,20 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
-    background: #f8f9fa;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    background: var(--tut-primary-light);
+    border: 2px solid var(--tut-primary-light);
+    border-radius: 10px;
 }
 
 .erp-file-icon {
     width: 40px;
     height: 40px;
-    border-radius: 8px;
+    border-radius: 10px;
     background: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #5f6368;
+    color: #ffffff;
 }
 
 .erp-file-info {
@@ -450,7 +468,7 @@
 
 .erp-file-size {
     font-size: 0.75rem;
-    color: #5f6368;
+    color: #ffffff;
 }
 
 .erp-file-remove {
@@ -458,13 +476,13 @@
     height: 32px;
     border-radius: 50%;
     background: transparent;
-    border: 1px solid #e0e0e0;
-    color: #5f6368;
+    border: 2px solid var(--tut-primary-light);
+    color: #ffffff;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .erp-file-remove:hover {
@@ -479,7 +497,7 @@
     align-items: flex-start;
     gap: 0.75rem;
     padding: 1rem 1.25rem;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-bottom: 1rem;
 }
 
@@ -505,7 +523,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem;
-    background: #fafafa;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f3ff 100%);
     border-top: 1px solid #e8eaed;
 }
 
@@ -517,32 +535,32 @@
     padding: 0.75rem 1.5rem;
     font-size: 0.95rem;
     font-weight: 600;
-    border-radius: 8px;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     text-decoration: none;
 }
 
 .erp-btn-primary {
-    background: #1a73e8;
+    background: var(--tut-primary-gradient);
     color: #ffffff;
 }
 
 .erp-btn-primary:hover {
-    background: #1557b0;
+    transform: translateY(-2px);
     transform: translateY(-1px);
 }
 
 .erp-btn-secondary {
     background: #ffffff;
     color: #1a73e8;
-    border: 1px solid #d0d0d0;
+    border: 2px solid #e0e0e0;
 }
 
 .erp-btn-secondary:hover {
     background: #f5f7fa;
-    border-color: #1a73e8;
+    border-color: var(--tut-primary);
 }
 
 .erp-btn:disabled {
@@ -557,7 +575,7 @@
     align-items: flex-start;
     gap: 1rem;
     padding: 1.25rem;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-bottom: 1.5rem;
 }
 
@@ -635,7 +653,7 @@
     gap: 0.75rem;
     padding: 1rem 1.25rem;
     background: #ffffff;
-    border-radius: 8px;
+    border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 300px;
     animation: erp-toast-in 0.3s ease;
@@ -675,7 +693,7 @@
     gap: 0.75rem;
     padding: 1rem 1.25rem;
     background: #ffffff;
-    border-radius: 8px;
+    border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 300px;
     animation: erp-toast-in 0.3s ease;
@@ -694,7 +712,7 @@
 
 .erp-preview-value {
     font-size: 0.875rem;
-    color: #5f6368;
+    color: #ffffff;
     margin-bottom: 0.25rem;
 }
 
@@ -719,7 +737,7 @@
 .erp-preview-label {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #5f6368;
+    color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 0.03em;
     margin-bottom: 0.35rem;
@@ -733,10 +751,10 @@
 }
 
 .erp-preview-image-thumb {
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     aspect-ratio: 16/10;
-    border: 1px solid #e0e0e0;
+    border: 2px solid var(--tut-primary-light);
 }
 
 .erp-preview-image-thumb img {
@@ -749,8 +767,8 @@
     display: inline-flex;
     align-items: center;
     padding: 0.25rem 0.5rem;
-    background: #e3f2fd;
-    color: #1976d2;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: var(--tut-primary);
     border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 500;
@@ -774,16 +792,16 @@
     align-items: center;
     padding: 0.25rem 0.5rem;
     background: #f1f3f4;
-    color: #5f6368;
+    color: #ffffff;
     border-radius: 4px;
     font-size: 0.7rem;
     font-weight: 500;
 }
 
 .erp-preview-desc-box {
-    background: #f8f9fa;
+    background: var(--tut-primary-light);
     padding: 0.75rem 1rem;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 0.875rem;
     line-height: 1.6;
     margin-top: 0.5rem;
