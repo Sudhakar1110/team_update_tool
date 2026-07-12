@@ -739,6 +739,7 @@ def get_gallery(limit=30, offset=0):
 	
 	try:
 		all_screenshots = []
+		debug_info = {"method1_count": 0, "method2_count": 0, "errors": []}
 		
 		# Validate limit and offset
 		limit = min(max(int(limit) if limit else 30, 1), 100)
@@ -752,6 +753,8 @@ def get_gallery(limit=30, offset=0):
 				WHERE screenshot IS NOT NULL AND screenshot != ''
 				ORDER BY creation DESC
 			""", as_dict=True)
+			
+			debug_info["method1_total"] = len(screenshot_records)
 			
 			for ss in screenshot_records:
 				if not ss.screenshot:
@@ -768,6 +771,7 @@ def get_gallery(limit=30, offset=0):
 				
 				screenshot_url = build_screenshot_url(ss.screenshot)
 				if screenshot_url:
+					debug_info["method1_count"] += 1
 					all_screenshots.append({
 						"screenshot": screenshot_url,
 						"caption": ss.caption or "",
@@ -776,16 +780,20 @@ def get_gallery(limit=30, offset=0):
 						"project_title": project_title,
 					})
 		except Exception as ss_error:
+			debug_info["errors"].append(f"Method 1: {str(ss_error)}")
 			frappe.log_error(f"Error fetching from Project Screenshots: {str(ss_error)}", "get_gallery Error")
 		
 		# Method 2: Fetch from Project child table (screenshots)
 		try:
 			projects = frappe.db.sql("SELECT name FROM `tabProject`", as_dict=True)
+			debug_info["projects_count"] = len(projects)
+			
 			for proj in projects:
 				p_name = proj.name
 				try:
 					doc = frappe.get_cached_doc("Project", p_name, ignore_permissions=True)
 					project_title = getattr(doc, "project_title", p_name)
+					child_screenshot_count = 0
 					
 					for s in doc.screenshots or []:
 						if not s.screenshot:
@@ -795,6 +803,8 @@ def get_gallery(limit=30, offset=0):
 						
 						# Check for duplicates
 						if screenshot_url and not any(ss.get('screenshot') == screenshot_url for ss in all_screenshots):
+							debug_info["method2_count"] += 1
+							child_screenshot_count += 1
 							all_screenshots.append({
 								"screenshot": screenshot_url,
 								"caption": s.caption or "",
@@ -802,9 +812,13 @@ def get_gallery(limit=30, offset=0):
 								"project": p_name,
 								"project_title": project_title,
 							})
+					
+					if child_screenshot_count > 0:
+						debug_info[f"project_{p_name}_screenshots"] = child_screenshot_count
 				except Exception as proj_error:
 					continue
 		except Exception as proj_error:
+			debug_info["errors"].append(f"Method 2: {str(proj_error)}")
 			frappe.log_error(f"Error loading project screenshots: {str(proj_error)}", "get_gallery Error")
 		
 		# Sort by creation (newest first) and apply pagination
@@ -812,7 +826,12 @@ def get_gallery(limit=30, offset=0):
 		total = len(all_screenshots)
 		limited = all_screenshots[offset:offset + limit]
 		
-		return {"screenshots": limited, "total": total, "has_more": (offset + limit) < total}
+		return {
+			"screenshots": limited, 
+			"total": total, 
+			"has_more": (offset + limit) < total,
+			"debug": debug_info
+		}
 	except Exception as e:
 		frappe.log_error(f"Error in get_gallery: {str(e)}", "get_gallery Error")
 		return {"screenshots": [], "total": 0, "has_more": False, "error": str(e)}
