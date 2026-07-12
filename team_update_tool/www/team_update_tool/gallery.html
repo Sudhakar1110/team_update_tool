@@ -135,13 +135,17 @@ document.getElementById('galleryLoading').style.display = 'block';
 document.getElementById('galleryContent').style.display = 'none';
 document.getElementById('galleryEmpty').style.display = 'none';
 
-frappe.call({
-method: 'team_update_tool.api.projects.get_gallery',
-args: {
-limit: galleryLimit,
-offset: offset
-},
-callback: function(data) {
+// Use fetch API with proper Frappe URL format
+var apiUrl = '/api/method/team_update_tool.api.projects.get_gallery?limit=' + galleryLimit + '&offset=' + offset;
+
+fetch(apiUrl)
+.then(function(response) {
+if (!response.ok) {
+throw new Error('API request failed: ' + response.status);
+}
+return response.json();
+})
+.then(function(data) {
 document.getElementById('galleryLoading').style.display = 'none';
 if (!data.message) {
 document.getElementById('galleryEmpty').style.display = 'block';
@@ -151,17 +155,13 @@ return;
 var d = data.message;
 document.getElementById('galleryTotal').textContent = d.total + ' screenshot' + (d.total !== 1 ? 's' : '');
 
-// Show debug info for troubleshooting
-if (d.debug) {
-console.log('Gallery Debug Info:', d.debug);
-}
+// Debug info
+console.log('Gallery Debug:', d.debug || 'No debug info');
 
 if (d.screenshots && d.screenshots.length) {
 var html = '';
 d.screenshots.forEach(function(s) {
-// Use screenshot URL directly (API returns full URLs)
 var screenshotUrl = s.screenshot || '';
-
 html += '<div class="tut-gallery-card"><a href="' + screenshotUrl + '" target="_blank"><img src="' + screenshotUrl + '" alt="' + escHtml(s.caption || 'Screenshot') + '" loading="lazy"></a>' +
 '<div class="card-body">' +
 '<div class="d-flex align-items-center justify-content-between gap-2">' +
@@ -185,12 +185,18 @@ document.getElementById('galleryContent').style.display = 'block';
 document.getElementById('galleryEmpty').style.display = 'block';
 document.getElementById('galleryContent').style.display = 'block';
 }
-},
-error: function(err) {
+})
+.catch(function(err) {
 console.error('Gallery load error:', err);
-document.getElementById('galleryLoading').innerHTML = '<div class="text-center py-5"><p class="text-danger">Failed to load gallery.</p><p class="text-muted small">Check browser console for details.</p><button class="btn btn-outline-secondary btn-sm" onclick="loadGallery(0)">Try Again</button></div>';
-}
+document.getElementById('galleryLoading').style.display = 'none';
+document.getElementById('galleryLoading').innerHTML = '<div class="text-center py-5"><p class="text-danger">Failed to load gallery.</p><p class="small text-muted">Error: ' + err.message + '</p><button class="btn btn-outline-secondary btn-sm" onclick="loadGallery(0)">Try Again</button></div>';
+document.getElementById('galleryContent').style.display = 'block';
 });
 }
+
+// Load gallery on page ready
+document.addEventListener('DOMContentLoaded', function() {
+loadGallery(0);
+});
 </script>
 {% endblock %}
