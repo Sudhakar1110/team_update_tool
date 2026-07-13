@@ -54,6 +54,16 @@ def force_sync_doctypes():
 		import_file_by_path(full_path)
 		frappe.db.commit()
 	
+	# Force update Project doctype autoname directly in database
+	if frappe.db.exists("DocType", "Project"):
+		frappe.db.sql("""
+			UPDATE `tabDocType` 
+			SET autoname = 'field:project_title' 
+			WHERE name = 'Project'
+		""")
+		frappe.db.commit()
+		frappe.log_error("Updated Project doctype autoname to 'field:project_title'", "force_sync_doctypes")
+	
 	# Sync Reports
 	report_list = [
 		"reports/project_summary_report/project_summary_report.json",
