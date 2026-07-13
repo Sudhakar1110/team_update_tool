@@ -9,37 +9,26 @@
 
 {% block page_content %}
 <div class="tut-page-header royal-header">
-	<div class="container">
-		<div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
-			<div>
-				<h1 class="m-0"><i class="fas fa-images me-2" style="color: var(--tut-gold);"></i>Screenshot Gallery</h1>
-				<p class="m-0" id="galleryTotal">Loading...</p>
-			</div>
-		</div>
-	</div>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+            <div>
+                <h1 class="m-0">Gallery</h1>
+                <p class="m-0">Gallery feature has been removed</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="tut-main-area">
-	<div class="container py-4">
-		<div class="tut-loading royal-loading" id="galleryLoading">
-			<div class="spinner-border royal-spinner" role="status"></div>
-			<p class="text-muted mt-2">Loading screenshots...</p>
-		</div>
-
-		<div id="galleryContent" style="display:none;">
-			<div class="tut-masonry-grid" id="galleryGrid"></div>
-
-			<div id="galleryEmpty" class="tut-empty-state royal-empty" style="display:none;">
-				<div class="empty-icon mx-auto mb-3">
-					<i class="fas fa-images"></i>
-				</div>
-				<h4>No Screenshots Available</h4>
-				<p>No screenshots have been uploaded to any projects yet.</p>
-			</div>
-
-			<div id="galleryPagination" class="tut-pagination" style="display:none;"></div>
-		</div>
-	</div>
+    <div class="container py-4">
+        <div class="tut-empty-state royal-empty">
+            <div class="empty-icon mx-auto mb-3">
+                <i class="fas fa-images"></i>
+            </div>
+            <h4>Gallery Feature Removed</h4>
+            <p>The screenshot gallery feature has been removed from this application.</p>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -79,19 +68,6 @@
     color: rgba(255,255,255,0.75);
     font-size: 0.95rem;
 }
-.royal-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 0;
-}
-.royal-spinner {
-    width: 3rem;
-    height: 3rem;
-    border: 0.25em solid rgba(124, 58, 237, 0.2);
-    border-top-color: var(--tut-primary);
-}
 .royal-empty {
     text-align: center;
     padding: 4rem 2rem;
@@ -119,126 +95,5 @@
     color: #1e1b4b;
     font-weight: 700;
 }
-
-/* Image error state */
-.tut-img-error {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #f8f9fa;
-    border-radius: 8px;
-    padding: 2rem;
-    color: #adb5bd;
-    min-height: 150px;
-}
-.tut-img-error i {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-.tut-img-error small {
-    font-size: 0.75rem;
-}
-
 </style>
-{% endblock %}
-
-{% block script %}
-<script>
-console.log('Gallery script loaded');
-var galleryLimit = 30;
-
-function imgError(img) {
-img.style.display = 'none';
-img.nextElementSibling.style.display = 'flex';
-// Hide the card body if no image
-var card = img.closest('.tut-gallery-card');
-if (card) {
-card.style.opacity = '0.6';
-card.style.border = '2px dashed #dc3545';
-}
-}
-
-
-function escHtml(str) {
-if (!str) return '';
-return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function loadGallery(offset) {
-console.log('Step 1: Starting gallery load');
-			document.getElementById('galleryLoading').style.display = 'block';
-document.getElementById('galleryContent').style.display = 'none';
-document.getElementById('galleryEmpty').style.display = 'none';
-
-// Use fetch API with proper Frappe URL format
-var apiUrl = '/api/method/team_update_tool.api.projects.get_gallery?limit=' + galleryLimit + '&offset=' + offset;
-
-console.log('Step 2: Fetching API');
-		fetch(apiUrl)
-.then(function(response) {
-if (!response.ok) {
-throw new Error('API request failed: ' + response.status);
-}
-return response.json();
-})
-.then(function(data) {
-document.getElementById('galleryLoading').style.display = 'none';
-if (!data.message) {
-document.getElementById('galleryEmpty').style.display = 'block';
-document.getElementById('galleryContent').style.display = 'block';
-return;
-}
-var d = data.message;
-document.getElementById('galleryTotal').textContent = d.total + ' screenshot' + (d.total !== 1 ? 's' : '');
-
-// Debug info
-console.log('Gallery Debug:', d.debug || 'No debug info');
-
-if (d.screenshots && d.screenshots.length) {
-var html = '';
-d.screenshots.forEach(function(s) {
-var screenshotUrl = s.screenshot || '';
-var projectTitle = s.project_title || s.project || 'Project';
-var origPath = s.original_path || '';
-// Use sample image placeholder if screenshot URL is missing or contains missing file
-// Try local placeholder first, fallback to external
-var sampleImg = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" style="background:%23667eea"><text x="50%" y="50%" font-family="Arial" font-size="24" fill="white" text-anchor="middle" dy=".3em">' + encodeURIComponent(projectTitle) + '</text></svg>');
-html += '<div class="tut-gallery-card"><a href="' + screenshotUrl + '" target="_blank"><img src="' + sampleImg + '" alt="' + escHtml(s.caption || 'Screenshot') + '" loading="lazy"><div class="tut-img-error" style="display:none;"><i class="fas fa-image"></i><small>Image not found</small><small class="d-block mt-1 text-break" style="font-size:0.6rem;">' + escHtml(origPath) + '</small></div></a>' +
-'<div class="card-body">' +
-'<div class="d-flex align-items-center justify-content-between gap-2">' +
-'<a href="/team_update_tool/project/' + s.project + '" class="fw-semibold small text-truncate text-decoration-none" style="color:#0f172a;">' + escHtml(projectTitle) + '</a>' +
-(s.screenshot_type ? '<span class="badge bg-light text-muted fw-normal" style="font-size:0.7rem;">' + escHtml(s.screenshot_type) + '</span>' : '') +
-'</div></div></div>';
-});
-document.getElementById('galleryGrid').innerHTML = html;
-
-if (d.has_more || offset > 0) {
-var pagHtml = '<div class="d-flex align-items-center gap-2">';
-if (offset > 0) pagHtml += '<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="loadGallery(' + (offset - galleryLimit) + ')">← Previous</button>';
-pagHtml += '<span class="text-muted small fw-semibold">' + (offset + 1) + '–' + Math.min(offset + galleryLimit, d.total) + ' of ' + d.total + '</span>';
-if (d.has_more) pagHtml += '<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="loadGallery(' + (offset + galleryLimit) + ')">Next →</button>';
-pagHtml += '</div>';
-document.getElementById('galleryPagination').innerHTML = pagHtml;
-document.getElementById('galleryPagination').style.display = 'flex';
-}
-document.getElementById('galleryContent').style.display = 'block';
-} else {
-document.getElementById('galleryEmpty').style.display = 'block';
-document.getElementById('galleryContent').style.display = 'block';
-}
-})
-.catch(function(err) {
-console.error('Gallery load error:', err);
-document.getElementById('galleryLoading').style.display = 'none';
-document.getElementById('galleryLoading').innerHTML = '<div class="text-center py-5"><p class="text-danger">Failed to load gallery.</p><p class="small text-muted">Error: ' + err.message + '</p><button class="btn btn-outline-secondary btn-sm" onclick="loadGallery(0)">Try Again</button></div>';
-document.getElementById('galleryContent').style.display = 'block';
-});
-}
-
-// Load gallery on page ready
-document.addEventListener('DOMContentLoaded', function() {
-loadGallery(0);
-});
-</script>
 {% endblock %}

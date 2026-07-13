@@ -883,7 +883,6 @@
 						{% set steps = [
 							{ 'name': 'Info', 'desc': 'Basic details', 'icon': 'info' },
 							{ 'name': 'GitHub', 'desc': 'Repository', 'icon': 'code' },
-							{ 'name': 'Screenshots', 'desc': 'Images', 'icon': 'image' },
 							{ 'name': 'Documents', 'desc': 'Files', 'icon': 'file' },
 							{ 'name': 'Preview', 'desc': 'Review', 'icon': 'check' }
 						] %}
@@ -1281,7 +1280,6 @@ function escHtml(str) {
 // ============================
 var currentStep = 1;
 var maxStep = 5;
-var uploadedScreenshots = [];
 var uploadedFiles = [];
 var referDocFile = null;
 
@@ -1386,13 +1384,8 @@ function validateStep(step) {
             }
         }
     } else if (step === 3) {
-        if (uploadedScreenshots.length === 0) {
-            valid = false;
-            msg = 'At least one screenshot is required.';
-        }
-        var screenshotInput = document.getElementById('screenshotInput');
-        screenshotInput.classList.toggle('is-invalid', uploadedScreenshots.length === 0);
-    } else if (step === 4) {
+        
+         else if (step === 4) {
         if (uploadedFiles.length === 0) {
             valid = false;
             msg = 'At least one document file is required.';
@@ -1454,7 +1447,6 @@ function setupDragDrop(dropZoneId, inputId) {
     });
 }
 
-setupDragDrop('screenshotDropZone', 'screenshotInput');
 setupDragDrop('fileDropZone', 'fileInput');
 setupDragDrop('referDocDropZone', 'referDocInput');
 
@@ -1479,31 +1471,7 @@ document.getElementById('screenshotInput').addEventListener('change', function(e
     this.value = '';
 });
 
-function renderScreenshots() {
-    var container = document.getElementById('screenshotPreview');
-    if (uploadedScreenshots.length === 0) {
-        container.innerHTML = '';
-        return;
-    }
-    var html = '';
-    uploadedScreenshots.forEach(function(s, i) {
-        html += '<div class="erp-preview-item">' +
-            '<img src="' + s.dataUrl + '" alt="Screenshot">' +
-            '<button type="button" class="erp-preview-remove" onclick="removeScreenshot(' + i + ')">' +
-                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-            '</button>' +
-        '</div>';
-    });
-    container.innerHTML = html;
-    
-    // Remove invalid state if screenshots exist
-    document.getElementById('screenshotInput').classList.remove('is-invalid');
-}
 
-function removeScreenshot(index) {
-    uploadedScreenshots.splice(index, 1);
-    renderScreenshots();
-}
 
 // ============================
 // File Upload Handler
