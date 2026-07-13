@@ -861,7 +861,7 @@
 		<div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 			<div>
 				<h1>{{ title }}</h1>
-				<p id="stepIndicator">Step 1 of 5: Project Information</p>
+				<p id="stepIndicator">Step 1 of 4: Project Information</p>
 			</div>
 			<div class="erp-step-badge" style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 50px; color: #fff; font-weight: 600;">
 				<span id="currentStepDisplay">1</span> / 5
@@ -1061,66 +1061,14 @@
 								Back
 							</button>
 							<button type="button" class="erp-btn erp-btn-primary" onclick="goToStep(3)">
-								Continue to Screenshots
-								<svg class="erp-btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-							</button>
-						</div>
-					</div>
-
-					<!-- Step 3: Screenshots -->
-					<div class="erp-form-card step-panel" id="step3" style="display:none;">
-						<div class="erp-form-card-header">
-							<div class="erp-form-card-icon purple">
-								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-							</div>
-							<div>
-								<h3 class="erp-form-card-title">Project Screenshots</h3>
-								<p class="erp-form-card-subtitle">Upload images to showcase your project</p>
-							</div>
-						</div>
-						<div class="erp-form-card-body">
-							<div class="erp-alert warning">
-								<svg class="erp-alert-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-								<div>Upload at least one screenshot (PNG, JPG, JPEG, or WEBP). You can add multiple images.</div>
-							</div>
-							<div class="erp-form-group">
-								<label class="erp-form-label">Upload Screenshots</label>
-								<div class="erp-upload-area" id="screenshotDropZone">
-									<input type="file" id="screenshotInput" accept="image/png,image/jpeg,image/webp" multiple class="d-none">
-									<div class="erp-upload-icon">
-										<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-									</div>
-									<h5>Drag & drop images here</h5>
-									<p>or click to browse your files</p>
-									<div class="erp-upload-formats">
-										<span class="erp-upload-format-tag">PNG</span>
-										<span class="erp-upload-format-tag">JPG</span>
-										<span class="erp-upload-format-tag">JPEG</span>
-										<span class="erp-upload-format-tag">WEBP</span>
-									</div>
-								</div>
-								<div class="erp-invalid-feedback">
-									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-									At least one screenshot is required.
-								</div>
-							</div>
-							<div id="screenshotPreview" class="erp-screenshot-grid"></div>
-							<input type="hidden" id="screenshotsData" name="screenshots" value="">
-						</div>
-						<div class="erp-form-actions">
-							<button type="button" class="erp-btn erp-btn-secondary" onclick="goToStep(2)">
-								<svg class="erp-btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-								Back
-							</button>
-							<button type="button" class="erp-btn erp-btn-primary" onclick="goToStep(4)">
 								Continue to Documents
 								<svg class="erp-btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
 							</button>
 						</div>
 					</div>
 
-					<!-- Step 4: Documents -->
-					<div class="erp-form-card step-panel" id="step4" style="display:none;">
+					<!-- Step 3: Documents -->
+					<div class="erp-form-card step-panel" id="step3" style="display:none;">
 						<div class="erp-form-card-header">
 							<div class="erp-form-card-icon orange">
 								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -1186,15 +1134,15 @@
 								<svg class="erp-btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
 								Back
 							</button>
-							<button type="button" class="erp-btn erp-btn-primary" onclick="goToStep(5)">
+							<button type="button" class="erp-btn erp-btn-primary" onclick="goToStep(4)">
 								Review Project
 								<svg class="erp-btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
 							</button>
 						</div>
 					</div>
 
-					<!-- Step 5: Preview & Submit -->
-					<div class="erp-form-card step-panel" id="step5" style="display:none;">
+					<!-- Step 4: Preview & Submit -->
+					<div class="erp-form-card step-panel" id="step4" style="display:none;">
 						<div class="erp-form-card-header">
 							<div class="erp-form-card-icon cyan">
 								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -1213,7 +1161,7 @@
 							</div>
 						</div>
 						<div class="erp-form-actions">
-							<button type="button" class="erp-btn erp-btn-secondary" onclick="goToStep(4)">
+							<button type="button" class="erp-btn erp-btn-secondary" onclick="goToStep(3)">
 								<svg class="erp-btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
 								Back
 							</button>
@@ -1322,11 +1270,11 @@ function goToStep(step) {
     if (currentBadge) currentBadge.textContent = step;
 
     // Update step indicator
-    var names = ['Project Information', 'GitHub Repository', 'Screenshots', 'Documents', 'Review & Submit'];
-    document.getElementById('stepIndicator').textContent = 'Step ' + step + ' of 5: ' + names[step - 1];
+    var names = ['Project Information', 'GitHub Repository', 'Documents', 'Review & Submit'];
+    document.getElementById('stepIndicator').textContent = 'Step ' + step + ' of 4: ' + names[step - 1];
 
     // Refresh preview on step 5
-    if (step === 5) refreshPreview();
+    if (step === 4) refreshPreview();
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1447,27 +1395,6 @@ function setupDragDrop(dropZoneId, inputId) {
 
 setupDragDrop('fileDropZone', 'fileInput');
 setupDragDrop('referDocDropZone', 'referDocInput');
-
-// ============================
-// Screenshot Upload Handler
-// ============================
-document.getElementById('screenshotInput').addEventListener('change', function(e) {
-    var files = Array.from(e.target.files);
-    var validTypes = ['image/png', 'image/jpeg', 'image/webp'];
-    files.forEach(function(file) {
-        if (!validTypes.includes(file.type)) {
-            erpToast('Invalid file type: ' + file.name + '. Only PNG, JPG, JPEG, WEBP allowed.', 'error');
-            return;
-        }
-        var reader = new FileReader();
-        reader.onload = function(ev) {
-            uploadedScreenshots.push({ file: file, dataUrl: ev.target.result });
-            renderScreenshots();
-        };
-        reader.readAsDataURL(file);
-    });
-    this.value = '';
-});
 
 
 
@@ -1624,14 +1551,6 @@ function refreshPreview() {
         '<div class="erp-preview-desc-box">' + escHtml(desc) + '</div>' +
     '</div>';
     
-    if (uploadedScreenshots.length > 0) {
-        html += '<div class="erp-preview-section">' +
-            '<div class="erp-preview-label">Screenshots (' + uploadedScreenshots.length + ')</div>' +
-            '<div class="erp-preview-grid">' + uploadedScreenshots.map(function(s) { 
-                return '<div class="erp-preview-image-thumb"><img src="' + s.dataUrl + '" alt="Screenshot"></div>'; 
-            }).join('') + '</div>' +
-        '</div>';
-    }
     
     if (uploadedFiles.length > 0) {
         html += '<div class="erp-preview-section">' +
@@ -1663,7 +1582,7 @@ document.getElementById('projectForm').addEventListener('submit', async function
     e.preventDefault();
 
     // Validate all steps
-    for (var i = 1; i <= 4; i++) {
+    for (var i = 1; i <= 3; i++) {
         if (!validateStep(i)) { goToStep(i); return; }
     }
 
@@ -1767,52 +1686,6 @@ document.getElementById('projectForm').addEventListener('submit', async function
             }
         }
 
-        // Upload screenshots and link to child table
-        if (uploadedScreenshots.length > 0) {
-            for (var si = 0; si < uploadedScreenshots.length; si++) {
-                try {
-                    // Upload file first
-                    var screenshotFile = uploadedScreenshots[si].file;
-                    var screenshotData = new FormData();
-                    screenshotData.append('file', screenshotFile);
-                    screenshotData.append('doctype', 'Project');
-                    screenshotData.append('docname', projectName);
-                    screenshotData.append('fieldname', 'screenshots');
-                    
-                    var screenshotResp = await fetch('/api/method/upload_file', {
-                        method: 'POST',
-                        headers: { 'X-Frappe-CSRF-Token': frappe.csrf_token },
-                        body: screenshotData
-                    });
-                    var screenshotResult = await screenshotResp.json();
-                    
-                    if (screenshotResult.message && screenshotResult.message.file_url) {
-                        // Call API to save screenshot
-                        var screenshotLinkResp = await fetch('/api/method/team_update_tool.api.projects.add_project_screenshot', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': frappe.csrf_token },
-                            body: JSON.stringify({
-                                project_name: projectName,
-                                file_url: screenshotResult.message.file_url,
-                                file_name: screenshotFile.name
-                            })
-                        });
-                        var screenshotLinkResult = await screenshotLinkResp.json();
-                        
-                        if (screenshotLinkResult.error) {
-                            console.error('Screenshot save error:', screenshotLinkResult.error);
-                            hasErrors = true;
-                        }
-                    } else {
-                        console.error('Screenshot upload failed');
-                        hasErrors = true;
-                    }
-                } catch(e) {
-                    console.error('Screenshot upload error:', e);
-                    hasErrors = true;
-                }
-            }
-        }
 
         // Upload files and link to child table
         if (uploadedFiles.length > 0) {
