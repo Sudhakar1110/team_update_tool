@@ -1385,7 +1385,8 @@ def create_project(project_title, team, status=None, priority="Medium",
 						"parent": project_name,
 						"parentfield": "technologies",
 						"parenttype": "Project",
-						"technology": tech
+						"technology": tech,
+						"project": project_name
 					}).insert(ignore_permissions=True)
 	
 	return {
