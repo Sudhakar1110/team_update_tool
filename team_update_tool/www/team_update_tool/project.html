@@ -924,6 +924,18 @@ function formatDate(dateStr) {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function getCsrfToken() {
+    const name = 'csrf_token';
+    let cookieValue = null;
+    document.cookie.split(';').forEach(function(val) {
+        const parts = val.trim().split('=');
+        if (parts[0] === name) {
+            cookieValue = parts.slice(1).join('=');
+        }
+    });
+    return cookieValue;
+}
+
 function getFileIcon(filename) {
     var ext = filename.split('.').pop().toLowerCase();
     var icons = {
@@ -948,7 +960,10 @@ frappe.ready(function() {
 });
 
 function loadProject(name) {
-    fetch('/api/method/team_update_tool.api.projects.get_project_detail?name=' + encodeURIComponent(name))
+    fetch('/api/method/team_update_tool.api.projects.get_project_detail?name=' + encodeURIComponent(name), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': getCsrfToken() }
+    })
         .then(function(r) { return r.json(); })
         .then(function(data) {
             if (data.message) {
