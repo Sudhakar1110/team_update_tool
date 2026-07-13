@@ -1452,7 +1452,7 @@ def create_project(project_title, team, status=None, priority="Medium",
                                                 "repository_name": repo_full_name,
                                                 "repository_url": github_repository,
                                         })
-                                        github_repo.insert(ignore_permissions=True)
+                                        github_repo.insert(ignore_permissions=True, ignore_links=True)
                                 except Exception as e:
                                         frappe.log_error(f"Error creating GitHub Repository: {str(e)}", "GitHub Repo Creation Error")
 
@@ -1500,7 +1500,7 @@ def create_project(project_title, team, status=None, priority="Medium",
                         "parenttype": "Project",
                         "technology": tech,
                         "project": project_name
-                    }).insert(ignore_permissions=True)
+                    }).insert(ignore_permissions=True, ignore_links=True)
 
         # Send email notification directly to all admin users
         try:
@@ -1563,7 +1563,7 @@ def add_project_screenshot(project_name, file_url=None, file_name=None, caption=
             "caption": caption or file_name or "",
             "screenshot_type": screenshot_type or "UI Screen"
         })
-        screenshot_doc.insert(ignore_permissions=True)
+        screenshot_doc.insert(ignore_permissions=True, ignore_links=True)
         
         # Log success
         frappe.log_error(f"Screenshot added - ID: {screenshot_doc.name}, project: {project_name}", "Screenshot Success")
@@ -1597,7 +1597,7 @@ def add_project_file(project_name, file_url=None, file_name=None, file_type=None
             "file_type": file_type or "",
             "file_description": file_description or ""
         })
-        file_doc.insert(ignore_permissions=True)
+        file_doc.insert(ignore_permissions=True, ignore_links=True)
         
         return {"message": "File added successfully", "success": True}
     
