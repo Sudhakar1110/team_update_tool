@@ -1526,9 +1526,9 @@ def add_project_screenshot(project_name, screenshot=None, caption=None, screensh
         # Use file_url if screenshot is not provided (handles both parameter names)
         screenshot_url = screenshot or file_url or ""
         
-        # Add screenshot
+        # Add screenshot - use Project Screenshots doctype
         screenshot_doc = frappe.get_doc({
-            "doctype": "Project Screenshot",
+            "doctype": "Project Screenshots",
             "parent": project_name,
             "parentfield": "screenshots",
             "parenttype": "Project",
@@ -1565,9 +1565,9 @@ def add_project_file(project_name, file_url=None, file_name=None, file_type=None
         if not is_admin and project.owner != frappe.session.user and not is_team_member:
             return {"error": "Permission denied"}
         
-        # Add file
+        # Add file - use Project Files doctype
         file_doc = frappe.get_doc({
-            "doctype": "Project File",
+            "doctype": "Project Files",
             "parent": project_name,
             "parentfield": "project_files",
             "parenttype": "Project",
