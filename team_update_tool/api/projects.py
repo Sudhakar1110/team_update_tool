@@ -1126,11 +1126,6 @@ def create_project(project_title, team, status=None, priority="Medium",
         if not status:
             status = frappe.db.get_value("Project Status", 1, "name")
     
-    # Create project with explicit name using hash
-    import hashlib
-    name_hash = hashlib.md5((project_title + str(frappe.utils.now())).encode()).hexdigest()[:10]
-    project_name = f"PRJ-{name_hash.upper()}"
-    
     # Handle GitHub Repository - find existing or create new
     github_repo_name = None
     if github_repository:
@@ -1167,11 +1162,10 @@ def create_project(project_title, team, status=None, priority="Medium",
                 github_repo_name = github_repository
     
     # Create project using Frappe document API
+    # First insert WITHOUT technologies (let Frappe handle naming)
     try:
         project_doc = frappe.get_doc({
             "doctype": "Project",
-            "__islocal": 1,
-            "name": project_name,
             "project_title": project_title,
             "team": team,
             "status": status,
@@ -1194,45 +1188,53 @@ def create_project(project_title, team, status=None, priority="Medium",
         if completion_date:
             project_doc.completion_date = completion_date
         
-        # Add technologies to child table
-        if technologies:
-            if isinstance(technologies, str):
-                try:
-                    technologies = frappe.parse_json(technologies)
-                except:
-                    technologies = []
-            
-            if isinstance(technologies, list):
-                for tech in technologies:
-                    if tech:
-                        # Ensure technology exists
-                        if not frappe.db.exists("Technology", tech):
-                            try:
-                                tech_doc = frappe.get_doc({
-                                    "doctype": "Technology",
-                                    "technology_name": tech
-                                })
-                                tech_doc.flags.ignore_permissions = True
-                                tech_doc.insert(ignore_permissions=True)
-                            except Exception as e:
-                                frappe.log_error(f"Error creating technology {tech}: {str(e)}", "Technology Creation Error")
-                        
-                        # Add to project's technologies child table
-                        project_doc.append("technologies", {
-                            "project": project_name,
-                            "technology": tech
-                        })
-        
-        # Save the project
+        # Save the project first
         project_doc.flags.ignore_permissions = True
         project_doc.flags.ignore_validate = True
         project_doc.flags.ignore_mandatory = True
         project_doc.flags.ignore_links = True
         project_doc.insert(ignore_permissions=True)
         
+        # Get the actual project name after insertion
+        project_name = project_doc.name
+        
     except Exception as e:
         frappe.log_error(f"Error creating project: {str(e)}", "Create Project Error")
         frappe.throw(_(f"Error creating project: {str(e)}"))
+    
+    # Add technologies using direct SQL (after project is saved)
+    if technologies:
+        if isinstance(technologies, str):
+            try:
+                technologies = frappe.parse_json(technologies)
+            except:
+                technologies = []
+        
+        if isinstance(technologies, list):
+            for tech in technologies:
+                if tech:
+                    # Ensure technology exists
+                    if not frappe.db.exists("Technology", tech):
+                        try:
+                            tech_doc = frappe.get_doc({
+                                "doctype": "Technology",
+                                "technology_name": tech
+                            })
+                            tech_doc.flags.ignore_permissions = True
+                            tech_doc.insert(ignore_permissions=True)
+                        except Exception as e:
+                            frappe.log_error(f"Error creating technology {tech}: {str(e)}", "Technology Creation Error")
+                    
+                    # Add to project technology using direct SQL
+                    try:
+                        pt_name = f"PROJTECH-{tech[:10]}-{project_name[-5:]}"
+                        frappe.db.sql("""
+                            INSERT INTO `tabProject Technology` (name, parent, parentfield, parenttype, project, technology, idx, creation, modified, owner)
+                            VALUES (%s, %s, 'technologies', 'Project', %s, %s, 1, NOW(), NOW(), %s)
+                        """, (pt_name, project_name, project_name, tech, frappe.session.user))
+                        frappe.db.commit()
+                    except Exception as e:
+                        frappe.log_error(f"Error adding technology: {str(e)}", "Add Technology Error")
     
     # Save README / Referral Document
     if readme_content or readme_file:
