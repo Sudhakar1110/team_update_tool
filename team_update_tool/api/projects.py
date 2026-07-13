@@ -1203,57 +1203,50 @@ def create_project(project_title, team, status=None, priority="Medium",
         project_data["due_date"] = due_date
     if completion_date:
         project_data["completion_date"] = completion_date
-# Handle GitHub Repository
-        github_repo_value = None
-        if github_repository:
-                # Extract repo name from URL
-                import re
-                match = re.search(r"github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)", github_repository)
-                if match:
-                        repo_owner = match.group(1)
-                        repo_name = match.group(2).replace('.git', '')
-                        repo_full_name = f"{repo_owner}/{repo_name}"
-
-                        # Check if GitHub Repository doc exists
-                        if not frappe.db.exists("GitHub Repository", repo_full_name):
-                                # Create GitHub Repository document
-                                try:
-                                        github_repo = frappe.get_doc({
-                                                "doctype": "GitHub Repository",
-                                                "repository_name": repo_full_name,
-                                                "repository_url": github_repository,
-                                        })
-                                        github_repo.insert(ignore_permissions=True)
-                                except Exception as e:
-                                        frappe.log_error(f"Error creating GitHub Repository: {str(e)}", "GitHub Repo Creation Error")
-
-                        github_repo_value = github_repository
-                else:
-                        github_repo_value = github_repository  # Use as-is if not a valid URL
-        
-        # Add github_repository to project_data
-        if github_repo_value:
-                project_data["github_repository"] = github_repo_value
-        
-        # Use db_insert to bypass all autoname and validation logic
-        project_doc = frappe.get_doc(project_data)
-        project_doc.flags.ignore_validate = True
-        project_doc.flags.ignore_mandatory = True
-        project_doc.db_insert()
-        
-        # Now update github_repository using direct SQL to ensure it is saved
-        if github_repo_value:
-                frappe.db.sql("""
-                        UPDATE \`tabProject\` 
-                        SET github_repository = %s 
-                        WHERE name = %s
-                """, (github_repo_value, project_name))
-                frappe.db.commit()
-
-        # Now save to ensure child tables are properly saved
-        project_doc.save(ignore_permissions=is_admin)
-
     
+    # Handle GitHub Repository
+    github_repo_value = None
+    if github_repository:
+        import re
+        match = re.search(r"github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)", github_repository)
+        if match:
+            repo_owner = match.group(1)
+            repo_name = match.group(2).replace('.git', '')
+            repo_full_name = f"{repo_owner}/{repo_name}"
+
+            if not frappe.db.exists("GitHub Repository", repo_full_name):
+                try:
+                    github_repo = frappe.get_doc({
+                        "doctype": "GitHub Repository",
+                        "repository_name": repo_full_name,
+                        "repository_url": github_repository,
+                    })
+                    github_repo.insert(ignore_permissions=True)
+                except Exception as e:
+                    frappe.log_error(f"Error creating GitHub Repository: {str(e)}", "GitHub Repo Creation Error")
+
+            github_repo_value = github_repository
+        else:
+            github_repo_value = github_repository
+    
+    if github_repo_value:
+        project_data["github_repository"] = github_repo_value
+    
+    # Use db_insert to bypass all autoname and validation logic
+    project_doc = frappe.get_doc(project_data)
+    project_doc.flags.ignore_validate = True
+    project_doc.flags.ignore_mandatory = True
+    project_doc.db_insert()
+    
+    # Now update github_repository using direct SQL to ensure it is saved
+    if github_repo_value:
+        frappe.db.sql("""
+            UPDATE `tabProject` 
+            SET github_repository = %s 
+            WHERE name = %s
+        """, (github_repo_value, project_name))
+        frappe.db.commit()
+
     # Add technologies if provided
     if technologies:
         if isinstance(technologies, str):
@@ -1264,14 +1257,17 @@ def create_project(project_title, team, status=None, priority="Medium",
         if isinstance(technologies, list):
             for tech in technologies:
                 if tech:
-                    frappe.get_doc({
+                    tech_doc = frappe.get_doc({
                         "doctype": "Project Technology",
                         "parent": project_name,
                         "parentfield": "technologies",
                         "parenttype": "Project",
                         "technology": tech,
                         "project": project_name
-                    }).insert(ignore_permissions=True)
+                    })
+                    tech_doc.flags.ignore_validate = True
+                    tech_doc.flags.ignore_mandatory = True
+                    tech_doc.db_insert()
 
         # Send email notification directly to all admin users
         try:
