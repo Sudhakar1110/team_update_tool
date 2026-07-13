@@ -1375,6 +1375,9 @@ def create_project(project_title, team, status=None, priority="Medium",
 	project_doc.flags.ignore_validate = True
 	project_doc.flags.ignore_mandatory = True
 	project_doc.db_insert()
+
+        # Now save to ensure child tables are properly saved
+        project_doc.save(ignore_permissions=is_admin)
 	
 	# Add technologies if provided
 	if technologies:
