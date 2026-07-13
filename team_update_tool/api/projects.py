@@ -134,48 +134,27 @@ def get_project_detail(name):
 		if not can_view:
 			frappe.throw(_("You do not have permission to view this project."), frappe.PermissionError)
 
-	# Screenshots - from child table
+	# Screenshots - query Project Screenshots doctype with 'project' field
 	screenshots = []
-	for s in project.screenshots or []:
-		screenshots.append({
-			"screenshot": s.screenshot,
-			"caption": s.caption,
-			"screenshot_type": s.screenshot_type,
-		})
-	
-	# Also check for screenshots in Project Screenshots doctype (standalone)
-	# Check both 'parent' and 'project' fields
-	if not screenshots:
-		try:
-			if frappe.db.exists("DocType", "Project Screenshots"):
-				# First try with 'parent' field (child table format)
-				ss_records = frappe.get_all("Project Screenshots",
-					filters={"parent": name},
-					fields=["screenshot", "caption", "screenshot_type"],
-					ignore_permissions=True
-				)
-				for s in ss_records:
-					screenshots.append({
-						"screenshot": s.screenshot,
-						"caption": s.caption,
-						"screenshot_type": s.screenshot_type,
-					})
-				
-				# If still empty, try with 'project' field (standalone format)
-				if not screenshots:
-					ss_records = frappe.get_all("Project Screenshots",
-						filters={"project": name},
-						fields=["screenshot", "caption", "screenshot_type"],
-						ignore_permissions=True
-					)
-					for s in ss_records:
-						screenshots.append({
-							"screenshot": s.screenshot,
-							"caption": s.caption,
-							"screenshot_type": s.screenshot_type,
-						})
-		except Exception as e:
-			frappe.log_error(f"Error fetching screenshots: {str(e)}", "get_project_detail Error")
+	try:
+		frappe.log_error(f"Fetching screenshots for project: {name}", "Screenshot Query Debug")
+		
+		# Query the Project Screenshots doctype
+		ss_records = frappe.get_all("Project Screenshots",
+			fields=["name", "screenshot", "caption", "screenshot_type", "project"],
+			filters={"project": name},
+			ignore_permissions=True
+		)
+		frappe.log_error(f"Screenshot records found: {len(ss_records)}", "Screenshot Query Result")
+		
+		for s in ss_records:
+			screenshots.append({
+				"screenshot": s.screenshot,
+				"caption": s.caption,
+				"screenshot_type": s.screenshot_type,
+			})
+	except Exception as e:
+		frappe.log_error(f"Error fetching screenshots: {str(e)}", "get_project_detail Error")
 
 	# Files/Documents - Get from project_files child table
 	files = []
@@ -1453,41 +1432,56 @@ def create_project(project_title, team, status=None, priority="Medium",
 		project_data["due_date"] = due_date
 	if completion_date:
 		project_data["completion_date"] = completion_date
-	# Handle GitHub Repository
-	if github_repository:
-		# Extract repo name from URL
-		import re
-		match = re.search(r'github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)', github_repository)
-		if match:
-			repo_owner = match.group(1)
-			repo_name = match.group(2).replace('.git', '')
-			repo_full_name = f"{repo_owner}/{repo_name}"
-			
-			# Check if GitHub Repository doc exists
-			if not frappe.db.exists("GitHub Repository", repo_full_name):
-				# Create GitHub Repository document
-				try:
-					github_repo = frappe.get_doc({
-						"doctype": "GitHub Repository",
-						"repository_name": repo_full_name,
-						"repository_url": github_repository,
-					})
-					github_repo.insert(ignore_permissions=True)
-				except Exception as e:
-					frappe.log_error(f"Error creating GitHub Repository: {str(e)}", "GitHub Repo Creation Error")
-			
-			# Store the full URL in the project for easier display
-			project_data["github_repository"] = github_repository
-		else:
-			project_data["github_repository"] = github_repository  # Use as-is if not a valid URL
-	# Use db_insert to bypass all autoname and validation logic
-	project_doc = frappe.get_doc(project_data)
-	project_doc.flags.ignore_validate = True
-	project_doc.flags.ignore_mandatory = True
-	project_doc.db_insert()
+# Handle GitHub Repository
+        github_repo_value = None
+        if github_repository:
+                # Extract repo name from URL
+                import re
+                match = re.search(r"github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)", github_repository)
+                if match:
+                        repo_owner = match.group(1)
+                        repo_name = match.group(2).replace('.git', '')
+                        repo_full_name = f"{repo_owner}/{repo_name}"
 
-	# Now save to ensure child tables are properly saved
-	project_doc.save(ignore_permissions=is_admin)
+                        # Check if GitHub Repository doc exists
+                        if not frappe.db.exists("GitHub Repository", repo_full_name):
+                                # Create GitHub Repository document
+                                try:
+                                        github_repo = frappe.get_doc({
+                                                "doctype": "GitHub Repository",
+                                                "repository_name": repo_full_name,
+                                                "repository_url": github_repository,
+                                        })
+                                        github_repo.insert(ignore_permissions=True)
+                                except Exception as e:
+                                        frappe.log_error(f"Error creating GitHub Repository: {str(e)}", "GitHub Repo Creation Error")
+
+                        github_repo_value = github_repository
+                else:
+                        github_repo_value = github_repository  # Use as-is if not a valid URL
+        
+        # Add github_repository to project_data
+        if github_repo_value:
+                project_data["github_repository"] = github_repo_value
+        
+        # Use db_insert to bypass all autoname and validation logic
+        project_doc = frappe.get_doc(project_data)
+        project_doc.flags.ignore_validate = True
+        project_doc.flags.ignore_mandatory = True
+        project_doc.db_insert()
+        
+        # Now update github_repository using direct SQL to ensure it is saved
+        if github_repo_value:
+                frappe.db.sql("""
+                        UPDATE \`tabProject\` 
+                        SET github_repository = %s 
+                        WHERE name = %s
+                """, (github_repo_value, project_name))
+                frappe.db.commit()
+
+        # Now save to ensure child tables are properly saved
+        project_doc.save(ignore_permissions=is_admin)
+
 	
 	# Add technologies if provided
 	if technologies:
@@ -1558,6 +1552,9 @@ def add_project_screenshot(project_name, file_url=None, file_name=None, caption=
         if not frappe.db.exists("Project", project_name):
             return {"error": "Project not found"}
         
+        # Log for debugging
+        frappe.log_error(f"Screenshot upload - project: {project_name}, file_url: {file_url}", "Screenshot Debug")
+        
         # Add screenshot - use Project Screenshots doctype with 'project' field
         screenshot_doc = frappe.get_doc({
             "doctype": "Project Screenshots",
@@ -1567,6 +1564,9 @@ def add_project_screenshot(project_name, file_url=None, file_name=None, caption=
             "screenshot_type": screenshot_type or "UI Screen"
         })
         screenshot_doc.insert(ignore_permissions=True)
+        
+        # Log success
+        frappe.log_error(f"Screenshot added - ID: {screenshot_doc.name}, project: {project_name}", "Screenshot Success")
         
         return {"message": "Screenshot added successfully", "success": True}
     
