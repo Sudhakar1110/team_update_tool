@@ -102,23 +102,23 @@ Created by: {doc.owner}</p>
 				except Exception as email_error:
 					frappe.log_error(f"Failed to send notification to {user_email}: {str(email_error)}", "Project Notification Error")
 		
-		# Create system notification as well
+		# Create system notification - simplified approach
 		try:
-			from frappe.desk.doctype.notification_log import make_notification_log
 			for user in admin_users:
-				make_notification_log(
-					subject=subject,
-					message=message,
-					for_user=user,
-					reference_doctype="Project",
-					reference_name=doc.name,
-				)
+				frappe.get_doc({
+					"doctype": "Notification Log",
+					"subject": subject[:140] if len(subject) > 140 else subject,
+					"email_content": message,
+					"for_user": user,
+					"type": "Alert",
+					"document_type": "Project",
+					"document_name": doc.name,
+				}).insert(ignore_permissions=True)
 		except Exception as notification_error:
-			frappe.log_error(f"Failed to create system notification: {str(notification_error)}", "Project Notification Error")
+			frappe.log_error(f"Failed to create system notification", "Project Notification Error")
 		
 	except Exception as e:
-		frappe.log_error(f"Error sending new project notification: {str(e)}", "Project Notification Error")
-		# Don't throw error - don't block project creation due to notification failure
+		frappe.log_error(f"Error sending new project notification", "Project Notification Error")
 
 
 def get_permission_query_conditions(user):
