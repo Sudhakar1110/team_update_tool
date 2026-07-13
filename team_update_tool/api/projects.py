@@ -1467,7 +1467,7 @@ def create_project(project_title, team, status=None, priority="Medium",
 
 
 @frappe.whitelist(allow_guest=True)
-def add_project_screenshot(project_name, screenshot, caption=None, screenshot_type=None):
+def add_project_screenshot(project_name, screenshot=None, caption=None, screenshot_type=None, file_url=None):
     """Add a screenshot to an existing project."""
     try:
         if not project_name:
@@ -1483,13 +1483,16 @@ def add_project_screenshot(project_name, screenshot, caption=None, screenshot_ty
         if not is_admin and project.owner != frappe.session.user and not is_team_member:
             return {"error": "Permission denied"}
         
+        # Use file_url if screenshot is not provided (handles both parameter names)
+        screenshot_url = screenshot or file_url or ""
+        
         # Add screenshot
         screenshot_doc = frappe.get_doc({
             "doctype": "Project Screenshot",
             "parent": project_name,
             "parentfield": "screenshots",
             "parenttype": "Project",
-            "screenshot": screenshot,
+            "screenshot": screenshot_url,
             "caption": caption or "",
             "screenshot_type": screenshot_type or ""
         })
@@ -1503,11 +1506,14 @@ def add_project_screenshot(project_name, screenshot, caption=None, screenshot_ty
 
 
 @frappe.whitelist(allow_guest=True)
-def add_project_file(project_name, file_url, file_name=None, file_type=None, file_description=None):
+def add_project_file(project_name, file_url=None, file_name=None, file_type=None, file_description=None):
     """Add a file/document to an existing project."""
     try:
         if not project_name:
             return {"error": "Project name is required"}
+        
+        if not file_url:
+            return {"error": "File URL is required"}
         
         if not frappe.db.exists("Project", project_name):
             return {"error": "Project not found"}
