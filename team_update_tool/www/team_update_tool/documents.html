@@ -132,10 +132,6 @@
 
 {% block script %}
 <script>
-    }
-    return frappe.csrf_token || '';
-}
-
 frappe.ready(function() { loadDocuments(0); });
 
 function escHtml(s) {
