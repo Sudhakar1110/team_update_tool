@@ -1266,47 +1266,74 @@ def create_project(project_title, team, status=None, priority="Medium",
         if isinstance(technologies, list):
             for tech in technologies:
                 if tech:
-                    tech_doc = frappe.get_doc({
-                        "doctype": "Project Technology",
-                        "parent": project_name,
-                        "parentfield": "technologies",
-                        "parenttype": "Project",
-                        "technology": tech,
-                        "project": project_name
-                    })
-                    tech_doc.flags.ignore_validate = True
-                    tech_doc.flags.ignore_mandatory = True
-                    tech_doc.db_insert()
+                    # Check if technology exists
+                    if frappe.db.exists("Technology", tech):
+                        tech_doc = frappe.get_doc({
+                            "doctype": "Project Technology",
+                            "parent": project_name,
+                            "parentfield": "technologies",
+                            "parenttype": "Project",
+                            "technology": tech,
+                            "project": project_name
+                        })
+                        tech_doc.flags.ignore_validate = True
+                        tech_doc.flags.ignore_mandatory = True
+                        tech_doc.db_insert()
+                    else:
+                        # Create the technology if it doesn't exist
+                        try:
+                            new_tech = frappe.get_doc({
+                                "doctype": "Technology",
+                                "technology_name": tech
+                            })
+                            new_tech.insert(ignore_permissions=True)
+                            # Now insert the project technology
+                            tech_doc = frappe.get_doc({
+                                "doctype": "Project Technology",
+                                "parent": project_name,
+                                "parentfield": "technologies",
+                                "parenttype": "Project",
+                                "technology": new_tech.name,
+                                "project": project_name
+                            })
+                            tech_doc.flags.ignore_validate = True
+                            tech_doc.flags.ignore_mandatory = True
+                            tech_doc.db_insert()
+                        except Exception as e:
+                            frappe.log_error(f"Error creating technology {tech}: {str(e)}", "Technology Creation Error")
 
-        # Send email notification directly to all admin users
-        try:
-            admin_emails = frappe.db.sql("""
-                SELECT DISTINCT u.email 
-                FROM tabUser u 
-                INNER JOIN `tabHas Role` hr ON hr.parent = u.name 
-                WHERE hr.role = 'Admin' AND u.enabled = 1 AND u.email IS NOT NULL
-        """, as_dict=1)
-            
-            for admin in admin_emails:
-                if admin.email:
-                    frappe.sendmail(
-                        recipients=admin.email,
-                        subject=f"New Project Uploaded: {project_title}",
-                        message=f"""
-                        <p>A new project has been uploaded:</p>
-                        <p><b>Project Title:</b> {project_title}</p>
-                        <p><b>Team:</b> {team}</p>
-                        <p><b>Status:</b> {status}</p>
-                        <p><b>Priority:</b> {priority or 'Medium'}</p>
-                        <p><b>Submitted by:</b> {frappe.session.user}</p>
-                        <p><a href="{frappe.utils.get_url()}/app/project/{project_name}">View Project</a></p>
-                        """,
-                        reference_doctype="Project",
-                        reference_name=project_name
-                    )
-            frappe.log_error(f"Email notification sent for project {project_name}", "Project Email Notification")
-        except Exception as e:
-            frappe.log_error(f"Failed to send email notification: {str(e)}", "Project Email Error")
+    # Reload the project document from database to ensure proper child table loading
+    project_doc = frappe.get_doc("Project", project_name)
+
+    # Send email notification directly to all admin users
+    try:
+        admin_emails = frappe.db.sql("""
+            SELECT DISTINCT u.email 
+            FROM tabUser u 
+            INNER JOIN `tabHas Role` hr ON hr.parent = u.name 
+            WHERE hr.role = 'Admin' AND u.enabled = 1 AND u.email IS NOT NULL
+    """, as_dict=1)
+        
+        for admin in admin_emails:
+            if admin.email:
+                frappe.sendmail(
+                    recipients=admin.email,
+                    subject=f"New Project Uploaded: {project_title}",
+                    message=f"""
+                    <p>A new project has been uploaded:</p>
+                    <p><b>Project Title:</b> {project_title}</p>
+                    <p><b>Team:</b> {team}</p>
+                    <p><b>Status:</b> {status}</p>
+                    <p><b>Priority:</b> {priority or 'Medium'}</p>
+                    <p><b>Submitted by:</b> {frappe.session.user}</p>
+                    <p><a href="{frappe.utils.get_url()}/app/project/{project_name}">View Project</a></p>
+                    """,
+                    reference_doctype="Project",
+                    reference_name=project_name
+                )
+        frappe.log_error(f"Email notification sent for project {project_name}", "Project Email Notification")
+    except Exception as e:
+        frappe.log_error(f"Failed to send email notification: {str(e)}", "Project Email Error")
 
     return {
         "message": _("Project created successfully."),
