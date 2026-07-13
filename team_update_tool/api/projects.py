@@ -1142,7 +1142,8 @@ def get_user_notifications():
 def create_project(project_title, team, status=None, priority="Medium",
                    project_category=None, description=None, tags=None,
                    start_date=None, due_date=None, completion_date=None,
-                   github_repository=None, technologies=None):
+                   github_repository=None, technologies=None,
+                   readme_content=None, readme_file=None):
     """Create a new project from the website."""
     roles, is_admin, is_team_member, is_viewer = _get_user_role_info()
     
@@ -1301,6 +1302,21 @@ def create_project(project_title, team, status=None, priority="Medium",
                             tech_doc.db_insert()
                         except Exception as e:
                             frappe.log_error(f"Error creating technology {tech}: {str(e)}", "Technology Creation Error")
+
+    # Save README / Referral Document
+    if readme_content or readme_file:
+        try:
+            readme_doc = frappe.get_doc({
+                "doctype": "Project Readme",
+                "project": project_name,
+                "readme_content": readme_content or "",
+                "readme_file": readme_file or ""
+            })
+            readme_doc.flags.ignore_validate = True
+            readme_doc.flags.ignore_mandatory = True
+            readme_doc.db_insert()
+        except Exception as e:
+            frappe.log_error(f"Error saving README: {str(e)}", "README Save Error")
 
     # Reload the project document from database to ensure proper child table loading
     project_doc = frappe.get_doc("Project", project_name)
