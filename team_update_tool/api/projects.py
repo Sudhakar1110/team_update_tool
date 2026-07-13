@@ -1151,16 +1151,21 @@ def create_project(project_title, team, status=None, priority="Medium",
             if existing_repo:
                 github_repo_name = existing_repo
             else:
-                # Create new GitHub Repository document
+                # Create new GitHub Repository document using direct SQL to avoid autoname issues
                 try:
-                    github_repo = frappe.get_doc({
-                        "doctype": "GitHub Repository",
-                        "repository_name": repo_full_name,
-                        "repository_url": github_repository,
-                    })
-                    github_repo.flags.ignore_permissions = True
-                    github_repo.insert(ignore_permissions=True)
-                    github_repo_name = github_repo.name
+                    # Generate unique name
+                    from frappe.utils import now_datetime
+                    import hashlib
+                    unique_id = hashlib.md5((github_repository + str(now_datetime())).encode()).hexdigest()[:8].upper()
+                    gr_name = f"GR-{unique_id}"
+                    
+                    # Insert using direct SQL
+                    frappe.db.sql("""
+                        INSERT INTO `tabGitHub Repository` (name, repository_name, repository_url, creation, modified, owner)
+                        VALUES (%s, %s, %s, NOW(), NOW(), %s)
+                    """, (gr_name, repo_full_name, github_repository, frappe.session.user))
+                    frappe.db.commit()
+                    github_repo_name = gr_name
                 except Exception as e:
                     frappe.log_error(f"Error creating GitHub Repository: {str(e)}", "GitHub Repo Creation Error")
                     github_repo_name = None
