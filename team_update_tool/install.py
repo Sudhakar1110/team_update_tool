@@ -256,8 +256,8 @@ def create_notifications():
 			"channel": "Email",
 			"subject": "New Project Uploaded: {{ doc.project_title }}",
 			"message": "<p>A new project has been uploaded:</p><p><b>{{ doc.project_title }}</b><br>Team: {{ doc.team }}<br>Status: {{ doc.status }}</p>",
-			"recipients": [{"receiver_by_role": "Admin"}],
 			"send_system_notification": 1,
+			"recipients": [{"receiver_by_role": "Admin"}],
 		},
 		{
 			"name": "Project Approved",
@@ -270,11 +270,11 @@ def create_notifications():
 			"message": "<p>Project has been approved:</p><p><b>{{ doc.project_title }}</b><br>Team: {{ doc.team }}<br>Approved by: {{ doc.approved_by }}</p>",
 			"value_changed": "status",
 			"condition": "frappe.db.get_value('Project Status', doc.status, 'status_name') == 'Approved'",
+			"send_system_notification": 1,
 			"recipients": [
 				{"receiver_by_role": "Admin"},
 				{"receiver_by_role": "View-Only User"},
 			],
-			"send_system_notification": 1,
 		},
 		{
 			"name": "Project Status Updated",
@@ -286,32 +286,43 @@ def create_notifications():
 			"subject": "Project Status Updated: {{ doc.project_title }}",
 			"message": "<p>Project status has been updated:</p><p><b>{{ doc.project_title }}</b><br>New Status: {{ doc.status }}<br>Team: {{ doc.team }}</p>",
 			"value_changed": "status",
-			"recipients": [{"receiver_by_role": "Admin"}],
 			"send_system_notification": 1,
+			"recipients": [{"receiver_by_role": "Admin"}],
 		},
 	]
 	
 	for notif in notifications:
-		if not frappe.db.exists("Notification", notif["name"]):
-			# Extract recipients before creating doc
-			recipients = notif.pop("recipients", [])
-			
-			doc = frappe.get_doc(notif)
-			doc.insert(ignore_permissions=True)
-			
-			# Add recipients
-			for recipient in recipients:
-				doc.append("recipients", recipient)
-			doc.save(ignore_permissions=True)
-			
-			frappe.db.commit()
-			frappe.log_error(f"Created notification: {notif['name']}", "Notification Setup")
-		else:
-			# Update existing notification
-			doc = frappe.get_doc("Notification", notif["name"])
-			doc.enabled = 1
-			doc.channel = "Email"
-			doc.event = notif.get("event", "New")
-			doc.send_system_notification = 1
-			doc.save(ignore_permissions=True)
-			frappe.db.commit()
+		try:
+			if not frappe.db.exists("Notification", notif["name"]):
+				# Extract recipients before creating doc
+				recipients = notif.pop("recipients", [])
+				
+				# Create doc with all fields including module
+				notif["module"] = "Team Update Tool"
+				
+				doc = frappe.get_doc(notif)
+				doc.insert(ignore_permissions=True)
+				
+				# Add recipients one by one with proper fields
+				for recipient in recipients:
+					doc.append("recipients", {
+						"receiver_by_role": recipient.get("receiver_by_role"),
+						"condition": recipient.get("condition", ""),
+						"receiver_by_document_field": recipient.get("receiver_by_document_field", ""),
+					})
+				
+				doc.save(ignore_permissions=True)
+				frappe.db.commit()
+				frappe.log_error(f"Created notification: {notif['name']}", "Notification Setup")
+			else:
+				# Update existing notification
+				doc = frappe.get_doc("Notification", notif["name"])
+				doc.enabled = 1
+				doc.channel = "Email"
+				doc.event = notif.get("event", "New")
+				doc.send_system_notification = 1
+				doc.save(ignore_permissions=True)
+				frappe.db.commit()
+		except Exception as e:
+			frappe.log_error(f"Error creating notification {notif.get('name')}: {str(e)}", "Notification Setup Error")
+			frappe.db.rollback()
