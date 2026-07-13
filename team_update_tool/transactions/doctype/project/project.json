@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 0,
- "autoname": "PRJ-.#####",
+ "autoname": "field:project_title",
  "creation": "2026-07-08 10:00:00",
  "doctype": "DocType",
  "module": "Transactions",
