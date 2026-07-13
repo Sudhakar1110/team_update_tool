@@ -107,15 +107,8 @@ def get_project_detail(name):
         frappe.throw(_("Project name is required."))
 
     try:
-        # Use direct SQL query to get project data to avoid caching issues
-        project_data = frappe.db.sql("""
-            SELECT * FROM `tabProject` WHERE name = %s
-        """, (name,), as_dict=1)
-        
-        if not project_data:
-            frappe.throw(_("Project not found."))
-        
-        project = project_data[0]
+        # Use frappe.get_doc to get project data
+        project = frappe.get_doc("Project", name)
     except frappe.DoesNotExistError:
         frappe.throw(_("Project not found."))
     except Exception as e:
@@ -126,75 +119,44 @@ def get_project_detail(name):
     __roles, is_admin, __is_team_member, is_viewer = _get_user_role_info()
     if is_viewer:
         approved = frappe.db.get_value("Project Status", {"status_name": "Approved"}, "name")
-        can_view = (approved and project.get("status") == approved) or is_admin
+        can_view = (approved and project.status == approved) or is_admin
         if not can_view:
             frappe.throw(_("You do not have permission to view this project."), frappe.PermissionError)
 
 
-    # Files/Documents - Get from Project Files doctype using direct SQL
+    # Files/Documents - Get from Project Files child table
     files = []
-    try:
-        file_records = frappe.db.sql("""
-            SELECT file, file_name, file_type, file_description 
-            FROM `tabProject Files` 
-            WHERE project = %s
-        """, (name,), as_dict=1)
+    for f in project.project_files or []:
+        file_url = f.file or ""
+        if file_url and not file_url.startswith('http://') and not file_url.startswith('https://'):
+            file_url = frappe.request.host_url.rstrip('/') + '/' + file_url.lstrip('/') if hasattr(frappe, 'request') and frappe.request else file_url
         
-        for f in file_records:
-            file_url = f.get("file") or ""
-            if file_url and not file_url.startswith('http://') and not file_url.startswith('https://'):
-                file_url = frappe.request.host_url.rstrip('/') + '/' + file_url.lstrip('/') if hasattr(frappe, 'request') and frappe.request else file_url
-            
-            files.append({
-                "file": file_url,
-                "file_name": f.get("file_name"),
-                "file_type": f.get("file_type"),
-                "description": f.get("file_description"),
-            })
-    except Exception as e:
-        frappe.log_error(f"Error fetching files: {str(e)}", "get_project_detail Error")
+        files.append({
+            "file": file_url,
+            "file_name": f.file_name,
+            "file_type": f.file_type,
+            "description": f.file_description,
+        })
 
-    # Updates - Get from Project Update doctype using direct SQL
+    # Updates
     updates = []
-    try:
-        update_records = frappe.db.sql("""
-            SELECT name, update_title, update_description, update_date, updated_by 
-            FROM `tabProject Update` 
-            WHERE project = %s
-            ORDER BY update_date DESC
-        """, (name,), as_dict=1)
-        
-        for u in update_records:
-            updates.append({
-                "name": u.get("name"),
-                "update_title": u.get("update_title"),
-                "update_description": u.get("update_description"),
-                "update_date": str(u.get("update_date")) if u.get("update_date") else "",
-                "updated_by": u.get("updated_by"),
-            })
-    except Exception as e:
-        frappe.log_error(f"Error fetching updates: {str(e)}", "get_project_detail Error")
+    for u in project.project_updates or []:
+        updates.append({
+            "name": u.name,
+            "update_title": u.update_title,
+            "update_description": u.update_description,
+            "update_date": str(u.update_date) if u.update_date else "",
+            "updated_by": u.updated_by,
+        })
 
-    # Technologies - Get from Project Technology doctype using direct SQL
-    technologies = []
-    try:
-        tech_records = frappe.db.sql("""
-            SELECT technology 
-            FROM `tabProject Technology` 
-            WHERE project = %s
-        """, (name,), as_dict=1)
-        
-        for t in tech_records:
-            if t.get("technology"):
-                technologies.append(t.get("technology"))
-    except Exception as e:
-        frappe.log_error(f"Error fetching technologies: {str(e)}", "get_project_detail Error")
+    # Technologies
+    technologies = [t.technology for t in project.technologies or []]
 
     # Status info
     status_info = {}
-    if project.get("status"):
+    if project.status:
         try:
-            status_doc = frappe.get_cached_doc("Project Status", project.get("status"))
+            status_doc = frappe.get_cached_doc("Project Status", project.status)
             status_info = {
                 "name": status_doc.name,
                 "status_name": status_doc.status_name,
@@ -205,7 +167,7 @@ def get_project_detail(name):
 
     # GitHub repo info
     github_info = None
-    github_repo_value = project.get("github_repository") or ""
+    github_repo_value = project.github_repository or ""
     
     if github_repo_value:
         import re
@@ -264,9 +226,9 @@ def get_project_detail(name):
                     "languages": "",
                 }
     # Team name
-    team_name = project.get("team")
+    team_name = project.team
     try:
-        team_doc = frappe.get_cached_doc("Team", project.get("team"))
+        team_doc = frappe.get_cached_doc("Team", project.team)
         team_name = team_doc.team_name
     except Exception:
         pass
@@ -291,31 +253,31 @@ def get_project_detail(name):
         frappe.log_error(f"Error getting README: {str(e)}", "get_project_detail README Error")
 
     return {
-        "name": project.get("name"),
-        "project_title": project.get("project_title"),
+        "name": project.name,
+        "project_title": project.project_title,
         "status": status_info,
-        "team": project.get("team"),
+        "team": project.team,
         "team_name": team_name,
-        "priority": project.get("priority"),
-        "project_category": project.get("project_category"),
-        "description": project.get("description"),
-        "tags": project.get("tags"),
-        "github_repository": project.get("github_repository"),
+        "priority": project.priority,
+        "project_category": project.project_category,
+        "description": project.description,
+        "tags": project.tags,
+        "github_repository": project.github_repository,
         "github_info": github_info,
-        "start_date": str(project.get("start_date")) if project.get("start_date") else "",
-        "due_date": str(project.get("due_date")) if project.get("due_date") else "",
-        "completion_date": str(project.get("completion_date")) if project.get("completion_date") else "",
-        "approved_by": project.get("approved_by") or "",
-        "approval_date": str(project.get("approval_date")) if project.get("approval_date") else "",
-        "review_remarks": project.get("review_remarks") or "",
-        "creation": str(project.get("creation")),
-        "modified": str(project.get("modified")),
-        "owner": project.get("owner"),
+        "start_date": str(project.start_date) if project.start_date else "",
+        "due_date": str(project.due_date) if project.due_date else "",
+        "completion_date": str(project.completion_date) if project.completion_date else "",
+        "approved_by": project.approved_by or "",
+        "approval_date": str(project.approval_date) if project.approval_date else "",
+        "review_remarks": project.review_remarks or "",
+        "creation": str(project.creation),
+        "modified": str(project.modified),
+        "owner": project.owner,
         "files": files,
         "updates": updates,
         "technologies": technologies,
         "readme": readme,
-        "is_owner": project.get("owner") == frappe.session.user,
+        "is_owner": project.owner == frappe.session.user,
     }
 
 
