@@ -771,26 +771,22 @@ def create_project_readme(project_name, readme_file=None, readme_content=None):
 
         # Check if Project Readme already exists for this project
         existing = frappe.db.get_value("Project Readme", {"project": project_name}, "name")
+        
         if existing:
-            # Update existing
-            readme = frappe.get_doc("Project Readme", existing)
+            # Update existing using direct SQL
+            frappe.db.sql("""
+                UPDATE `tabProject Readme` 
+                SET readme_file = %s, readme_content = %s, modified = NOW()
+                WHERE name = %s
+            """, (readme_file or "", readme_content or "", existing))
         else:
-            # Create new using get_doc with project field (autoname: field:project)
-            readme = frappe.get_doc({
-                "doctype": "Project Readme",
-                "project": project_name,
-            })
-
-        if readme_file:
-            readme.readme_file = readme_file
-        if readme_content:
-            readme.readme_content = readme_content
-
-        readme.flags.ignore_permissions = True
-        readme.flags.ignore_validate = True
-        readme.flags.ignore_mandatory = True
-        readme.flags.ignore_links = True
-        readme.save(ignore_permissions=True)
+            # Create new using direct SQL (autoname: field:project means name = project value)
+            frappe.db.sql("""
+                INSERT INTO `tabProject Readme` (name, project, readme_file, readme_content, creation, modified, owner)
+                VALUES (%s, %s, %s, %s, NOW(), NOW(), %s)
+            """, (project_name, project_name, readme_file or "", readme_content or "", frappe.session.user))
+        
+        frappe.db.commit()
 
         return {"message": "Project Readme created.", "success": True}
     except Exception as e:
