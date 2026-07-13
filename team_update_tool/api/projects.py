@@ -236,6 +236,9 @@ def get_project_detail(name):
     # README content - Fetch for all users (admin and view-only)
     readme = {"readme_content": "", "readme_file": ""}
     try:
+        # Log for debugging
+        frappe.log_error(f"Looking for README with project: {name}", "README Fetch Debug")
+        
         # Try direct SQL query to bypass any permission issues
         readme_doc = frappe.db.sql("""
             SELECT readme_content, readme_file 
@@ -244,11 +247,14 @@ def get_project_detail(name):
             LIMIT 1
         """, (name,), as_dict=1)
         
+        frappe.log_error(f"Found {len(readme_doc) if readme_doc else 0} README records", "README Fetch Debug")
+        
         if readme_doc and len(readme_doc) > 0:
             readme = {
                 "readme_content": readme_doc[0].get("readme_content") or "",
                 "readme_file": readme_doc[0].get("readme_file") or "",
             }
+            frappe.log_error(f"README file: {readme['readme_file']}", "README Fetch Debug")
     except Exception as e:
         frappe.log_error(f"Error getting README: {str(e)}", "get_project_detail README Error")
 
@@ -769,6 +775,9 @@ def create_project_readme(project_name, readme_file=None, readme_content=None):
         if not frappe.db.exists("Project", project_name):
             return {"error": "Project not found"}
 
+        # Log for debugging
+        frappe.log_error(f"Creating README for project: {project_name}, file: {readme_file}", "README Debug")
+
         # Check if Project Readme already exists for this project
         existing = frappe.db.get_value("Project Readme", {"project": project_name}, "name")
         
@@ -779,12 +788,14 @@ def create_project_readme(project_name, readme_file=None, readme_content=None):
                 SET readme_file = %s, readme_content = %s, modified = NOW()
                 WHERE name = %s
             """, (readme_file or "", readme_content or "", existing))
+            frappe.log_error(f"Updated existing README: {existing}", "README Debug")
         else:
             # Create new using direct SQL (autoname: field:project means name = project value)
             frappe.db.sql("""
                 INSERT INTO `tabProject Readme` (name, project, readme_file, readme_content, creation, modified, owner)
                 VALUES (%s, %s, %s, %s, NOW(), NOW(), %s)
             """, (project_name, project_name, readme_file or "", readme_content or "", frappe.session.user))
+            frappe.log_error(f"Created new README for project: {project_name}", "README Debug")
         
         frappe.db.commit()
 
