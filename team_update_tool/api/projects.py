@@ -912,60 +912,40 @@ def get_gallery(limit=30, offset=0):
 
 
 @frappe.whitelist()
+@frappe.whitelist()
 def add_project_screenshot(project_name, file_url, caption=None):
-	"""Attach a screenshot to a project's child table after file upload."""
-	__roles, is_admin, is_team_member, is_viewer = _get_user_role_info()
-	if is_viewer and not is_admin and not is_team_member:
-		frappe.throw(_("Permission denied."), frappe.PermissionError)
+    """Attach a screenshot to a project's child table after file upload."""
+    __roles, is_admin, is_team_member, is_viewer = _get_user_role_info()
+    if is_viewer and not is_admin and not is_team_member:
+        frappe.throw(_("Permission denied."), frappe.PermissionError)
 
-	if not project_name or not file_url:
-		frappe.throw(_("Project name and file URL are required."))
+    if not project_name or not file_url:
+        frappe.throw(_("Project name and file URL are required."))
 
-	project = frappe.get_doc("Project", project_name)
-	if not is_admin and project.owner != frappe.session.user:
-		frappe.throw(_("You can only modify your own projects."), frappe.PermissionError)
+    if not frappe.db.exists("Project", project_name):
+        frappe.throw(_("Project not found."))
 
-	# Check if screenshot already exists
-	existing_screenshots = [s.screenshot for s in project.get("screenshots", [])]
-	if file_url not in existing_screenshots:
-		project.append("screenshots", {
-			"screenshot": file_url,
-			"caption": caption or "",
-			"screenshot_type": "UI Screen",
-		})
-		project.save(ignore_permissions=is_admin)
+    project = frappe.get_doc("Project", project_name)
+    if not is_admin and project.owner != frappe.session.user and not is_team_member:
+        frappe.throw(_("You can only modify your own projects."), frappe.PermissionError)
 
-	return {"message": _("Screenshot added."), "success": True}
-
-
-@frappe.whitelist()
-def add_project_file(project_name, file_url, file_name=None, file_type=None):
-	"""Attach a file to a project's child table after upload."""
-	__roles, is_admin, is_team_member, is_viewer = _get_user_role_info()
-	if is_viewer and not is_admin and not is_team_member:
-		frappe.throw(_("Permission denied."), frappe.PermissionError)
-
-	if not project_name or not file_url:
-		frappe.throw(_("Project name and file URL are required."))
-
-	project = frappe.get_doc("Project", project_name)
-	if not is_admin and project.owner != frappe.session.user:
-		frappe.throw(_("You can only modify your own projects."), frappe.PermissionError)
-
-	# Check if file already exists in project_files
-	existing_files = [f.file for f in project.get("project_files", [])]
-	if file_url not in existing_files:
-		project.append("project_files", {
-			"file": file_url,
-			"file_name": file_name or file_url.split("/")[-1],
-			"file_type": file_type or "Other",
-		})
-		project.save(ignore_permissions=is_admin)
-
-	return {"message": _("File added."), "success": True}
+    # Direct insert to child table
+    import uuid
+    screenshot_id = str(uuid.uuid4())
+    
+    frappe.db.sql("""
+        INSERT INTO `tabProject Screenshot` 
+        (name, parent, parentfield, parenttype, screenshot, caption, screenshot_type, idx, modified, creation)
+        VALUES (%s, %s, 'screenshots', 'Project', %s, %s, 'UI Screen', 
+                (SELECT COALESCE(MAX(idx), 0) + 1 FROM `tabProject Screenshot` WHERE parent = %s),
+                NOW(), NOW())
+    """, (screenshot_id, project_name, file_url, caption or "", project_name))
+    
+    frappe.db.commit()
+    
+    return {"message": _("Screenshot added."), "success": True}
 
 
-@frappe.whitelist()
 def create_project_readme(project_name, readme_file=None, readme_content=None):
 	"""Create or update Project Readme for a project."""
 	__roles, is_admin, is_team_member, is_viewer = _get_user_role_info()
@@ -1433,3 +1413,182 @@ def create_project(project_title, team, status=None, priority="Medium",
 		"name": project_name,
 		"success": True
 	}
+
+
+@frappe.whitelist(allow_guest=True)
+def add_project_screenshot(project_name, screenshot, caption=None, screenshot_type=None):
+    """Add a screenshot to an existing project."""
+    try:
+        if not project_name:
+            return {"error": "Project name is required"}
+        
+        if not frappe.db.exists("Project", project_name):
+            return {"error": "Project not found"}
+        
+        # Check permission
+        project = frappe.get_doc("Project", project_name)
+        __roles, is_admin, is_team_member, is_viewer = _get_user_role_info()
+        
+        if not is_admin and project.owner != frappe.session.user and not is_team_member:
+            return {"error": "Permission denied"}
+        
+        # Add screenshot
+        screenshot_doc = frappe.get_doc({
+            "doctype": "Project Screenshot",
+            "parent": project_name,
+            "parentfield": "screenshots",
+            "parenttype": "Project",
+            "screenshot": screenshot,
+            "caption": caption or "",
+            "screenshot_type": screenshot_type or ""
+        })
+        screenshot_doc.insert(ignore_permissions=True)
+        
+        return {"message": "Screenshot added successfully", "success": True}
+    
+    except Exception as e:
+        frappe.log_error(f"Error adding screenshot: {str(e)}", "add_project_screenshot Error")
+        return {"error": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def add_project_file(project_name, file_url, file_name=None, file_type=None, file_description=None):
+    """Add a file/document to an existing project."""
+    try:
+        if not project_name:
+            return {"error": "Project name is required"}
+        
+        if not frappe.db.exists("Project", project_name):
+            return {"error": "Project not found"}
+        
+        # Check permission
+        project = frappe.get_doc("Project", project_name)
+        __roles, is_admin, is_team_member, is_viewer = _get_user_role_info()
+        
+        if not is_admin and project.owner != frappe.session.user and not is_team_member:
+            return {"error": "Permission denied"}
+        
+        # Add file
+        file_doc = frappe.get_doc({
+            "doctype": "Project File",
+            "parent": project_name,
+            "parentfield": "project_files",
+            "parenttype": "Project",
+            "file": file_url,
+            "file_name": file_name or "Document",
+            "file_type": file_type or "",
+            "file_description": file_description or ""
+        })
+        file_doc.insert(ignore_permissions=True)
+        
+        return {"message": "File added successfully", "success": True}
+    
+    except Exception as e:
+        frappe.log_error(f"Error adding file: {str(e)}", "add_project_file Error")
+        return {"error": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def get_project_gallery_data(project_name):
+    """Get gallery data for a specific project."""
+    try:
+        if not project_name:
+            return {"error": "Project name is required"}
+        
+        project = frappe.get_doc("Project", project_name)
+        
+        # Screenshots
+        screenshots = []
+        for s in project.screenshots or []:
+            full_url = s.screenshot
+            if full_url and not full_url.startswith('http'):
+                full_url = frappe.request.host_url.rstrip('/') + '/' + full_url.lstrip('/')
+            
+            screenshots.append({
+                "name": s.name,
+                "screenshot": full_url,
+                "caption": s.caption or "",
+                "screenshot_type": s.screenshot_type or ""
+            })
+        
+        # Files
+        files = []
+        for f in project.project_files or []:
+            full_url = f.file
+            if full_url and not full_url.startswith('http'):
+                full_url = frappe.request.host_url.rstrip('/') + '/' + full_url.lstrip('/')
+            
+            files.append({
+                "name": f.name,
+                "file": full_url,
+                "file_name": f.file_name or "Document",
+                "file_type": f.file_type or "",
+                "description": f.file_description or ""
+            })
+        
+        # GitHub info
+        github_info = None
+        if project.github_repository:
+            try:
+                repo = frappe.get_cached_doc("GitHub Repository", project.github_repository)
+                github_info = {
+                    "name": repo.name,
+                    "repository_url": repo.repository_url,
+                    "repository_name": repo.repository_name,
+                    "commit_hash": repo.commit_hash,
+                    "default_branch": repo.default_branch,
+                    "languages": repo.languages,
+                }
+            except:
+                github_info = {
+                    "name": project.github_repository,
+                    "repository_url": "",
+                }
+        
+        return {
+            "screenshots": screenshots,
+            "files": files,
+            "github_info": github_info,
+            "github_repository": project.github_repository
+        }
+    
+    except Exception as e:
+        frappe.log_error(f"Error getting gallery data: {str(e)}", "get_project_gallery_data Error")
+        return {"error": str(e)}
+
+@frappe.whitelist()
+def add_project_file(project_name, file_url, file_name=None, file_type=None):
+    """Attach a file to a project's child table after upload."""
+    __roles, is_admin, is_team_member, is_viewer = _get_user_role_info()
+    if is_viewer and not is_admin and not is_team_member:
+        frappe.throw(_("Permission denied."), frappe.PermissionError)
+
+    if not project_name or not file_url:
+        frappe.throw(_("Project name and file URL are required."))
+
+    if not frappe.db.exists("Project", project_name):
+        frappe.throw(_("Project not found."))
+
+    project = frappe.get_doc("Project", project_name)
+    if not is_admin and project.owner != frappe.session.user and not is_team_member:
+        frappe.throw(_("You can only modify your own projects."), frappe.PermissionError)
+
+    # Direct insert to child table
+    import uuid
+    file_id = str(uuid.uuid4())
+    fname = file_name or file_url.split("/")[-1] if file_url else "Document"
+    ftype = file_type or "Other"
+    
+    frappe.db.sql("""
+        INSERT INTO `tabProject File` 
+        (name, parent, parentfield, parenttype, file, file_name, file_type, idx, modified, creation)
+        VALUES (%s, %s, 'project_files', 'Project', %s, %s, %s,
+                (SELECT COALESCE(MAX(idx), 0) + 1 FROM `tabProject File` WHERE parent = %s),
+                NOW(), NOW())
+    """, (file_id, project_name, file_url, fname, ftype, project_name))
+    
+    frappe.db.commit()
+    
+    return {"message": _("File added."), "success": True}
+
+
