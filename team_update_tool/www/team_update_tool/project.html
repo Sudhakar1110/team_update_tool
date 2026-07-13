@@ -951,12 +951,10 @@ frappe.ready(function() {
 });
 
 function loadProject(name) {
-    fetch('/api/method/team_update_tool.api.projects.get_project_detail?name=' + encodeURIComponent(name), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': getCsrfToken() }
-    })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
+    frappe.call({
+        method: 'team_update_tool.api.projects.get_project_detail',
+        args: { name: name },
+        callback: function(data) {
             if (data.message) {
                 renderProject(data.message);
             } else if (data.exc) {
@@ -975,12 +973,13 @@ function loadProject(name) {
                 document.getElementById('projectError').style.display = 'flex';
                 document.getElementById('errorMsg').textContent = 'Project not found.';
             }
-        })
-        .catch(function(err) {
+        },
+        error: function(err) {
             document.getElementById('projectLoading').style.display = 'none';
             document.getElementById('projectError').style.display = 'flex';
-            document.getElementById('errorMsg').textContent = 'Network error: ' + err.message;
-        });
+            document.getElementById('errorMsg').textContent = 'Network error.';
+        }
+    });
 }
 
 function renderProject(p) {
