@@ -250,9 +250,16 @@ def get_project_detail(name):
         frappe.log_error(f"Found {len(readme_doc) if readme_doc else 0} README records", "README Fetch Debug")
         
         if readme_doc and len(readme_doc) > 0:
+            readme_file = readme_doc[0].get("readme_file") or ""
+            # Construct full URL for the readme file (same as project files)
+            if readme_file and not readme_file.startswith('http://') and not readme_file.startswith('https://'):
+                try:
+                    readme_file = (frappe.request.host_url.rstrip('/') + '/' + readme_file.lstrip('/'))
+                except:
+                    pass
             readme = {
                 "readme_content": readme_doc[0].get("readme_content") or "",
-                "readme_file": readme_doc[0].get("readme_file") or "",
+                "readme_file": readme_file,
             }
             frappe.log_error(f"README file: {readme['readme_file']}", "README Fetch Debug")
     except Exception as e:
@@ -667,8 +674,16 @@ def get_documents(limit=20, offset=0):
                     readme_desc = rm.readme_content[:200] + "..." if len(rm.readme_content) > 200 else rm.readme_content
                 readme_name = rm.readme_file.split("/")[-1] if rm.readme_file else "README - " + project_title
                 
+                # Construct full URL for the readme file
+                readme_file_url = rm.readme_file or ""
+                if readme_file_url and not readme_file_url.startswith('http://') and not readme_file_url.startswith('https://'):
+                    try:
+                        readme_file_url = (frappe.request.host_url.rstrip('/') + '/' + readme_file_url.lstrip('/'))
+                    except:
+                        pass
+                
                 all_files.append({
-                    "file": rm.readme_file or "",
+                    "file": readme_file_url,
                     "file_name": readme_name,
                     "file_type": "md",
                     "description": readme_desc,
@@ -731,8 +746,17 @@ def get_documents(limit=20, offset=0):
                         if rm.readme_content:
                             readme_desc = rm.readme_content[:200] + "..." if len(rm.readme_content) > 200 else rm.readme_content
                         readme_name = rm.readme_file.split("/")[-1] if rm.readme_file else "README - " + project_title
+                        
+                        # Construct full URL for the readme file
+                        readme_file_url = rm.readme_file or ""
+                        if readme_file_url and not readme_file_url.startswith('http://') and not readme_file_url.startswith('https://'):
+                            try:
+                                readme_file_url = (frappe.request.host_url.rstrip('/') + '/' + readme_file_url.lstrip('/'))
+                            except:
+                                pass
+                        
                         all_files.append({
-                            "file": rm.readme_file or "",
+                            "file": readme_file_url,
                             "file_name": readme_name,
                             "file_type": "md",
                             "description": readme_desc,

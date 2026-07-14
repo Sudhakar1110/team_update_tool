@@ -1085,8 +1085,11 @@ function renderProject(p) {
     
     if (hasReadmeFile) {
         var readmeFileUrl = p.readme.readme_file || '';
+        // Only construct URL if it's a relative path (not starting with http:// or https://)
         if (readmeFileUrl && !readmeFileUrl.startsWith('http://') && !readmeFileUrl.startsWith('https://')) {
-            readmeFileUrl = window.location.origin + (readmeFileUrl.startsWith('/') ? '' : '/') + readmeFileUrl;
+            // Use the site's base URL to construct the full path
+            var baseUrl = window.location.origin;
+            readmeFileUrl = baseUrl + (readmeFileUrl.startsWith('/') ? '' : '/') + readmeFileUrl;
         }
         var readmeFileName = readmeFileUrl.split('/').pop() || 'Reference Document';
         
